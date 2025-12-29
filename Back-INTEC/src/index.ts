@@ -63,6 +63,11 @@ app.use('/api', terminationRouter);
 app.use(express.static(path.join(__dirname, '../public')));
 app.get('/seed', async (req, res) => {
   try {
+    if (!database.isInitialized) {
+      await database.initialize();
+      console.log("Database initialized for seeding");
+    }
+
     const roleRepo = database.getRepository(RoleEntity);
     const userRepo = database.getRepository(UserEntity);
 
