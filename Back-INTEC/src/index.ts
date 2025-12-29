@@ -23,6 +23,10 @@ import jobDescriptionRouter from './core/infrastructure/rest/routes/job-descript
 import uploadRouter from './core/infrastructure/rest/routes/upload.route';
 import terminationRouter from './core/infrastructure/rest/routes/terminations.route';
 
+import { RoleEntity } from './core/infrastructure/entity/roles.entity';
+import { UserEntity } from './core/infrastructure/entity/users.entity';
+import bcrypt from 'bcrypt';
+
 dotenv.config();
 const app = express();
 
@@ -57,6 +61,42 @@ app.use('/api', terminationRouter);
 
 // Serve Frontend Static Files
 app.use(express.static(path.join(__dirname, '../public')));
+app.get('/seed', async (req, res) => {
+  try {
+    const roleRepo = database.getRepository(RoleEntity);
+    const userRepo = database.getRepository(UserEntity);
+
+    // 1. Create Admin Role if not exists
+    let adminRole = await roleRepo.findOne({ where: { name_role: 'Admin' } });
+    if (!adminRole) {
+      adminRole = roleRepo.create({ name_role: 'Admin', status: true });
+      await roleRepo.save(adminRole);
+      console.log('Role Admin created');
+    }
+
+    // 2. Create Admin User if not exists
+    let adminUser = await userRepo.findOne({ where: { email: 'admin@intec.com' } });
+    if (!adminUser) {
+      const hashedPassword = await bcrypt.hash('123456', 10);
+      adminUser = userRepo.create({
+        name_user: 'Admin',
+        email: 'admin@intec.com',
+        password: hashedPassword,
+        phone: '0000000000',
+        status: true,
+        role_id: adminRole
+      });
+      await userRepo.save(adminUser);
+      console.log('User Admin created');
+    }
+
+    res.send('Seeding completed! User: admin@intec.com / Pass: 123456');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error seeding database: ' + error);
+  }
+});
+
 app.get(/(.*)/, (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
