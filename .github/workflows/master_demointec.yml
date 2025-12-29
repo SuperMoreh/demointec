@@ -35,19 +35,26 @@ jobs:
           npm install
           npm run build
 
-      # 3. Prepare Artifact
-      # Create 'public' folder in Back-INTEC and copy frontend build there
-      - name: Copy Frontend to Backend Public
+      # 3. Create Release Package (Flatten structure)
+      - name: Prepare Release
         run: |
-          mkdir -p Back-INTEC/public
-          cp -r Frontend-INTEC/dist/frontend-app/browser/* Back-INTEC/public/
+          mkdir release
+          # Copy Backend compiled code and config
+          cp Back-INTEC/package.json release/
+          cp -r Back-INTEC/dist release/dist
+          # Copy Frontend static files to public folder expected by backend
+          mkdir -p release/public
+          cp -r Frontend-INTEC/dist/frontend-app/browser/* release/public/
+          # Install ONLY production dependencies in release
+          cd release
+          npm install --omit=dev
 
-      # 4. Upload Backend (with included frontend in public) as artifact
+      # 4. Upload Release Artifact
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: ./Back-INTEC
+          path: ./release
 
   deploy:
     runs-on: ubuntu-latest
