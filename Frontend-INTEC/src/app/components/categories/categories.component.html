@@ -1,0 +1,188 @@
+<div class="content-container">
+  <!-- Header de la página -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Catálogo de Partidas</h1>
+    </div>
+    <a (click)="setCreateMode()" class="btn-primary" data-bs-toggle="modal" data-bs-target="#agregarPartidaModal">
+      <i class="bi bi-plus-circle"></i>
+      Agregar Partida
+    </a>
+  </div>
+
+  <!-- Filtros y búsqueda -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <div class="filter-group">
+        <label for="search">Buscar</label>
+        <input type="text" id="search" class="filter-input" placeholder="Nombre..." [(ngModel)]="searchTerm" (input)="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <select id="status" class="filter-input" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+          <option value="">Todos los estados</option>
+          <option value="true">Activo</option>
+          <option value="false">Inactivo</option>
+        </select>
+      </div>
+      <button class="btn-consult" (click)="consultCategories()" [disabled]="isLoading">
+        <i class="bi bi-search"></i>
+        Consultar
+      </button>
+      <button class="btn-filter" (click)="clearFilters()">
+        <i class="bi bi-list-ul"></i>
+      </button>
+      <button class="btn-sync" (click)="syncCategories()" title="Sincronizar partidas" [disabled]="isLoading">
+        <i class="bi bi-arrow-repeat"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabla de partidas -->
+  <div class="table-container" *ngIf="hasConsulted && !isLoading && filteredCategories.length > 0">
+    <div class="table-header">
+      <div class="table-info">
+        Mostrando {{ categories.length }} de {{ allCategories.length }} partidas
+        <span *ngIf="hasActiveFilters()" class="text-muted">(filtradas)</span>
+      </div>
+      <div class="table-actions">
+        <button class="btn-filter1" (click)="exportCategories()">
+          <i class="bi bi-download"></i>
+          Exportar
+        </button>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let category of categories">
+            <td>{{ category.name_category }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="category.status ? 'status-active' : 'status-inactive'">
+                {{ category.status ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn-action btn-edit" (click)="handleEditClick(category)" title="Editar">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn-action btn-delete" (click)="deleteCategory(category)" title="Eliminar">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Paginación -->
+    <div class="pagination-container" *ngIf="totalPages > 1">
+      <div class="pagination">
+        <button [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button *ngFor="let page of pages" [class.active]="page === currentPage" (click)="setPage(page)">
+          {{ page }}
+        </button>
+        <button [disabled]="currentPage === totalPages" (click)="setPage(currentPage + 1)">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="table-container placeholder-container" *ngIf="hasConsulted && !isLoading && filteredCategories.length === 0">
+    <div class="table-placeholder">
+      <i class="bi bi-inbox"></i>
+      No se encontraron partidas con los filtros aplicados.
+    </div>
+  </div>
+  <div class="table-container placeholder-container" *ngIf="hasConsulted && isLoading">
+    <div class="table-placeholder">
+      <i class="bi bi-arrow-repeat loading-icon"></i>
+      Cargando partidas...
+    </div>
+  </div>
+  <div class="consult-placeholder" *ngIf="!hasConsulted">
+    <i class="bi bi-info-circle"></i>
+    Consulte para ver la información de partidas.
+  </div>
+</div>
+
+<!-- Modal para Agregar Partida -->
+<div class="modal fade" id="agregarPartidaModal" tabindex="-1" aria-labelledby="agregarPartidaModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="agregarPartidaModalLabel">Agregar Partida</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="categoriesForm" (ngSubmit)="createCategory()">
+          <!-- Nombre -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-tags"></i></span>
+              <input formControlName="name_category" type="text" class="form-control" placeholder="Ingresa nombre de la partida">
+            </div>
+            <div *ngIf="categoriesForm.get('name_category')?.invalid && categoriesForm.get('name_category')?.touched" class="text-danger mt-1">
+              <small>El nombre es requerido</small>
+            </div>
+          </div>
+          <!-- Botón guardar -->
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-success px-4" [disabled]="categoriesForm.invalid">
+              <i class="bi bi-check-circle-fill"></i> Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Editar partida -->
+<div class="modal fade" id="editarPartidaModal" tabindex="-1" aria-labelledby="editarPartidaModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="editarPartidaModalLabel">Editar Partida</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedCategory">
+        <form [formGroup]="categoriesForm" (ngSubmit)="updateCategory()">
+          <!-- Nombre -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-tags"></i></span>
+              <input formControlName="name_category" type="text" class="form-control" placeholder="Ingresa nombre de la partida">
+            </div>
+            <div *ngIf="categoriesForm.get('name_category')?.invalid && categoriesForm.get('name_category')?.touched" class="text-danger mt-1">
+              <small>El nombre es requerido</small>
+            </div>
+          </div>
+          <!-- Estatus -->
+          <div class="mb-3">
+            <label class="form-label">Estatus</label>
+            <div class="form-check form-switch status-switch">
+              <input class="form-check-input" type="checkbox" formControlName="status">
+              <label class="form-check-label">{{ categoriesForm.get('status')?.value ? 'Activo' : 'Inactivo' }}</label>
+            </div>
+          </div>
+          <!-- Botón guardar -->
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary px-4">
+              <i class="bi bi-check-circle-fill"></i> Guardar Cambios
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div> 

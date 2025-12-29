@@ -1,0 +1,167 @@
+<div class="content-container">
+    <div class="page-header">
+        <h1 class="page-title">Control de Bajas del Personal</h1>
+        <button class="btn btn-primary" (click)="openAddModal()">
+            <i class="bi bi-plus-lg"></i> Agregar Baja
+        </button>
+    </div>
+
+    <!-- Filtros y búsqueda -->
+    <div class="filters-section">
+        <div class="filters-row">
+            <div class="filter-group">
+                <label for="search">Buscar</label>
+                <input type="text" id="search" class="filter-input" placeholder="Nombre, motivo..."
+                    [(ngModel)]="searchTerm">
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>Colaborador</th>
+                    <th>Último Día Trabajado</th>
+                    <th>Motivo de Baja</th>
+                    <th>Fecha Entrega Finiquito</th>
+                    <th>Observaciones</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let termination of filteredTerminations">
+                    <td class="fw-bold">{{ termination.employee?.name_employee || termination.name_employee || 'N/A' }}
+                    </td>
+                    <td>{{ termination.last_work_day | date:'dd/MM/yyyy':'UTC' }}</td>
+                    <td>{{ termination.reason }}</td>
+                    <td>{{ termination.severance_date ? (termination.severance_date | date:'dd/MM/yyyy':'UTC') :
+                        'Pendiente' }}</td>
+                    <td>{{ termination.observation || '-' }}</td>
+                    <td class="text-center">
+                        <a *ngIf="termination.document_path" [href]="termination.document_path" target="_blank"
+                            class="btn-action btn-edit me-1" style="background-color: #d1e7dd; color: #0f5132;"
+                            title="Ver Documento">
+                            <i class="bi bi-file-earmark-text"></i>
+                        </a>
+                        <button class="btn-action btn-view" (click)="viewTermination(termination)" title="Ver Detalles">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn-action btn-edit" (click)="openEditModal(termination)" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn-action btn-delete" (click)="deleteTermination(termination.id!)"
+                            title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr *ngIf="terminations.length === 0 && !isLoading">
+                    <td colspan="6" class="text-center py-4 text-muted">
+                        No hay bajas registradas.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal para Agregar/Editar Baja -->
+<div class="modal fade" id="terminationModal" tabindex="-1" aria-labelledby="terminationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="terminationModalLabel">{{ isEditMode ? 'Editar Baja' : 'Registrar Baja' }}
+                </h5>
+                <button type="button" class="btn-close" (click)="hideModal()" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="terminationForm">
+                    <div class="mb-3">
+                        <label class="form-label">Colaborador</label>
+                        <select class="form-select" formControlName="id_employee">
+                            <option value="">Seleccione un colaborador</option>
+                            <option *ngFor="let employee of employees" [value]="employee.id_employee">
+                                {{ employee.name_employee }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Último día trabajado</label>
+                        <input type="date" class="form-control" formControlName="last_work_day">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Motivo de Baja</label>
+                        <input type="text" class="form-control" formControlName="reason"
+                            placeholder="Ej. Renuncia voluntaria">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Fecha de entrega de finiquito</label>
+                        <input type="date" class="form-control" formControlName="severance_date">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Observaciones</label>
+                        <textarea class="form-control" formControlName="observation" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nombre del Documento</label>
+                        <input type="text" class="form-control" formControlName="document_name"
+                            placeholder="Ej. Carta de Renuncia">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Documento Adjunto</label>
+                        <input type="file" class="form-control" (change)="onFileSelected($event)">
+                        <div *ngIf="isEditMode && terminationForm.get('document_path')?.value" class="form-text">
+                            <a [href]="terminationForm.get('document_path')?.value" target="_blank">Ver documento
+                                actual</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="hideModal()">Cancelar</button>
+                <button type="button" class="btn btn-primary" (click)="saveTermination()"
+                    [disabled]="terminationForm.invalid">
+                    {{ isEditMode ? 'Actualizar' : 'Guardar' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Visualizar Baja -->
+<div class="modal fade" id="viewTerminationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-dark">
+                <h5 class="modal-title">Detalle de Baja</h5>
+                <button type="button" class="btn-close" (click)="hideViewModal()" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" *ngIf="selectedTermination">
+                <p><strong>Colaborador:</strong> {{ selectedTermination.employee?.name_employee ||
+                    selectedTermination.name_employee }}</p>
+                <p><strong>Último día trabajado:</strong> {{ selectedTermination.last_work_day |
+                    date:'dd/MM/yyyy':'UTC' }}</p>
+                <p><strong>Motivo:</strong> {{ selectedTermination.reason }}</p>
+                <p><strong>Fecha Finiquito:</strong> {{ selectedTermination.severance_date ?
+                    (selectedTermination.severance_date | date:'dd/MM/yyyy':'UTC') : 'Pendiente' }}</p>
+                <p><strong>Observaciones:</strong><br /> {{ selectedTermination.observation || 'Sin observaciones' }}
+                </p>
+
+                <div *ngIf="selectedTermination.document_path" class="mt-3">
+                    <p class="fw-bold">Documento Adjunto ({{ selectedTermination.document_name || 'Baja'
+                        }}):</p>
+                    <a [href]="selectedTermination.document_path" target="_blank" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-file-earmark-arrow-down"></i> Ver / Descargar Documento
+                    </a>
+                </div>
+                <div *ngIf="!selectedTermination.document_path" class="alert alert-secondary mt-3">
+                    No hay documento adjunto.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="hideViewModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

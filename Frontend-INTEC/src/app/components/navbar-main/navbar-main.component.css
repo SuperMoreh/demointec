@@ -1,0 +1,221 @@
+.layout {
+display: flex;
+height: 100vh;
+font-family: Arial, sans-serif;
+overflow: hidden; /* Evita scroll en el layout principal */
+}
+
+/* Menú lateral */
+.sidebar {
+width: 220px;
+color: rgb(255, 255, 255);
+display: flex;
+flex-direction: column;
+transition: width 0.3s ease;
+background: #0543a8;  
+position: fixed; /* Hace el sidebar estático */
+height: 100vh; /* Altura completa */
+z-index: 1000; /* Asegura que esté por encima */
+overflow-y: auto; /* Scroll interno si es necesario */
+}
+
+.sidebar.collapsed {
+width: 60px;
+}
+
+.logo {
+display: flex;
+align-items: center;
+justify-content: space-between; 
+height: 43px;
+padding: 0 1rem;
+background: #0543a8;  
+}
+
+.logo-img {
+height: 35px;
+object-fit: contain;
+}
+
+.menu-toggle {
+background: none;
+border: none;
+color: rgb(253, 249, 249);
+font-size: 1.4rem;
+cursor: pointer;
+padding: 10;
+height: 45px;
+width: 40px;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.nav-links {
+display: flex;
+flex-direction: column;
+}
+
+.nav-links a {
+color: rgb(234, 241, 200);
+text-decoration: none;
+padding: 0.75rem 1rem;
+display: flex;
+align-items: center;
+gap: 0.75rem;
+font-size: 0.95rem;
+transition: background-color 0.3s;
+}
+
+.nav-links a:last-child {
+border-bottom: none;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+background-color: #3a99e7a6;
+}
+
+.submenu {
+display: none;
+flex-direction: column;
+background-color: #036572a8;
+width: 100%; 
+box-sizing: border-box;
+}
+
+.submenu a {
+padding: 0.5rem 1rem;
+color: rgb(200, 220, 180);
+text-decoration: none;
+font-size: 0.9rem;
+transition: background-color 0.3s;
+border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.submenu.open {
+display: flex;
+}
+
+.submenu-arrow {
+margin-left: auto;
+font-size: 0.8rem;
+}
+
+/* Contenido principal */
+.main-content {
+flex: 1;
+display: flex;
+flex-direction: column;
+background-color: #f3f3f3;
+margin-left: 220px; /* Espacio para el sidebar */
+transition: margin-left 0.3s ease;
+}
+
+.main-content.sidebar-collapsed {
+margin-left: 60px; /* Espacio reducido cuando el sidebar está colapsado */
+}
+
+/* Navbar superior */
+.topbar {
+display: flex;
+align-items: center;
+justify-content: flex-end;
+background-color: #f9fbfd;
+color: white;
+padding: 1rem;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+height: 45px;
+position: fixed; /* Hace el topbar estático */
+top: 0;
+right: 0;
+left: 220px; /* Alineado con el sidebar */
+z-index: 999; /* Por debajo del sidebar */
+transition: left 0.3s ease;
+}
+
+.topbar.sidebar-collapsed {
+left: 60px; /* Ajustado cuando el sidebar está colapsado */
+}
+
+.user-info {
+display: flex;
+align-items: center;
+gap: 0.5rem;
+font-size: 1rem;
+color: rgba(87, 84, 84, 0.747);
+}
+
+.user-info i {
+font-size: 1.2rem;
+}
+
+.user-avatar-wrapper {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa;
+}
+
+.user-avatar {
+  height: 100%;
+  width: auto;
+}
+
+.user-actions {
+display: flex;
+align-items: center;
+gap: 0.4rem; 
+}
+
+.login-button {
+background: none;
+border: none;
+color: rgb(105, 102, 102);
+padding: 0.5rem;
+cursor: pointer;
+display: flex;
+align-items: center;
+font-size: 1.4rem;
+}
+
+.login-button:hover {
+  background-color: #f5f5f531;
+}
+
+.content-area {
+  flex: 1;
+  overflow-y: auto; 
+  overflow-x: hidden;
+  margin-top: 45px; /* Espacio para el topbar fijo */
+  height: calc(100vh - 45px); /* Altura total menos el topbar */
+}
+
+/* Centrado de logo e iconos en menú colapsado */
+.sidebar.collapsed .logo {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+  height: auto;
+  gap: 10px;
+}
+
+.sidebar.collapsed .logo-img {
+  display: block !important;
+}
+
+.sidebar.collapsed .menu-toggle {
+  display: flex;
+}
+
+.sidebar.collapsed .nav-links a {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}

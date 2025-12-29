@@ -1,0 +1,294 @@
+<div class="content-container">
+  <!-- Header de la página -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Catálogo de Obras</h1>
+    </div>
+    <a (click)="setCreateMode()" class="btn-primary" data-bs-toggle="modal" data-bs-target="#agregarProyectoModal">
+      <i class="bi bi-plus-circle"></i>
+      Agregar Obra
+    </a>
+  </div>
+
+  <!-- Filtros y búsqueda -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <div class="filter-group">
+        <label for="search">Buscar</label>
+        <input type="text" id="search" class="filter-input" placeholder="Nombre, tipo, localidad, oficial..." [(ngModel)]="searchTerm" (input)="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <select id="status" class="filter-input" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+          <option value="">Todos los estados</option>
+          <option value="true">Activo</option>
+          <option value="false">Inactivo</option>
+        </select>
+      </div>
+      <button class="btn-consult" (click)="consultProjects()" [disabled]="isLoading">
+        <i class="bi bi-search"></i>
+      </button>
+      <button class="btn-filter" (click)="clearFilters()">
+        <i class="bi bi-list-ul"></i>
+      </button>
+      <button class="btn-sync" (click)="syncProjects()" title="Sincronizar obras" [disabled]="isLoading">
+        <i class="bi bi-arrow-repeat"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabla de obras -->
+  <div class="table-container" *ngIf="hasConsulted && !isLoading && filteredProjects.length > 0">
+    <div class="table-header">
+      <div class="table-info">
+        Mostrando {{ projects.length }} de {{ allProjects.length }} obras
+        <span *ngIf="hasActiveFilters()" class="text-muted">(filtradas)</span>
+      </div>
+      <div class="table-actions">
+        <button class="btn-filter1" (click)="exportProjects()">
+          <i class="bi bi-download"></i>
+          Exportar
+        </button>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Tipo de Ubicación</th>
+            <th>Localidad</th>
+            <th>Oficial</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let project of projects">
+            <td>{{ project.name_project }}</td>
+            <td>{{ project.locationType }}</td>
+            <td>{{ project.locality }}</td>
+            <td>{{ project.official }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="project.status ? 'status-active' : 'status-inactive'">
+                {{ project.status ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <!-- <button class="btn-action btn-view" (click)="viewProject(project)" data-bs-toggle="modal" data-bs-target="#visualizarProyecto" title="Ver detalles">
+                  <i class="bi bi-eye"></i>
+                </button> -->
+                <button class="btn-action btn-edit" (click)="handleEditClick(project)" title="Editar">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn-action btn-delete" (click)="deleteProject(project)" title="Eliminar">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Paginación -->
+    <div class="pagination-container" *ngIf="totalPages > 1">
+      <div class="pagination">
+        <button [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button *ngFor="let page of pages" [class.active]="page === currentPage" (click)="setPage(page)">
+          {{ page }}
+        </button>
+        <button [disabled]="currentPage === totalPages" (click)="setPage(currentPage + 1)">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="table-container placeholder-container" *ngIf="hasConsulted && !isLoading && filteredProjects.length === 0">
+    <div class="table-placeholder">
+      <i class="bi bi-inbox"></i>
+      No se encontraron obras con los filtros aplicados.
+    </div>
+  </div>
+  <div class="table-container placeholder-container" *ngIf="hasConsulted && isLoading">
+    <div class="table-placeholder">
+      <i class="bi bi-arrow-repeat loading-icon"></i>
+      Cargando obras...
+    </div>
+  </div>
+  <div class="consult-placeholder" *ngIf="!hasConsulted">
+    <i class="bi bi-info-circle"></i>
+    Consulte para ver la información de obras.
+  </div>
+</div>
+
+<!-- Modal para Agregar Obra -->
+<div class="modal fade" id="agregarProyectoModal" tabindex="-1" aria-labelledby="agregarProyectoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="agregarProyectoModalLabel">Agregar Obra</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="projectsForm" (ngSubmit)="createProject()">
+          <!-- Nombre -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-building"></i></span>
+              <input formControlName="name_project" type="text" class="form-control" placeholder="Ingresa nombre de la obra">
+            </div>
+            <div *ngIf="projectsForm.get('name_project')?.invalid && projectsForm.get('name_project')?.touched" class="text-danger mt-1">
+              <small>El nombre es requerido</small>
+            </div>
+          </div>
+          <!-- Tipo de Ubicación -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+              <input formControlName="locationType" type="text" class="form-control" placeholder="Tipo de ubicación">
+            </div>
+            <div *ngIf="projectsForm.get('locationType')?.invalid && projectsForm.get('locationType')?.touched" class="text-danger mt-1">
+              <small>El tipo de ubicación es requerido</small>
+            </div>
+          </div>
+          <!-- Localidad -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-geo"></i></span>
+              <input formControlName="locality" type="text" class="form-control" placeholder="Localidad">
+            </div>
+            <div *ngIf="projectsForm.get('locality')?.invalid && projectsForm.get('locality')?.touched" class="text-danger mt-1">
+              <small>La localidad es requerida</small>
+            </div>
+          </div>
+          <!-- Oficial -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+              <input formControlName="official" type="text" class="form-control" placeholder="Oficial">
+            </div>
+            <div *ngIf="projectsForm.get('official')?.invalid && projectsForm.get('official')?.touched" class="text-danger mt-1">
+              <small>El oficial es requerido</small>
+            </div>
+          </div>
+          <!-- Botón guardar -->
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-success px-4" [disabled]="projectsForm.invalid">
+              <i class="bi bi-check-circle-fill"></i> Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para visualizar obra -->
+<div class="modal fade" id="visualizarProyecto" tabindex="-1" aria-labelledby="visualizarProyectoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="visualizarProyectoModalLabel">Detalles de la Obra</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedProject">
+        <div class="mb-3">
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-building"></i></span>
+            <input type="text" class="form-control" [value]="selectedProject.name_project" disabled>
+          </div>
+        </div>
+        <div class="mb-3">
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+            <input type="text" class="form-control" [value]="selectedProject.locationType" disabled>
+          </div>
+        </div>
+        <div class="mb-3">
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-geo"></i></span>
+            <input type="text" class="form-control" [value]="selectedProject.locality" disabled>
+          </div>
+        </div>
+        <div class="mb-3">
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+            <input type="text" class="form-control" [value]="selectedProject.official" disabled>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Editar obra -->
+<div class="modal fade" id="editarProyectoModal" tabindex="-1" aria-labelledby="editarProyectoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="editarProyectoModalLabel">Editar Obra</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedProject">
+        <form [formGroup]="projectsForm" (ngSubmit)="updateProject()">
+          <!-- Nombre -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-building"></i></span>
+              <input formControlName="name_project" type="text" class="form-control" placeholder="Ingresa nombre de la obra">
+            </div>
+            <div *ngIf="projectsForm.get('name_project')?.invalid && projectsForm.get('name_project')?.touched" class="text-danger mt-1">
+              <small>El nombre es requerido</small>
+            </div>
+          </div>
+          <!-- Tipo de Ubicación -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+              <input formControlName="locationType" type="text" class="form-control" placeholder="Tipo de ubicación">
+            </div>
+            <div *ngIf="projectsForm.get('locationType')?.invalid && projectsForm.get('locationType')?.touched" class="text-danger mt-1">
+              <small>El tipo de ubicación es requerido</small>
+            </div>
+          </div>
+          <!-- Localidad -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-geo"></i></span>
+              <input formControlName="locality" type="text" class="form-control" placeholder="Localidad">
+            </div>
+            <div *ngIf="projectsForm.get('locality')?.invalid && projectsForm.get('locality')?.touched" class="text-danger mt-1">
+              <small>La localidad es requerida</small>
+            </div>
+          </div>
+          <!-- Oficial -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+              <input formControlName="official" type="text" class="form-control" placeholder="Oficial">
+            </div>
+            <div *ngIf="projectsForm.get('official')?.invalid && projectsForm.get('official')?.touched" class="text-danger mt-1">
+              <small>El oficial es requerido</small>
+            </div>
+          </div>
+          <!-- Estatus -->
+          <div class="mb-3">
+            <label class="form-label">Estatus</label>
+            <div class="form-check form-switch status-switch">
+              <input class="form-check-input" type="checkbox" formControlName="status">
+              <label class="form-check-label">{{ projectsForm.get('status')?.value ? 'Activo' : 'Inactivo' }}</label>
+            </div>
+          </div>
+          <!-- Botón guardar -->
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary px-4">
+              <i class="bi bi-check-circle-fill"></i> Guardar Cambios
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div> 

@@ -1,0 +1,463 @@
+<div class="content-container">
+  <!-- Header de la página -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Catálogo de Materiales</h1>
+    </div>
+    <a (click)="setCreateMode()" class="btn-primary" data-bs-toggle="modal" data-bs-target="#agregarMaterialModal">
+      <i class="bi bi-plus-circle"></i>
+      Agregar Material
+    </a>
+  </div>
+
+  <!-- Filtros y búsqueda -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <div class="filter-group">
+        <label for="search">Buscar</label>
+        <input type="text" id="search" class="filter-input" placeholder="Nombre, código, c1, c2..." [(ngModel)]="searchTerm" (input)="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <select id="status" class="filter-input" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+          <option value="">Todos los estados</option>
+          <option value="true">Activo</option>
+          <option value="false">Inactivo</option>
+        </select>
+      </div>
+      <button class="btn-consult" (click)="consultMaterials()" [disabled]="isLoading">
+        <i class="bi bi-search"></i>
+      </button>
+      <button class="btn-filter" (click)="clearFilters()">
+        <i class="bi bi-list-ul"></i>
+      </button>
+      <button class="btn-sync" (click)="syncMaterials()" title="Sincronizar materiales" [disabled]="isLoading">
+        <i class="bi bi-arrow-repeat"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabla de materiales -->
+  <div class="table-container" *ngIf="hasConsulted && !isLoading && filteredMaterials.length > 0">
+    <div class="table-header">
+      <div class="table-info">
+        Mostrando {{ materials.length }} de {{ allMaterials.length }} materiales
+        <span *ngIf="hasActiveFilters()" class="text-muted">(filtrados)</span>
+      </div>
+      <div class="table-actions">
+        <button class="btn-filter1" (click)="exportMaterials()">
+          <i class="bi bi-download"></i>
+          Exportar
+        </button>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Material</th>
+            <th>Código</th>
+            <th>C1</th>
+            <th>C2</th>
+            <th>Partida</th>
+            <th>Subpartida</th>
+            <th>Unidad</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let material of materials">
+            <td>
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div class="user-avatar">
+                  <i class="bi bi-box"></i>
+                </div>
+                <div>
+                  <div style="font-weight: 600;">{{ material.name_material }}</div>
+                  <div style="color: #666; font-size: 0.8rem;">
+                    {{ material.code }}
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td>{{ material.code }}</td>
+            <td>{{ material.c1 }}</td>
+            <td>{{ material.c2 }}</td>
+            <td>{{ material.category }}</td>
+            <td>{{ material.subcategory }}</td>
+            <td>{{ material.unit }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="material.status ? 'status-active' : 'status-inactive'">
+                {{ material.status ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn-action btn-view" (click)="viewMaterial(material)" data-bs-toggle="modal" data-bs-target="#visualizarMaterial" title="Ver detalles">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn-action btn-edit" (click)="handleEditClick(material)" title="Editar">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn-action btn-delete" (click)="deleteMaterial(material)" title="Eliminar">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Paginación -->
+    <div class="pagination-container" *ngIf="totalPages > 1">
+      <div class="pagination">
+        <button [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button *ngFor="let page of pages" [class.active]="page === currentPage" (click)="setPage(page)">
+          {{ page }}
+        </button>
+        <button [disabled]="currentPage === totalPages" (click)="setPage(currentPage + 1)">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="table-container placeholder-container" *ngIf="hasConsulted && !isLoading && filteredMaterials.length === 0">
+    <div class="table-placeholder">
+      <i class="bi bi-inbox"></i>
+      No se encontraron materiales con los filtros aplicados.
+    </div>
+  </div>
+  <div class="table-container placeholder-container" *ngIf="hasConsulted && isLoading">
+    <div class="table-placeholder">
+      <i class="bi bi-arrow-repeat loading-icon"></i>
+      Cargando materiales...
+    </div>
+  </div>
+  <div class="consult-placeholder" *ngIf="!hasConsulted">
+    <i class="bi bi-info-circle"></i>
+    Consulte para ver la información de materiales.
+  </div>
+</div>
+
+<!-- Modal para Agregar Material -->
+<div class="modal fade" id="agregarMaterialModal" tabindex="-1" aria-labelledby="agregarMaterialModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="agregarMaterialModalLabel">Agregar Material</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-8">
+            <form [formGroup]="materialsForm" (ngSubmit)="createMaterial()">
+              <!-- Nombre -->
+              <div class="mb-3">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-box"></i></span>
+                  <input formControlName="name_material" type="text" class="form-control" placeholder="Ingresa nombre del material">
+                </div>
+                <div *ngIf="materialsForm.get('name_material')?.invalid && materialsForm.get('name_material')?.touched" class="text-danger mt-1">
+                  <small>El nombre es requerido</small>
+                </div>
+              </div>
+              <!-- Código -->
+              <div class="mb-3">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-code-slash"></i></span>
+                  <input formControlName="code" type="text" class="form-control" placeholder="Ingresa código del material">
+                </div>
+                <div *ngIf="materialsForm.get('code')?.invalid && materialsForm.get('code')?.touched" class="text-danger mt-1">
+                  <small>El código es requerido</small>
+                </div>
+              </div>
+              <!-- C1 -->
+              <div class="mb-3">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-gear"></i></span>
+                  <input formControlName="c1" type="text" class="form-control" placeholder="Característica 1">
+                </div>
+                <div *ngIf="materialsForm.get('c1')?.invalid && materialsForm.get('c1')?.touched" class="text-danger mt-1">
+                  <small>Característica 1 es requerida</small>
+                </div>
+              </div>
+              <!-- C2 -->
+              <div class="mb-3">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-gear-wide-connected"></i></span>
+                  <input formControlName="c2" type="text" class="form-control" placeholder="Característica 2">
+                </div>
+                <div *ngIf="materialsForm.get('c2')?.invalid && materialsForm.get('c2')?.touched" class="text-danger mt-1">
+                  <small>Característica 2 es requerida</small>
+                </div>
+              </div>
+              <!-- Partida -->
+              <div class="mb-3">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-tags"></i></span>
+                  <select formControlName="category" class="form-control" (change)="onCategoryChange()">
+                    <option value="">Selecciona una partida</option>
+                    <option *ngFor="let cat of categories" [value]="cat.name_category">
+                      {{ cat.name_category }}
+                    </option>
+                  </select>
+                </div>
+                <div *ngIf="materialsForm.get('category')?.invalid && materialsForm.get('category')?.touched" class="text-danger mt-1">
+                  <small>La partida es requerida</small>
+                </div>
+              </div>
+              <!-- Subpartida -->
+              <div class="mb-3">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                  <select formControlName="subcategory" class="form-control">
+                    <option value="">Selecciona una subpartida</option>
+                    <option *ngFor="let sub of filteredSubcategories" [value]="sub.name_subcategory">
+                      {{ sub.name_subcategory }}
+                    </option>
+                  </select>
+                </div>
+                <div *ngIf="materialsForm.get('subcategory')?.invalid && materialsForm.get('subcategory')?.touched" class="text-danger mt-1">
+                  <small>La subpartida es requerida</small>
+                </div>
+              </div>
+              <!-- Unidad -->
+              <div class="mb-3">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-rulers"></i></span>
+                  <input formControlName="unit" type="text" class="form-control" placeholder="Unidad">
+                </div>
+                <div *ngIf="materialsForm.get('unit')?.invalid && materialsForm.get('unit')?.touched" class="text-danger mt-1">
+                  <small>La unidad es requerida</small>
+                </div>
+              </div>
+              <!-- Botón guardar -->
+              <div class="text-center mt-4">
+                <button type="submit" class="btn btn-success px-4" [disabled]="materialsForm.invalid">
+                  <i class="bi bi-check-circle-fill"></i> Guardar
+                </button>
+              </div>
+            </form>
+          </div>
+          <div class="col-md-4 d-flex flex-column align-items-center justify-content-start pt-3">
+            <h6 class="mb-2 text-center">Imagen del Material</h6>
+            <div class="mb-3 text-center user-photo-frame position-relative">
+              <ng-container *ngIf="photo && photo !== 'Sin foto' && photo !== '...' && photo !== 'null' && photo !== 'undefined'; else iconoMaterial">
+                <img [src]="photo" class="user-photo-img">
+              </ng-container>
+              <ng-template #iconoMaterial>
+                <i class="bi bi-box user-photo-icon"></i>
+              </ng-template>
+            </div>
+            <label class="btn-upload-image">
+              <i class="bi bi-upload"></i> Subir imagen
+              <input type="file" accept="image/*" hidden (change)="onImageSelected($event)">
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para visualizar material -->
+<div class="modal fade" id="visualizarMaterial" tabindex="-1" aria-labelledby="visualizarMaterialModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="visualizarMaterialModalLabel">Detalles del Material</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedMaterial">
+        <div class="row">
+          <div class="col-md-8">
+            <div class="mb-3">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-box"></i></span>
+                <input type="text" class="form-control" [value]="selectedMaterial.name_material" disabled>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-code-slash"></i></span>
+                <input type="text" class="form-control" [value]="selectedMaterial.code" disabled>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-gear"></i></span>
+                <input type="text" class="form-control" [value]="selectedMaterial.c1" disabled>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-gear-wide-connected"></i></span>
+                <input type="text" class="form-control" [value]="selectedMaterial.c2" disabled>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-tags"></i></span>
+                <input type="text" class="form-control" [value]="selectedMaterial.category" disabled>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                <input type="text" class="form-control" [value]="selectedMaterial.subcategory" disabled>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-rulers"></i></span>
+                <input type="text" class="form-control" [value]="selectedMaterial.unit" disabled>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 d-flex flex-column align-items-center justify-content-start">
+            <h6 class="mb-2 text-center">Imagen del Material</h6>
+            <div class="mb-3 text-center user-photo-frame-view">
+              <ng-container *ngIf="selectedMaterial.image && selectedMaterial.image !== 'Sin foto' && selectedMaterial.image !== '...' && selectedMaterial.image !== 'null' && selectedMaterial.image !== 'undefined'; else iconoMaterialView">
+                <img [src]="selectedMaterial.image" class="user-photo-img">
+              </ng-container>
+              <ng-template #iconoMaterialView>
+                <i class="bi bi-box user-photo-icon"></i>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Editar material -->
+<div class="modal fade" id="editarMaterialModal" tabindex="-1" aria-labelledby="editarMaterialModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="editarMaterialModalLabel">Editar Material</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedMaterial">
+        <div class="row">
+          <div class="col-md-8">
+            <form [formGroup]="materialsForm" (ngSubmit)="updateMaterial()">
+              <!-- Nombre -->
+              <div class="mb-3">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-box"></i></span>
+                  <input formControlName="name_material" type="text" class="form-control" placeholder="Ingresa nombre del material">
+                </div>
+                <div *ngIf="materialsForm.get('name_material')?.invalid && materialsForm.get('name_material')?.touched" class="text-danger mt-1">
+                  <small>El nombre es requerido</small>
+                </div>
+              </div>
+              <!-- Código -->
+              <div class="mb-3">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-code-slash"></i></span>
+                  <input formControlName="code" type="text" class="form-control" placeholder="Ingresa código del material">
+                </div>
+                <div *ngIf="materialsForm.get('code')?.invalid && materialsForm.get('code')?.touched" class="text-danger mt-1">
+                  <small>El código es requerido</small>
+                </div>
+              </div>
+              <!-- C1 -->
+              <div class="mb-3">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-gear"></i></span>
+                  <input formControlName="c1" type="text" class="form-control" placeholder="Característica 1">
+                </div>
+                <div *ngIf="materialsForm.get('c1')?.invalid && materialsForm.get('c1')?.touched" class="text-danger mt-1">
+                  <small>Característica 1 es requerida</small>
+                </div>
+              </div>
+              <!-- C2 -->
+              <div class="mb-3">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-gear-wide-connected"></i></span>
+                  <input formControlName="c2" type="text" class="form-control" placeholder="Característica 2">
+                </div>
+                <div *ngIf="materialsForm.get('c2')?.invalid && materialsForm.get('c2')?.touched" class="text-danger mt-1">
+                  <small>Característica 2 es requerida</small>
+                </div>
+              </div>
+              <!-- Partida -->
+              <div class="mb-3">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-tags"></i></span>
+                  <select formControlName="category" class="form-control" (change)="onCategoryChange()">
+                    <option value="">Selecciona una partida</option>
+                    <option *ngFor="let cat of categories" [value]="cat.name_category">
+                      {{ cat.name_category }}
+                    </option>
+                  </select>
+                </div>
+                <div *ngIf="materialsForm.get('category')?.invalid && materialsForm.get('category')?.touched" class="text-danger mt-1">
+                  <small>La partida es requerida</small>
+                </div>
+              </div>
+              <!-- Subpartida -->
+              <div class="mb-3">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                  <select formControlName="subcategory" class="form-control">
+                    <option value="">Selecciona una subpartida</option>
+                    <option *ngFor="let sub of filteredSubcategories" [value]="sub.name_subcategory">
+                      {{ sub.name_subcategory }}
+                    </option>
+                  </select>
+                </div>
+                <div *ngIf="materialsForm.get('subcategory')?.invalid && materialsForm.get('subcategory')?.touched" class="text-danger mt-1">
+                  <small>La subpartida es requerida</small>
+                </div>
+              </div>
+              <!-- Unidad -->
+              <div class="mb-3">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-rulers"></i></span>
+                  <input formControlName="unit" type="text" class="form-control" placeholder="Unidad">
+                </div>
+                <div *ngIf="materialsForm.get('unit')?.invalid && materialsForm.get('unit')?.touched" class="text-danger mt-1">
+                  <small>La unidad es requerida</small>
+                </div>
+              </div>
+              <!-- Estatus -->
+              <div class="mb-3">
+                <label class="form-label">Estatus</label>
+                <div class="form-check form-switch status-switch">
+                  <input class="form-check-input" type="checkbox" formControlName="status">
+                  <label class="form-check-label">{{ materialsForm.get('status')?.value ? 'Activo' : 'Inactivo' }}</label>
+                </div>
+              </div>
+              <!-- Botón guardar -->
+              <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary px-4">
+                  <i class="bi bi-check-circle-fill"></i> Guardar Cambios
+                </button>
+              </div>
+            </form>
+          </div>
+          <div class="col-md-4 d-flex flex-column align-items-center justify-content-start">
+            <h6 class="mb-2 text-center">Imagen del Material</h6>
+            <div class="mb-3 text-center user-photo-frame">
+              <ng-container *ngIf="photo && photo !== 'Sin foto' && photo !== '...' && photo !== 'null' && photo !== 'undefined'; else iconoMaterialEdit">
+                <img [src]="photo" class="user-photo-img">
+              </ng-container>
+              <ng-template #iconoMaterialEdit>
+                <i class="bi bi-box user-photo-icon"></i>
+              </ng-template>
+            </div>
+            <label class="btn-upload-image">
+              <i class="bi bi-upload"></i> Cambiar imagen
+              <input type="file" accept="image/*" hidden (change)="onImageSelected($event)">
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

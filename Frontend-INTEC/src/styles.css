@@ -1,0 +1,11 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Fix for Toastr notifications appearing behind Bootstrap modals */
+#toast-container,
+.toast-container {
+    z-index: 999999 !important;
+}
+
+.ngx-toastr {
+    z-index: 999999 !important;
+}

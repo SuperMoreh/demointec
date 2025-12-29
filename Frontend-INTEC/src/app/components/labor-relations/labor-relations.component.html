@@ -1,0 +1,293 @@
+<div class="content-container">
+    <div class="page-header">
+        <h1 class="page-title">Relaciones Laborales</h1>
+    </div>
+
+    <!-- Panel 1: Búsqueda -->
+    <div class="filters-section">
+        <h5 class="mb-3" style="font-weight: 400; color: #555;">Búsqueda de Colaborador</h5>
+        <form [formGroup]="searchForm">
+            <div class="position-relative">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control filter-input" placeholder="Escribe el nombre del empleado..."
+                        formControlName="searchTerm" (keydown)="onKeydown($event)">
+                </div>
+
+                <!-- Lista de sugerencias -->
+                <ul class="list-group position-absolute w-100 mt-1 shadow" style="z-index: 1000;"
+                    *ngIf="filteredEmployees.length > 0">
+                    <li class="list-group-item list-group-item-action cursor-pointer border-bottom"
+                        *ngFor="let emp of filteredEmployees; let i = index"
+                        [class.active-search-item]="i === selectedIndex" (click)="selectEmployee(emp)">
+                        <strong>{{ emp.name_employee }}</strong> <small class="text-muted ms-2">({{ emp.role }})</small>
+                    </li>
+                </ul>
+            </div>
+        </form>
+
+        <!-- Datos básicos del empleado seleccionado -->
+        <div *ngIf="selectedEmployee"
+            class="mt-4 p-3 bg-white rounded border d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-1 text-primary">{{ selectedEmployee.name_employee }}</h5>
+                <div class="text-muted small">
+                    <span class="me-3"><i class="bi bi-briefcase"></i> {{ selectedEmployee.position || 'Sin puesto'
+                        }}</span>
+                    <span class="me-3"><i class="bi bi-envelope"></i> {{ selectedEmployee.email }}</span>
+                    <span><i class="bi bi-telephone"></i> {{ selectedEmployee.phone }}</span>
+                </div>
+            </div>
+            <div>
+                <span class="status-badge" [ngClass]="selectedEmployee.status ? 'status-active' : 'status-inactive'">
+                    {{ selectedEmployee.status ? 'Activo' : 'Inactivo' }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" *ngIf="selectedEmployee">
+        <!-- Panel 2: Histórico de Eventos -->
+        <div class="col-lg-8">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5><i class="bi bi-clock-history text-primary"></i> Historial de Eventos</h5>
+                    <button class="btn btn-primary btn-sm" style="padding: 0.4rem 0.8rem;"
+                        (click)="openAddEventModal()">
+                        <i class="bi bi-plus-lg"></i> Agregar Evento
+                    </button>
+                </div>
+                <div class="card-body">
+                    <!-- Timeline -->
+                    <div class="timeline" *ngIf="events.length > 0; else noEvents">
+                        <div class="timeline-item" *ngFor="let event of events">
+                            <div class="timeline-date">{{ event.event_date | date:'dd MMM yyyy' }}</div>
+                            <div class="timeline-content">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="fw-bold mb-1">{{ event.event_name }}</h6>
+                                        <p class="mb-1 text-muted small">{{ event.observation }}</p>
+                                        <small *ngIf="event.document_path" class="text-primary"><i
+                                                class="bi bi-paperclip"></i> Documento Adjunto</small>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn-action btn-view" (click)="viewEvent(event)"
+                                            title="Ver Detalle">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn-action btn-edit" (click)="editEvent(event)" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn-action btn-delete" (click)="deleteEvent(event.id)"
+                                            title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <ng-template #noEvents>
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-calendar-x fs-1"></i>
+                            <p>No hay eventos registrados.</p>
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel 3: Uniformes -->
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5><i class="bi bi-shield-check text-primary"></i> Uniformes</h5>
+                    <button class="btn-save-sm" (click)="saveUniforms()">
+                        <i class="bi bi-save"></i> Guardar
+                    </button>
+                </div>
+                <div class="card-body">
+                    <form [formGroup]="uniformForm">
+
+                        <!-- Chaleco -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Chaleco</label>
+                            <select class="form-select" formControlName="vest_type">
+                                <option value="">-- Seleccionar --</option>
+                                <option value="Azul Rey">Azul Rey</option>
+                                <option value="Azul Marino">Azul Marino</option>
+                                <option value="Beige">Beige</option>
+                            </select>
+                        </div>
+
+                        <!-- Casco -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Casco</label>
+                            <select class="form-select" formControlName="helmet_color">
+                                <option value="">-- Seleccionar --</option>
+                                <option value="Blanco">Blanco</option>
+                                <option value="Azul">Azul</option>
+                            </select>
+                        </div>
+
+                        <!-- Lentes (Check) -->
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="glasses" formControlName="glasses">
+                            <label class="form-check-label fw-bold" for="glasses">Lentes (Transparentes)</label>
+                        </div>
+
+                        <!-- Guantes -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Guantes</label>
+                            <select class="form-select" formControlName="gloves_type">
+                                <option value="">-- Seleccionar --</option>
+                                <option value="Negro Nitrilo">Negro Nitrilo</option>
+                                <option value="Camel Carnaza">Camel Carnaza</option>
+                                <option value="Gris Nitrilo">Gris Nitrilo</option>
+                            </select>
+                        </div>
+
+                        <!-- Tapones (Check) -->
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="earplugs" formControlName="earplugs">
+                            <label class="form-check-label fw-bold" for="earplugs">Tapones Auditivos</label>
+                        </div>
+
+                        <!-- Botas -->
+                        <hr>
+                        <label class="form-label fw-bold">Botas</label>
+                        <div class="row">
+                            <div class="col-6">
+                                <input type="text" class="form-control" placeholder="Talla"
+                                    formControlName="boots_size">
+                            </div>
+                            <div class="col-6">
+                                <select class="form-select" formControlName="boots_color">
+                                    <option value="">Color</option>
+                                    <option value="Negras">Negras</option>
+                                    <option value="Café">Café</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Agregar Evento -->
+<div class="modal fade" id="addEventModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Agregar Evento Laboral</h5>
+                <button type="button" class="btn-close btn-close-white" (click)="closeModal('addEventModal')"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="eventForm">
+                    <div class="mb-3">
+                        <label class="form-label">Fecha</label>
+                        <input type="date" class="form-control" formControlName="event_date">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nombre del Evento</label>
+                        <input type="text" class="form-control" formControlName="event_name"
+                            placeholder="Ej: Amonestación, Ascenso...">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Observación</label>
+                        <textarea class="form-control" formControlName="observation" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Documento Adjunto</label>
+                        <input type="file" class="form-control" (change)="onFileSelected($event)">
+                        <small class="text-muted">Formatos: PDF, Imagen... (Max 5MB)</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="closeModal('addEventModal')">Cancelar</button>
+                <button type="button" class="btn btn-primary" (click)="addEvent()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Visualizar Evento -->
+<div class="modal fade" id="visualizarEventoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-dark">
+                <h5 class="modal-title">Detalle del Evento</h5>
+                <button type="button" class="btn-close" (click)="closeModal('visualizarEventoModal')"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body" *ngIf="selectedEventDetail">
+                <p><strong>Fecha:</strong> {{ selectedEventDetail.event_date | date:'dd/MM/yyyy' }}</p>
+                <p><strong>Evento:</strong> {{ selectedEventDetail.event_name }}</p>
+                <p><strong>Observación:</strong><br /> {{ selectedEventDetail.observation || 'Sin observaciones' }}</p>
+
+                <div *ngIf="selectedEventDetail.document_path" class="mt-3">
+                    <p class="fw-bold">Documento Adjunto:</p>
+                    <a [href]="selectedEventDetail.document_path" target="_blank" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-file-earmark-arrow-down"></i> Ver / Descargar Documento
+                    </a>
+                </div>
+                <div *ngIf="!selectedEventDetail.document_path" class="alert alert-secondary mt-3">
+                    No hay documento adjunto.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary"
+                    (click)="closeModal('visualizarEventoModal')">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Evento -->
+<div class="modal fade" id="editarEventoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">Editar Evento Laboral</h5>
+                <button type="button" class="btn-close" (click)="closeModal('editarEventoModal')"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="eventForm">
+                    <div class="mb-3">
+                        <label class="form-label">Fecha</label>
+                        <input type="date" class="form-control" formControlName="event_date">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nombre del Evento</label>
+                        <input type="text" class="form-control" formControlName="event_name">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Observación</label>
+                        <textarea class="form-control" formControlName="observation" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Documento Adjunto</label>
+                        <div *ngIf="selectedEventDetail?.document_path" class="mb-2">
+                            <a [href]="selectedEventDetail?.document_path" target="_blank" class="text-decoration-none">
+                                <i class="bi bi-file-earmark"></i> Ver documento actual
+                            </a>
+                        </div>
+                        <input type="file" class="form-control" (change)="onFileSelected($event)">
+                        <small class="text-muted">Sube un nuevo archivo para reemplazar el anterior.</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary"
+                    (click)="closeModal('editarEventoModal')">Cancelar</button>
+                <button type="button" class="btn btn-primary" (click)="updateEvent()">Actualizar</button>
+            </div>
+        </div>
+    </div>
+</div>

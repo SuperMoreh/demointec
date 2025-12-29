@@ -1,0 +1,483 @@
+<div class="content-container">
+    <!-- Header de la página -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Gestión de Usuarios</h1>
+        </div>
+        <a (click)="setCreateMode()" class="btn-primary" data-bs-toggle="modal" data-bs-target="#agregarUsuarioModal">
+            <i class="bi bi-plus-circle"></i>
+            Agregar Usuario
+        </a>
+    </div>
+
+    <!-- Filtros y búsqueda -->
+    <div class="filters-section">
+        <div class="filters-row">
+            <div class="filter-group">
+                <label for="search">Buscar</label>
+                <input type="text" id="search" class="filter-input" placeholder="Nombre, email o usuario..." [(ngModel)]="searchTerm" (input)="applyFilters()">
+            </div>
+            <div class="filter-group">
+                <select id="role" class="filter-input" [(ngModel)]="selectedRole" (change)="applyFilters()">
+                    <option value="">Todos los roles</option>
+                    <option *ngFor="let role of roles" [value]="role.id_role">{{ role.name_role }}</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <select id="status" class="filter-input" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+                    <option value="">Todos los estados</option>
+                    <option value="true">Activo</option>
+                    <option value="false">Inactivo</option>
+                </select>
+            </div>
+            <button class="btn-filter" (click)="clearFilters()">
+                <i class="bi bi-list-ul"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Tabla de usuarios -->
+    <div class="table-container">
+        <div class="table-header">
+            <div class="table-info">
+                Mostrando {{ users.length }} de {{ allUsers.length }} usuarios
+                @if (hasActiveFilters()) {
+                    <span class="text-muted">(filtrados)</span>
+                }
+            </div>
+            <div class="table-actions">
+                <button class="btn-filter1" (click)="exportUsers()">
+                    <i class="bi bi-download"></i>
+                    Exportar
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Fecha creación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let user of users">
+                        <td>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div class="user-avatar">
+                            {{ user.name_user.charAt(0).toUpperCase() }}
+                            </div>
+                            <div>
+                            <div style="font-weight: 600;">{{ user.name_user }}</div>
+                            <div style="color: #666; font-size: 0.8rem;">
+                                {{ user.email.split('@')[0] }}
+                            </div>
+                            </div>
+                        </div>
+                        </td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.phone }}</td>
+                        <td>
+                        <span class="role-badge">
+                            {{ getRoleName(user.role_id) }}
+                        </span>
+                        </td>
+                        <td>
+                        <span
+                            class="status-badge"
+                            [ngClass]="user.status ? 'status-active' : 'status-inactive'"
+                        >
+                            {{ user.status ? 'Activo' : 'Inactivo' }}
+                        </span>
+                        </td>
+                        <td>{{ user.createdAt | date: 'dd/MM/yyyy' }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-view" (click)="viewUser(user)" data-bs-toggle="modal" data-bs-target="#visualizarUsuario" title="Ver detalles">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn-action btn-edit" (click)="handleEditClick(user)" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn-action btn-delete" (click)="deleteUser(user)"  title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody> 
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        <div class="pagination-container" *ngIf="totalPages > 1">
+            <div class="pagination">
+                <button [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <button *ngFor="let page of pages" [class.active]="page === currentPage" (click)="setPage(page)">
+                    {{ page }}
+                </button>
+                <button [disabled]="currentPage === totalPages" (click)="setPage(currentPage + 1)">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Agregar Usuario --> 
+<div class="modal fade" id="agregarUsuarioModal" tabindex="-1" aria-labelledby="agregarUsuarioModalLabel" aria-hidden="true">
+<div class="modal-dialog modal-lg"> 
+    <div class="modal-content">
+    <div class="modal-header justify-content-center">
+                <h5 class="modal-title" id="agregarUsuarioModalLabel">Agregar Usuario</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+    </div>
+
+    <div class="modal-body">
+        <div class="row">
+        <div class="col-md-8">
+            <form [formGroup]="usuarioForm" (ngSubmit)="createUser()">
+            <!-- Nombre -->
+            <div class="mb-3">
+                <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                                    <input formControlName="name" type="text" class="form-control" placeholder="Ingresa nombre completo">
+                                </div>
+                                @if (usuarioForm.get('name')?.invalid && usuarioForm.get('name')?.touched) {
+                                    <div class="text-danger mt-1">
+                                        @if (usuarioForm.get('name')?.hasError('required')) {
+                                            <small>El nombre es requerido</small>
+                                        }
+                </div>
+                                }
+            </div>
+
+            <!-- Correo -->
+            <div class="mb-3">
+                <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+                                    <input formControlName="email" type="email" class="form-control" placeholder="Ingresa correo electrónico">
+                                </div>
+                                @if (usuarioForm.get('email')?.invalid && usuarioForm.get('email')?.touched) {
+                                    <div class="text-danger mt-1">
+                                        @if (usuarioForm.get('email')?.hasError('required')) {
+                                            <small>El correo electrónico es requerido</small>
+                                        }
+                                        @if (usuarioForm.get('email')?.hasError('email')) {
+                                            <small>Ingrese un correo electrónico válido</small>
+                                        }
+                </div>
+                                }
+            </div>
+
+             <!-- Telefono -->
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-phone-fill"></i></span>
+                                    <input formControlName="phone" type="text" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="form-control" placeholder="Ingresa número telefónico">
+                                </div>
+                                @if (usuarioForm.get('phone')?.invalid && usuarioForm.get('phone')?.touched) {
+                                    <div class="text-danger mt-1">
+                                        @if (usuarioForm.get('phone')?.hasError('required')) {
+                                            <small>El teléfono es requerido</small>
+                                        }
+                                        @if (usuarioForm.get('phone')?.hasError('pattern')) {
+                                            <small>El teléfono debe ser de 10 dígitos numéricos</small>
+                                        }
+                </div>
+                                }
+            </div>
+
+            <!-- Rol -->
+            <div class="mb-3">
+                <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-shield-lock-fill"></i></span>
+                <select class="form-control" formControlName="role">
+                    <option value="">Selecciona un rol</option>
+                    <option *ngFor="let role of roles" [value]="role.id_role">{{ role.name_role }}</option>
+                </select>
+                </div>
+                                @if (usuarioForm.get('role')?.invalid && usuarioForm.get('role')?.touched) {
+                                    <div class="text-danger mt-1">
+                                        @if (usuarioForm.get('role')?.hasError('required')) {
+                                            <small>Debe seleccionar un rol</small>
+                                        }
+                                    </div>
+                                }
+            </div>
+
+            <!-- Contraseña -->
+            <div class="mb-3">
+                <div class="input-group">
+                <span class="input-group-text bg-white"><i class="bi bi-lock-fill"></i></span>
+                                    <input [type]="showPassword ? 'text' : 'password'" class="form-control" formControlName="password" placeholder="Ingresa contraseña">
+                <button type="button" class="btn btn-outline-secondary" (click)="togglePassword()">
+                    <i class="bi" [class]="showPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'"></i>
+                </button>
+                </div>
+                                @if (usuarioForm.get('password')?.invalid && usuarioForm.get('password')?.touched) {
+                                    <div class="text-danger mt-1">
+                                        @if (usuarioForm.get('password')?.hasError('required')) {
+                                            <small>La contraseña es requerida</small>
+                                        }
+                                    </div>
+                                }
+            </div>
+
+            <!-- Verificar contraseña -->
+            <div class="mb-3">
+                <div class="input-group">
+                <span class="input-group-text bg-white"><i class="bi bi-lock-fill"></i></span>
+                                    <input [type]="showConfirmPassword ? 'text' : 'password'" class="form-control" formControlName="confirmPassword" placeholder="Verifica contraseña">
+                <button type="button" class="btn btn-outline-secondary" (click)="toggleConfirmPassword()">
+                    <i class="bi" [class]="showConfirmPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'"></i>
+                </button>
+                </div>
+                                @if (usuarioForm.get('confirmPassword')?.touched && (usuarioForm.get('confirmPassword')?.invalid || usuarioForm.hasError('passwordsMismatch'))) {
+                                    <div class="text-danger mt-1">
+                                        @if (usuarioForm.get('confirmPassword')?.hasError('required')) {
+                                            <small>Debe confirmar la contraseña</small>
+                                        }
+                                        @if (usuarioForm.hasError('passwordsMismatch') && !usuarioForm.get('confirmPassword')?.hasError('required')) {
+                                            <small>Las contraseñas no coinciden</small>
+                                        }
+                                    </div>
+                                }
+            </div>
+
+            <!-- Botón guardar -->
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-success px-4" [disabled]="usuarioForm.invalid">
+                <i class="bi bi-check-circle-fill"></i> Guardar
+                </button>
+            </div>
+            </form>
+        </div>
+
+        <div class="col-md-4 d-flex flex-column align-items-center justify-content-start pt-3">
+        <h6 class="mb-2 text-center">Foto de Perfil</h6>
+        
+        <div class="mb-3 text-center user-photo-frame position-relative">
+            <ng-container *ngIf="imagenUsuario; else iconoPersona">
+            <img [src]="imagenUsuario" class="user-photo-img">
+            </ng-container>
+            <ng-template #iconoPersona>
+            <i class="bi bi-person-circle user-photo-icon"></i>
+            </ng-template>
+        </div>
+
+        <label class="btn-upload-image">
+            <i class="bi bi-upload"></i> Subir imagen
+            <input type="file" accept="image/*" hidden (change)="onImageSelected($event)">
+        </label>
+        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para visualizar usuario--> 
+<div class="modal fade" id="visualizarUsuario" tabindex="-1" aria-labelledby="visualizarUsuarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg"> 
+        <div class="modal-content">
+            <div class="modal-header justify-content-center">
+                <h5 class="modal-title" id="visualizarUsuarioModalLabel">Detalles del Usuario</h5>
+                <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+    </div>
+
+            <div class="modal-body" *ngIf="selectedUser">
+                <div class="row">
+                    <div class="col-md-8">
+                        <!-- Nombre -->
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                                <input type="text" class="form-control" [value]="selectedUser.name_user" disabled>
+                            </div>
+                        </div>
+
+                        <!-- Correo -->
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+                                <input type="email" class="form-control" [value]="selectedUser.email" disabled>
+                            </div>
+        </div>
+
+                        <!-- Telefono -->
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-phone-fill"></i></span>
+                                <input type="text" class="form-control" [value]="selectedUser.phone" disabled>
+        </div>
+    </div>
+
+                        <!-- Rol -->
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-shield-lock-fill"></i></span>
+                                <input type="text" class="form-control" [value]="getRoleName(selectedUser.role_id)" disabled>
+    </div>
+</div>
+</div>
+
+                    <div class="col-md-4 d-flex flex-column align-items-center justify-content-start">
+                        <h6 class="mb-2 text-center">Foto de Perfil</h6>
+                        
+                        <div class="mb-3 text-center user-photo-frame-view">
+                            <ng-container *ngIf="selectedUser.photo; else iconoPersonaView">
+                                <img [src]="selectedUser.photo" class="user-photo-img">
+                            </ng-container>
+                            <ng-template #iconoPersonaView>
+                                <i class="bi bi-person-circle user-photo-icon"></i>
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Editar usuario--> 
+<div class="modal fade" id="editarUsuarioModal" tabindex="-1" aria-labelledby="editarUsuarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg"> 
+        <div class="modal-content">
+            <div class="modal-header justify-content-center">
+                <h5 class="modal-title" id="editarUsuarioModalLabel">Editar Usuario</h5>
+                <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+    
+            <div class="modal-body" *ngIf="selectedUser">
+                <div class="row">
+                    <div class="col-md-8">
+                        <form [formGroup]="usuarioForm" (ngSubmit)="updateUser()">
+                            <!-- Nombre -->
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                                    <input formControlName="name" type="text" class="form-control" placeholder="Ingresa nombre completo">
+                                </div>
+                                @if (usuarioForm.get('name')?.invalid && usuarioForm.get('name')?.touched) {
+                                    <div class="text-danger mt-1">
+                                        @if (usuarioForm.get('name')?.hasError('required')) {
+                                            <small>El nombre es requerido</small>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Correo -->
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+                                    <input formControlName="email" type="email" class="form-control" placeholder="Ingresa correo electrónico">
+                                </div>
+                                @if (usuarioForm.get('email')?.invalid && usuarioForm.get('email')?.touched) {
+                                    <div class="text-danger mt-1">
+                                        @if (usuarioForm.get('email')?.hasError('required')) {
+                                            <small>El correo electrónico es requerido</small>
+                                        }
+                                        @if (usuarioForm.get('email')?.hasError('email')) {
+                                            <small>Ingrese un correo electrónico válido</small>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Telefono -->
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-phone-fill"></i></span>
+                                    <input formControlName="phone" type="text" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="form-control" placeholder="Ingresa número telefónico">
+                                </div>
+                                @if (usuarioForm.get('phone')?.invalid && usuarioForm.get('phone')?.touched) {
+                                    <div class="text-danger mt-1">
+                                        @if (usuarioForm.get('phone')?.hasError('required')) {
+                                            <small>El teléfono es requerido</small>
+                                        }
+                                        @if (usuarioForm.get('phone')?.hasError('pattern')) {
+                                            <small>El teléfono debe ser de 10 dígitos numéricos</small>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Rol -->
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-shield-lock-fill"></i></span>
+                                    <select class="form-control" formControlName="role">
+                                        <option value="">Selecciona un rol</option>
+                                        <option *ngFor="let role of roles" [value]="role.id_role">{{ role.name_role }}</option>
+                                    </select>
+                                </div>
+                                @if (usuarioForm.get('role')?.invalid && usuarioForm.get('role')?.touched) {
+                                    <div class="text-danger mt-1">
+                                        @if (usuarioForm.get('role')?.hasError('required')) {
+                                            <small>Debe seleccionar un rol</small>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                            
+                            <!-- Contraseña -->
+                            <div class="mb-3">
+                                <label class="form-label">Contraseña (Opcional)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                                    <input [type]="showPassword ? 'text' : 'password'" class="form-control" formControlName="password" placeholder="Dejar en blanco para no cambiar">
+                                    <button type="button" class="btn btn-outline-secondary" (click)="togglePassword()">
+                                        <i class="bi" [class]="showPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Estatus -->
+                            <div class="mb-3">
+                                <label class="form-label">Estatus</label>
+                                <div class="form-check form-switch status-switch">
+                                    <input class="form-check-input" type="checkbox" formControlName="status">
+                                    <label class="form-check-label">{{ usuarioForm.get('status')?.value ? 'Activo' : 'Inactivo' }}</label>
+                                </div>
+                            </div>
+
+                            <!-- Botón guardar -->
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="bi bi-check-circle-fill"></i> Guardar Cambios
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="col-md-4 d-flex flex-column align-items-center justify-content-start">
+                        <h6 class="mb-2 text-center">Foto de Perfil</h6>
+                        <div class="mb-3 text-center user-photo-frame">
+                            <ng-container *ngIf="imagenUsuario; else iconoPersonaEdit">
+                                <img [src]="imagenUsuario" class="user-photo-img">
+                            </ng-container>
+                            <ng-template #iconoPersonaEdit>
+                                <i class="bi bi-person-circle user-photo-icon"></i>
+                            </ng-template>
+                        </div>
+                        <label class="btn-upload-image">
+                            <i class="bi bi-upload"></i> Cambiar imagen
+                            <input type="file" accept="image/*" hidden (change)="onImageSelected($event)">
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

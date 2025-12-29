@@ -1,0 +1,128 @@
+<div class="layout">
+  <!-- Menú lateral -->
+  <aside class="sidebar" id="sidebar" #sidebar>
+    <div class="logo">
+      <img src="assets/logo.png" alt="Logo" class="logo-img" #logo />
+      <button class="menu-toggle" (click)="toggleSidebar()">☰</button>
+    </div>
+    <nav class="nav-links">
+      <div class="nav-item">
+        <a (click)="toggleSubmenu('operaciones')" class="nav-link" (click)="expandSidebarIfCollapsed()">
+          <i class="bi bi-person-badge icon-box"></i>
+          <span class="menu-text">Operaciones</span>
+        </a>
+        <div class="submenu" [class.open]="isSubmenuOpen['operaciones']">
+          <a routerLink="/dashboard/obras" routerLinkActive="active"><span class="menu-text">Seguimiento de
+              obras</span></a>
+        </div>
+      </div>
+      <div class="nav-item">
+        <a (click)="toggleSubmenu('inventarios')" class="nav-link" (click)="expandSidebarIfCollapsed()">
+          <i class="bi bi-box-seam icon-box"></i>
+          <span class="menu-text">Inventarios</span>
+        </a>
+        <div class="submenu" [class.open]="isSubmenuOpen['inventarios']">
+          <a routerLink="/dashboard/herramientas" routerLinkActive="active"><span class="menu-text">Catálogo de
+              Herramientas</span></a>
+          <a routerLink="/dashboard/materiales" routerLinkActive="active"><span class="menu-text">Catálogo de
+              Materiales</span></a>
+          <a routerLink="/dashboard/partidas" routerLinkActive="active"><span class="menu-text">Partidas</span></a>
+          <a routerLink="/dashboard/subpartidas" routerLinkActive="active"><span
+              class="menu-text">Subpartidas</span></a>
+        </div>
+      </div>
+      <div class="nav-item">
+        <a (click)="toggleSubmenu('compras')" class="nav-link" (click)="expandSidebarIfCollapsed()">
+          <i class="bi bi-cart icon-box"></i>
+          <span class="menu-text">Compras</span>
+        </a>
+        <div class="submenu" [class.open]="isSubmenuOpen['compras']">
+          <a routerLink="/dashboard/solicitudes" routerLinkActive="active"><span class="menu-text">Solicitudes de
+              compra</span></a>
+          <a routerLinkActive="active"><span class="menu-text">Gestión de proveedores</span></a>
+        </div>
+      </div>
+      <div class="nav-item">
+        <a (click)="toggleSubmenu('ventas')" class="nav-link" (click)="expandSidebarIfCollapsed()">
+          <i class="bi bi-cash-coin icon-box"></i>
+          <span class="menu-text">Ventas</span>
+        </a>
+        <div class="submenu" [class.open]="isSubmenuOpen['ventas']">
+          <a routerLinkActive="active"><span class="menu-text">Gestión de clientes</span></a>
+          <a routerLinkActive="active"><span class="menu-text">Ventas por clientes/proyectos</span></a>
+          <a routerLinkActive="active"><span class="menu-text">Cotizaciones</span></a>
+        </div>
+      </div>
+      <div class="nav-item">
+        <a (click)="toggleSubmenu('finanzas')" class="nav-link" (click)="expandSidebarIfCollapsed()">
+          <i class="bi bi-bank icon-box"></i>
+          <span class="menu-text">Finanzas</span>
+        </a>
+        <div class="submenu" [class.open]="isSubmenuOpen['finanzas']">
+          <a routerLinkActive="active"><span class="menu-text">Control de ingresos y egresos</span></a>
+          <a routerLinkActive="active"><span class="menu-text">Conciliación bancaria</span></a>
+          <a routerLinkActive="active"><span class="menu-text">Reporte Financieros</span></a>
+        </div>
+      </div>
+      <div class="nav-item">
+        <a (click)="toggleSubmenu('humanos')" class="nav-link" (click)="expandSidebarIfCollapsed()">
+          <i class="bi bi-people icon-box"></i>
+          <span class="menu-text">Recursos Humanos</span>
+        </a>
+        <div class="submenu" [class.open]="isSubmenuOpen['humanos']">
+          <a routerLink="/dashboard/colaboradores" routerLinkActive="active"><span class="menu-text">Gestión de
+              colaboradores</span></a>
+          <a routerLink="/dashboard/asistencias" routerLinkActive="active"><span class="menu-text">Control
+              asistencia</span></a>
+          <a routerLink="/dashboard/relaciones-laborales" routerLinkActive="active"><span class="menu-text">Relaciones
+              Laborales</span></a>
+          <a routerLink="/dashboard/repositorio-documental" routerLinkActive="active"><span
+              class="menu-text">Repositorio Documental</span></a>
+          <a routerLink="/dashboard/descripciones-puestos" routerLinkActive="active"><span
+              class="menu-text">Descripciones de Puestos</span></a>
+          <a routerLink="/dashboard/control-bajas" routerLinkActive="active"><span class="menu-text">Control de bajas
+              del personal</span></a>
+        </div>
+      </div>
+      <div class="nav-item">
+        <a (click)="toggleSubmenu('configuracion')" class="nav-link" (click)="expandSidebarIfCollapsed()">
+          <i class="bi bi-gear icon-box"></i>
+          <span class="menu-text">Configuración</span>
+        </a>
+        <div class="submenu" [class.open]="isSubmenuOpen['configuracion']">
+          <a routerLink="/dashboard/usuarios" routerLinkActive="active"><span class="menu-text">Gestión de
+              Usuarios</span></a>
+        </div>
+      </div>
+    </nav>
+
+  </aside>
+
+  <!-- Contenido principal -->
+  <div class="main-content" [class.sidebar-collapsed]="isSidebarCollapsed">
+    <!-- Navbar superior -->
+    <nav class="topbar" [class.sidebar-collapsed]="isSidebarCollapsed">
+      <div class="user-actions">
+        <div class="user-info">
+          <ng-container *ngIf="userImage; else defaultIcon">
+            <div class="user-avatar-wrapper">
+              <img [src]="userImage" alt="Foto de perfil" class="user-avatar">
+            </div>
+          </ng-container>
+          <ng-template #defaultIcon>
+            <i class="bi bi-person-circle"></i>
+          </ng-template>
+          <span class="user-name">{{ userName }}</span>
+        </div>
+        <button class="login-button" routerLink="/login">
+          <i class="bi bi-box-arrow-right"></i>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Contenido dinámico -->
+    <div class="content-area">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

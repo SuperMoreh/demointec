@@ -1,0 +1,216 @@
+<div class="content-container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Descripciones de Puestos</h1>
+            <div class="breadcrumb">Gestión de puestos y perfiles</div>
+        </div>
+        <button class="btn btn-primary" (click)="openModal()" *ngIf="hasPermission">
+            <i class="bi bi-plus-lg"></i> Nuevo Puesto
+        </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-section">
+        <div class="filters-row">
+            <div class="filter-group">
+                <label for="search">Buscar</label>
+                <input type="text" id="search" class="filter-input" placeholder="Puesto, Jefe, Tipo..."
+                    [(ngModel)]="searchTerm" (input)="applyFilters()">
+            </div>
+            <button class="btn-filter" (click)="clearFilters()">
+                <i class="bi bi-x-circle"></i> Limpiar
+            </button>
+        </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-container" *ngIf="paginatedJobDescriptions.length > 0">
+        <div class="table-header">
+            <div class="table-info">
+                Mostrando {{ paginatedJobDescriptions.length }} de {{ filteredJobDescriptions.length }} puestos
+                <span *ngIf="searchTerm" class="text-muted">(filtrados de {{ jobDescriptions.length }})</span>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>Puesto</th>
+                        <th>Jefe Inmediato</th>
+                        <th>Tipo de Empleo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let job of paginatedJobDescriptions">
+                        <td><strong>{{ job.job_title }}</strong></td>
+                        <td>{{ job.immediate_boss || 'N/A' }}</td>
+                        <td>
+                            <span class="role-badge">{{ job.employment_type || 'General' }}</span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-view" (click)="viewJob(job)" title="Ver Detalles">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn-action btn-edit" (click)="openModal(job)" title="Editar"
+                                    *ngIf="hasPermission">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn-action btn-delete" (click)="deleteJob(job.id!)" title="Eliminar"
+                                    *ngIf="hasPermission">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- Paginación -->
+        <div class="pagination-container" *ngIf="totalPages > 1">
+            <div class="pagination">
+                <button [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <button *ngFor="let page of pages" [class.active]="page === currentPage" (click)="setPage(page)">
+                    {{ page }}
+                </button>
+                <button [disabled]="currentPage === totalPages" (click)="setPage(currentPage + 1)">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="table-container placeholder-container" *ngIf="paginatedJobDescriptions.length === 0">
+        <div class="table-placeholder">
+            <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+            <span *ngIf="searchTerm">No se encontraron puestos que coincidan con la búsqueda.</span>
+            <span *ngIf="!searchTerm">No hay descripciones de puestos registradas.</span>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Formulario -->
+<div class="modal-backdrop fade show" *ngIf="isModalOpen"></div>
+<div class="modal fade show d-block" *ngIf="isModalOpen" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">{{ isViewMode ? 'Detalles de' : (isEditMode ? 'Editar' : 'Nueva') }} Descripción
+                    de Puesto</h5>
+                <button type="button" class="btn-close btn-close-white" (click)="closeModal()"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="jobForm">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Puesto</label>
+                            <input type="text" class="form-control" formControlName="job_title">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Jefe Inmediato</label>
+                            <input type="text" class="form-control" formControlName="immediate_boss">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Subordinados</label>
+                            <input type="text" class="form-control" formControlName="subordinates">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Función Básica</label>
+                            <input type="text" class="form-control" formControlName="basic_function">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Grado de Responsabilidad</label>
+                            <input type="text" class="form-control" formControlName="responsibility_level">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tipo de Empleo</label>
+                            <input type="text" class="form-control" formControlName="employment_type">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Jornada</label>
+                            <input type="text" class="form-control" formControlName="shift">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Horario Lunes a Viernes</label>
+                            <input type="text" class="form-control" formControlName="schedule_mon_fri">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Horario Fin de Semana</label>
+                            <input type="text" class="form-control" formControlName="schedule_weekend">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Toma de Decisiones</label>
+                            <input type="text" class="form-control" formControlName="decision_making">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Objetivo General</label>
+                            <textarea class="form-control" rows="3" formControlName="general_objective"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Funciones</label>
+                            <textarea class="form-control" rows="5" formControlName="functions"
+                                placeholder="Escribe las funciones aquí"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Tareas</label>
+                            <textarea class="form-control" rows="5" formControlName="tasks"
+                                placeholder="Escribe las tareas correspondientes aquí"></textarea>
+                        </div>
+
+                        <!-- Documentos Requeridos -->
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Documentos Requeridos</label>
+                            <div class="row g-2 mb-3 align-items-end">
+                                <div class="col-md-5">
+                                    <label class="small text-muted mb-1">Nombre del Documento</label>
+                                    <input type="text" class="form-control" placeholder="Ej: Manual de Operaciones"
+                                        [(ngModel)]="newDocumentName" [ngModelOptions]="{standalone: true}">
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="small text-muted mb-1">Archivo de Plantilla (Opcional)</label>
+                                    <input type="file" class="form-control" (change)="onFileSelected($event)"
+                                        #fileInput>
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-success w-100" type="button" (click)="addDocument()"
+                                        [disabled]="isViewMode">
+                                        <i class="bi bi-plus-lg"></i> Añadir
+                                    </button>
+                                </div>
+                            </div>
+
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between align-items-center"
+                                    *ngFor="let doc of documents; let i = index">
+                                    <div>
+                                        <strong>{{ doc.name }}</strong>
+                                        <span *ngIf="doc.path" class="badge bg-success ms-2">
+                                            <i class="bi bi-file-earmark-check"></i> Archivo adjunto
+                                        </span>
+                                    </div>
+                                    <button class="btn btn-sm btn-danger" (click)="removeDocument(i)"
+                                        *ngIf="!isViewMode">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </li>
+                                <li class="list-group-item text-muted" *ngIf="documents.length === 0">
+                                    No hay documentos requeridos asignados.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="closeModal()">{{ isViewMode ? 'Cerrar' :
+                    'Cancelar' }}</button>
+                <button type="button" class="btn btn-primary" (click)="saveJob()" *ngIf="!isViewMode">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>

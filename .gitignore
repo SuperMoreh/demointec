@@ -1,0 +1,5 @@
+node_modules/
+dist/
+.env
+Back-INTEC/src/firebase/firebase-config.json
+Back-INTEC/dist/

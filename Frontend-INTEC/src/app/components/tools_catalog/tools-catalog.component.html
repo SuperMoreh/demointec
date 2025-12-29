@@ -1,0 +1,402 @@
+<div class="content-container">
+    <!-- Header de la página -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Catálogo de Herramientas</h1>
+        </div>
+        <a (click)="setCreateMode()" class="btn-primary" data-bs-toggle="modal" data-bs-target="#agregarHerramientaModal">
+            <i class="bi bi-plus-circle"></i>
+            Agregar Herramienta
+        </a>
+    </div>
+
+    <!-- Filtros y búsqueda -->
+    <div class="filters-section">
+        <div class="filters-row">
+            <div class="filter-group">
+                <label for="search">Buscar</label>
+                <input type="text" id="search" class="filter-input" placeholder="Nombre, código o descripción..." [(ngModel)]="searchTerm" (input)="applyFilters()">
+            </div>
+            <div class="filter-group">
+                <select id="status" class="filter-input" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+                    <option value="">Todos los estados</option>
+                    <option value="true">Activo</option>
+                    <option value="false">Inactivo</option>
+                </select>
+            </div>
+            <button class="btn-consult" (click)="consultTools()" [disabled]="isLoading">
+                <i class="bi bi-search"></i>
+                Consultar
+            </button>
+            <button class="btn-filter" (click)="clearFilters()">
+                <i class="bi bi-list-ul"></i>
+            </button>
+            <button class="btn-sync" (click)="syncTools()" title="Sincronizar herramientas" [disabled]="isLoading">
+                <i class="bi bi-arrow-repeat"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Tabla de herramientas -->
+    <div class="table-container" *ngIf="hasConsulted && !isLoading && filteredTools.length > 0">
+        <div class="table-header">
+            <div class="table-info">
+                Mostrando {{ tools.length }} de {{ allTools.length }} herramientas
+                <span *ngIf="hasActiveFilters()" class="text-muted">(filtradas)</span>
+            </div>
+            <div class="table-actions">
+                <button class="btn-filter1" (click)="exportTools()">
+                    <i class="bi bi-download"></i>
+                    Exportar
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>Herramienta</th>
+                        <th>Código</th>
+                        <th>Descripción</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let tool of tools">
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div class="user-avatar">
+                                    <i class="bi bi-tools"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600;">{{ tool.name_tool }}</div>
+                                    <div style="color: #666; font-size: 0.8rem;">
+                                        {{ tool.code }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ tool.code }}</td>
+                        <td>{{ tool.description }}</td>
+                        <td>
+                            <span
+                                class="status-badge"
+                                [ngClass]="tool.status ? 'status-active' : 'status-inactive'"
+                            >
+                                {{ tool.status ? 'Activo' : 'Inactivo' }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-view" (click)="viewTool(tool)" data-bs-toggle="modal" data-bs-target="#visualizarHerramienta" title="Ver detalles">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn-action btn-edit" (click)="handleEditClick(tool)" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn-action btn-delete" (click)="deleteTool(tool)" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody> 
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        <div class="pagination-container" *ngIf="totalPages > 1">
+            <div class="pagination">
+                <button [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <button *ngFor="let page of pages" [class.active]="page === currentPage" (click)="setPage(page)">
+                    {{ page }}
+                </button>
+                <button [disabled]="currentPage === totalPages" (click)="setPage(currentPage + 1)">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="table-container placeholder-container" *ngIf="hasConsulted && !isLoading && filteredTools.length === 0">
+        <div class="table-placeholder">
+            <i class="bi bi-inbox"></i>
+            No se encontraron herramientas con los filtros aplicados.
+        </div>
+    </div>
+    <div class="table-container placeholder-container" *ngIf="hasConsulted && isLoading">
+        <div class="table-placeholder">
+            <i class="bi bi-arrow-repeat loading-icon"></i>
+            Cargando herramientas...
+        </div>
+    </div>
+    <div class="consult-placeholder" *ngIf="!hasConsulted">
+        <i class="bi bi-info-circle"></i>
+        Consulte para ver la información de herramientas.
+    </div>
+</div>
+
+<!-- Modal para Agregar Herramienta --> 
+<div class="modal fade" id="agregarHerramientaModal" tabindex="-1" aria-labelledby="agregarHerramientaModalLabel" aria-hidden="true">
+<div class="modal-dialog modal-lg"> 
+    <div class="modal-content">
+    <div class="modal-header justify-content-center">
+                <h5 class="modal-title" id="agregarHerramientaModalLabel">Agregar Herramienta</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+    </div>
+
+    <div class="modal-body">
+        <div class="row">
+        <div class="col-md-8">
+            <form [formGroup]="toolsForm" (ngSubmit)="createTool()">
+            <!-- Nombre -->
+            <div class="mb-3">
+                <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-tools"></i></span>
+                                    <input formControlName="name" type="text" class="form-control" placeholder="Ingresa nombre de la herramienta">
+                                </div>
+                                @if (toolsForm.get('name')?.invalid && toolsForm.get('name')?.touched) {
+                                    <div class="text-danger mt-1">
+                                        @if (toolsForm.get('name')?.hasError('required')) {
+                                            <small>El nombre es requerido</small>
+                                        }
+                </div>
+                                }
+            </div>
+
+            <!-- Código -->
+            <div class="mb-3">
+                <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-code-slash"></i></span>
+                                    <input formControlName="code" type="text" class="form-control" placeholder="Ingresa código de la herramienta">
+                                </div>
+                                @if (toolsForm.get('code')?.invalid && toolsForm.get('code')?.touched) {
+                                    <div class="text-danger mt-1">
+                                        @if (toolsForm.get('code')?.hasError('required')) {
+                                            <small>El código es requerido</small>
+                                        }
+                </div>
+                                }
+            </div>
+
+             <!-- Descripción -->
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                                    <input formControlName="description" type="text" class="form-control" placeholder="Ingresa descripción de la herramienta">
+                                </div>
+                                @if (toolsForm.get('description')?.invalid && toolsForm.get('description')?.touched) {
+                                    <div class="text-danger mt-1">
+                                        @if (toolsForm.get('description')?.hasError('required')) {
+                                            <small>La descripción es requerida</small>
+                                        }
+                </div>
+                                }
+            </div>
+
+            <!-- Botón guardar -->
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-success px-4" [disabled]="toolsForm.invalid">
+                <i class="bi bi-check-circle-fill"></i> Guardar
+                </button>
+            </div>
+            </form>
+        </div>
+
+        <div class="col-md-4 d-flex flex-column align-items-center justify-content-start pt-3">
+        <h6 class="mb-2 text-center">Imagen de la Herramienta</h6>
+        
+        <div class="mb-3 text-center user-photo-frame position-relative">
+            <ng-container *ngIf="photo; else iconoHerramienta">
+            <img [src]="photo" class="user-photo-img">
+            </ng-container>
+            <ng-template #iconoHerramienta>
+            <i class="bi bi-tools user-photo-icon"></i>
+            </ng-template>
+        </div>
+
+        <label class="btn-upload-image">
+            <i class="bi bi-upload"></i> Subir imagen
+            <input type="file" accept="image/*" hidden (change)="onImageSelected($event)">
+        </label>
+        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para visualizar herramienta--> 
+<div class="modal fade" id="visualizarHerramienta" tabindex="-1" aria-labelledby="visualizarHerramientaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg"> 
+        <div class="modal-content">
+            <div class="modal-header justify-content-center">
+                <h5 class="modal-title" id="visualizarHerramientaModalLabel">Detalles de la Herramienta</h5>
+                <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+    </div>
+
+            <div class="modal-body" *ngIf="selectedTool">
+                <div class="row">
+                    <div class="col-md-8">
+                        <!-- Nombre -->
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-tools"></i></span>
+                                <input type="text" class="form-control" [value]="selectedTool.name_tool" disabled>
+                            </div>
+                        </div>
+
+                        <!-- Código -->
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-code-slash"></i></span>
+                                <input type="text" class="form-control" [value]="selectedTool.code" disabled>
+        </div>
+    </div>
+
+                        <!-- Descripción -->
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                                <input type="text" class="form-control" [value]="selectedTool.description" disabled>
+    </div>
+</div>
+
+</div>
+
+                    <div class="col-md-4 d-flex flex-column align-items-center justify-content-start">
+                        <h6 class="mb-2 text-center">Imagen de la Herramienta</h6>
+                        <div class="mb-3 text-center user-photo-frame-view">
+                            <ng-container *ngIf="selectedTool.image && selectedTool.image !== 'Sin foto' && selectedTool.image !== '...' && selectedTool.image !== 'null' && selectedTool.image !== 'undefined'; else iconoHerramientaView">
+                                <img [src]="selectedTool.image" class="user-photo-img">
+                            </ng-container>
+                            <ng-template #iconoHerramientaView>
+                                <i class="bi bi-tools user-photo-icon"></i>
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Editar herramienta--> 
+<div class="modal fade" id="editarHerramientaModal" tabindex="-1" aria-labelledby="editarHerramientaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg"> 
+        <div class="modal-content">
+            <div class="modal-header justify-content-center">
+                <h5 class="modal-title" id="editarHerramientaModalLabel">Editar Herramienta</h5>
+                <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+    
+            <div class="modal-body" *ngIf="selectedTool">
+                <div class="row">
+                    <div class="col-md-8">
+                        <form [formGroup]="toolsForm" (ngSubmit)="updateTool()">
+                            <!-- Nombre -->
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-tools"></i></span>
+                                    <input formControlName="name" type="text" class="form-control" placeholder="Ingresa nombre de la herramienta">
+                                </div>
+                                @if (toolsForm.get('name')?.invalid && toolsForm.get('name')?.touched) {
+                                    <div class="text-danger mt-1">
+                                        @if (toolsForm.get('name')?.hasError('required')) {
+                                            <small>El nombre es requerido</small>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Código -->
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-code-slash"></i></span>
+                                    <input formControlName="code" type="text" class="form-control" placeholder="Ingresa código de la herramienta">
+                                </div>
+                                @if (toolsForm.get('code')?.invalid && toolsForm.get('code')?.touched) {
+                                    <div class="text-danger mt-1">
+                                        @if (toolsForm.get('code')?.hasError('required')) {
+                                            <small>El código es requerido</small>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Descripción -->
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                                    <input formControlName="description" type="text" class="form-control" placeholder="Ingresa descripción de la herramienta">
+                                </div>
+                                @if (toolsForm.get('description')?.invalid && toolsForm.get('description')?.touched) {
+                                    <div class="text-danger mt-1">
+                                        @if (toolsForm.get('description')?.hasError('required')) {
+                                            <small>La descripción es requerida</small>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Estatus -->
+                            <div class="mb-3">
+                                <label class="form-label">Estatus</label>
+                                <div class="form-check form-switch status-switch">
+                                    <input class="form-check-input" type="checkbox" formControlName="status">
+                                    <label class="form-check-label">{{ toolsForm.get('status')?.value ? 'Activo' : 'Inactivo' }}</label>
+                                </div>
+                            </div>
+
+                            <!-- Botón guardar -->
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="bi bi-check-circle-fill"></i> Guardar Cambios
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="col-md-4 d-flex flex-column align-items-center justify-content-start">
+                        <h6 class="mb-2 text-center">Imagen de la Herramienta</h6>
+                        <div class="mb-3 text-center user-photo-frame">
+                            <ng-container *ngIf="photo && photo !== 'Sin foto' && photo !== '...' && photo !== 'null' && photo !== 'undefined'; else iconoHerramientaEdit">
+                                <img [src]="photo" class="user-photo-img">
+                            </ng-container>
+                            <ng-template #iconoHerramientaEdit>
+                                <i class="bi bi-tools user-photo-icon"></i>
+                            </ng-template>
+                        </div>
+                        <label class="btn-upload-image">
+                            <i class="bi bi-upload"></i> Cambiar imagen
+                            <input type="file" accept="image/*" hidden (change)="onImageSelected($event)">
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function applyFilters() {
+        const search = document.getElementById('search').value;
+        const status = document.getElementById('status').value;
+        
+        console.log('Filtros aplicados:', { search,  status });
+        alert('Filtros aplicados: ' + JSON.stringify({ search,status }));
+    }
+
+    function exportUsers() {
+        alert('Exportando usuarios...');
+    }
+
+    // Búsqueda en tiempo real
+    document.getElementById('search').addEventListener('input', function(e) {
+        console.log('Buscando:', e.target.value);
+    });
+</script>

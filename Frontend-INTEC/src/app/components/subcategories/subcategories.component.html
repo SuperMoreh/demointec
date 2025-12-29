@@ -1,0 +1,263 @@
+<div class="content-container">
+  <!-- Header de la página -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Catálogo de Subpartidas</h1>
+    </div>
+    <a (click)="setCreateMode()" class="btn-primary" data-bs-toggle="modal" data-bs-target="#agregarSubpartidaModal">
+      <i class="bi bi-plus-circle"></i>
+      Agregar Subpartida
+    </a>
+  </div>
+
+  <!-- Filtros y búsqueda -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <div class="filter-group">
+        <label for="search">Buscar</label>
+        <input type="text" id="search" class="filter-input" placeholder="Nombre, C1, C2..." [(ngModel)]="searchTerm" (input)="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <select id="status" class="filter-input" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+          <option value="">Todos los estados</option>
+          <option value="true">Activo</option>
+          <option value="false">Inactivo</option>
+        </select>
+      </div>
+      <button class="btn-consult" (click)="consultSubcategories()" [disabled]="isLoading">
+        <i class="bi bi-search"></i>
+      </button>
+      <button class="btn-filter" (click)="clearFilters()">
+        <i class="bi bi-list-ul"></i>
+      </button>
+      <button class="btn-sync" (click)="syncSubcategories()" title="Sincronizar subpartidas" [disabled]="isLoading">
+        <i class="bi bi-arrow-repeat"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabla de subpartidas -->
+  <div class="table-container" *ngIf="hasConsulted && !isLoading && filteredSubcategories.length > 0">
+    <div class="table-header">
+      <div class="table-info">
+        Mostrando {{ subcategories.length }} de {{ allSubcategories.length }} subpartidas
+        <span *ngIf="hasActiveFilters()" class="text-muted">(filtradas)</span>
+      </div>
+      <div class="table-actions">
+        <button class="btn-filter1" (click)="exportSubcategories()">
+          <i class="bi bi-download"></i>
+          Exportar
+        </button>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Característica 1</th>
+            <th>Característica 2</th>
+            <th>Partida</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let subcategory of subcategories">
+            <td>{{ subcategory.name_subcategory }}</td>
+            <td>{{ subcategory.c1 }}</td>
+            <td>{{ subcategory.c2 }}</td>
+            <td>{{ getCategoryName(subcategory.category_id) }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="subcategory.status ? 'status-active' : 'status-inactive'">
+                {{ subcategory.status ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn-action btn-edit" (click)="handleEditClick(subcategory)" title="Editar">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn-action btn-delete" (click)="deleteSubcategory(subcategory)" title="Eliminar">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Paginación -->
+    <div class="pagination-container" *ngIf="totalPages > 1">
+      <div class="pagination">
+        <button [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button *ngFor="let page of pages" [class.active]="page === currentPage" (click)="setPage(page)">
+          {{ page }}
+        </button>
+        <button [disabled]="currentPage === totalPages" (click)="setPage(currentPage + 1)">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="table-container placeholder-container" *ngIf="hasConsulted && !isLoading && filteredSubcategories.length === 0">
+    <div class="table-placeholder">
+      <i class="bi bi-inbox"></i>
+      No se encontraron subpartidas con los filtros aplicados.
+    </div>
+  </div>
+  <div class="table-container placeholder-container" *ngIf="hasConsulted && isLoading">
+    <div class="table-placeholder">
+      <i class="bi bi-arrow-repeat loading-icon"></i>
+      Cargando subpartidas...
+    </div>
+  </div>
+  <div class="consult-placeholder" *ngIf="!hasConsulted">
+    <i class="bi bi-info-circle"></i>
+    Consulte para ver la información de subpartidas.
+  </div>
+</div>
+
+<!-- Modal para Agregar Subpartida -->
+<div class="modal fade" id="agregarSubpartidaModal" tabindex="-1" aria-labelledby="agregarSubpartidaModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="agregarSubpartidaModalLabel">Agregar Subpartida</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="subcategoriesForm" (ngSubmit)="createSubcategory()">
+          <!-- Nombre -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-tag"></i></span>
+              <input formControlName="name_subcategory" type="text" class="form-control" placeholder="Ingresa nombre de la subpartida">
+            </div>
+            <div *ngIf="subcategoriesForm.get('name_subcategory')?.invalid && subcategoriesForm.get('name_subcategory')?.touched" class="text-danger mt-1">
+              <small>El nombre es requerido</small>
+            </div>
+          </div>
+          <!-- Característica 1 -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-gear"></i></span>
+              <input formControlName="c1" type="text" class="form-control" placeholder="Característica 1">
+            </div>
+            <div *ngIf="subcategoriesForm.get('c1')?.invalid && subcategoriesForm.get('c1')?.touched" class="text-danger mt-1">
+              <small>Característica 1 es requerida</small>
+            </div>
+          </div>
+          <!-- Característica 2 -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-gear-wide-connected"></i></span>
+              <input formControlName="c2" type="text" class="form-control" placeholder="Característica 2">
+            </div>
+            <div *ngIf="subcategoriesForm.get('c2')?.invalid && subcategoriesForm.get('c2')?.touched" class="text-danger mt-1">
+              <small>Característica 2 es requerida</small>
+            </div>
+          </div>
+          <!-- Partida -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-tags"></i></span>
+              <select formControlName="category_id" class="form-control">
+                <option value="">Selecciona una partida</option>
+                <option *ngFor="let cat of categories" [value]="cat.id_category">
+                  {{ cat.name_category }}
+                </option>
+              </select>
+            </div>
+            <div *ngIf="subcategoriesForm.get('category_id')?.invalid && subcategoriesForm.get('category_id')?.touched" class="text-danger mt-1">
+              <small>La partida es requerida</small>
+            </div>
+          </div>
+          <!-- Botón guardar -->
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-success px-4" [disabled]="subcategoriesForm.invalid">
+              <i class="bi bi-check-circle-fill"></i> Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Editar subpartida -->
+<div class="modal fade" id="editarSubpartidaModal" tabindex="-1" aria-labelledby="editarSubpartidaModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="editarSubpartidaModalLabel">Editar Subpartida</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedSubcategory">
+        <form [formGroup]="subcategoriesForm" (ngSubmit)="updateSubcategory()">
+          <!-- Nombre -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-tag"></i></span>
+              <input formControlName="name_subcategory" type="text" class="form-control" placeholder="Ingresa nombre de la subpartida">
+            </div>
+            <div *ngIf="subcategoriesForm.get('name_subcategory')?.invalid && subcategoriesForm.get('name_subcategory')?.touched" class="text-danger mt-1">
+              <small>El nombre es requerido</small>
+            </div>
+          </div>
+          <!-- Característica 1 -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-gear"></i></span>
+              <input formControlName="c1" type="text" class="form-control" placeholder="Característica 1">
+            </div>
+            <div *ngIf="subcategoriesForm.get('c1')?.invalid && subcategoriesForm.get('c1')?.touched" class="text-danger mt-1">
+              <small>Característica 1 es requerida</small>
+            </div>
+          </div>
+          <!-- Característica 2 -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-gear-wide-connected"></i></span>
+              <input formControlName="c2" type="text" class="form-control" placeholder="Característica 2">
+            </div>
+            <div *ngIf="subcategoriesForm.get('c2')?.invalid && subcategoriesForm.get('c2')?.touched" class="text-danger mt-1">
+              <small>Característica 2 es requerida</small>
+            </div>
+          </div>
+          <!-- Partida -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-tags"></i></span>
+              <select formControlName="category_id" class="form-control">
+                <option value="">Selecciona una partida</option>
+                <option *ngFor="let cat of categories" [value]="cat.id_category">
+                  {{ cat.name_category }}
+                </option>
+              </select>
+            </div>
+            <div *ngIf="subcategoriesForm.get('category_id')?.invalid && subcategoriesForm.get('category_id')?.touched" class="text-danger mt-1">
+              <small>La partida es requerida</small>
+            </div>
+          </div>
+          <!-- Estatus -->
+          <div class="mb-3">
+            <label class="form-label">Estatus</label>
+            <div class="form-check form-switch status-switch">
+              <input class="form-check-input" type="checkbox" formControlName="status">
+              <label class="form-check-label">{{ subcategoriesForm.get('status')?.value ? 'Activo' : 'Inactivo' }}</label>
+            </div>
+          </div>
+          <!-- Botón guardar -->
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary px-4">
+              <i class="bi bi-check-circle-fill"></i> Guardar Cambios
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div> 

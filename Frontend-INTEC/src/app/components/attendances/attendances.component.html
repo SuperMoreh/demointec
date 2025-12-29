@@ -1,0 +1,125 @@
+<div class="content-container">
+  <!-- Header de la página -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Control de Asistencias</h1>
+    </div>
+  </div>
+
+  <!-- Filtros y búsqueda -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <div class="filter-group">
+        <label for="search">Buscar por nombre</label>
+        <input type="text" id="search" class="filter-input" placeholder="Nombre..." [(ngModel)]="searchTerm"
+          (input)="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <label for="periodType">Periodo</label>
+        <select id="periodType" class="filter-input" [(ngModel)]="periodType" (change)="onPeriodTypeChange()">
+          <option value="dia">Día</option>
+          <option value="semana">Semana</option>
+          <option value="mes">Mes</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="startDate">Fecha inicial</label>
+        <input type="date" id="startDate" class="filter-input" [(ngModel)]="startDate" (change)="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <label for="endDate">Fecha final</label>
+        <input type="date" id="endDate" class="filter-input" [(ngModel)]="endDate" (change)="applyFilters()">
+      </div>
+      <button class="btn-consult" (click)="consultAttendances()" [disabled]="isLoading">
+        <i class="bi bi-search"></i>
+      </button>
+      <button class="btn-filter" (click)="clearFilters()">
+        <i class="bi bi-list-ul"></i>
+      </button>
+      <button class="btn-sync" (click)="syncAttendances()" title="Sincronizar asistencias" [disabled]="isLoading">
+        <i class="bi bi-arrow-repeat"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabla de asistencias -->
+  <div class="table-container" *ngIf="hasConsulted && !isLoading && filteredAttendances.length > 0">
+    <div class="table-header">
+      <div class="table-info">
+        Mostrando {{ attendances.length }} de {{ allAttendances.length }} asistencias
+        <span *ngIf="searchTerm || startDate || endDate" class="text-muted">(filtradas)</span>
+      </div>
+      <div class="table-actions">
+        <button class="btn-filter1" (click)="exportAttendances()">
+          <i class="bi bi-download"></i>
+          Exportar
+        </button>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Latitud</th>
+            <th>Longitud</th>
+            <th>Observación</th>
+            <th>Tipo</th>
+            <th>UUID</th>
+            <th>Estatus</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let att of attendances">
+            <td>{{ att.name_user }}</td>
+            <td>{{ att.date | date:'yyyy-MM-dd' }}</td>
+            <td>{{ att.hour }}</td>
+            <td>{{ att.latitude }}</td>
+            <td>{{ att.length }}</td>
+            <td>{{ att.observation }}</td>
+            <td>{{ att.type }}</td>
+            <td>{{ att.uuid }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="att.status ? 'status-active' : 'status-inactive'">
+                {{ att.status ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Paginación -->
+    <div class="pagination-container" *ngIf="totalPages > 1">
+      <div class="pagination">
+        <button [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button *ngFor="let page of pages" [class.active]="page === currentPage" (click)="setPage(page)">
+          {{ page }}
+        </button>
+        <button [disabled]="currentPage === totalPages" (click)="setPage(currentPage + 1)">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="table-container placeholder-container"
+    *ngIf="hasConsulted && !isLoading && filteredAttendances.length === 0">
+    <div class="table-placeholder">
+      <i class="bi bi-inbox"></i>
+      No se encontraron asistencias con los filtros aplicados.
+    </div>
+  </div>
+  <div class="table-container placeholder-container" *ngIf="hasConsulted && isLoading">
+    <div class="table-placeholder">
+      <i class="bi bi-arrow-repeat loading-icon"></i>
+      Cargando asistencias...
+    </div>
+  </div>
+  <div class="consult-placeholder" *ngIf="!hasConsulted">
+    <i class="bi bi-info-circle"></i>
+    Consulte para ver la información de asistencias.
+  </div>
+</div>

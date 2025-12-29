@@ -1,0 +1,128 @@
+<style>
+  .btn-orange {
+  background-color: #F58525;
+  border: none;
+  color: white;
+  
+  &:hover {
+    background-color: #e07b21;
+  }
+
+  &:disabled {
+    background-color: #f5a562;
+    cursor: not-allowed;
+  }
+}
+
+.btn-admin {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0.5rem 1rem;
+  
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  i {
+    font-style: normal;
+  }
+}
+
+.input-group-text {
+  cursor: pointer;
+}
+
+.custom-bg {
+  background-color: #000;
+  color: white;
+}
+
+.fondo-bg {
+  background: #1e130c;  /* fallback for old browsers */
+background: -webkit-linear-gradient(to right, #9a8478, #1e130c);  /* Chrome 10-25, Safari 5.1-6 */
+background: linear-gradient(to right, #9a8478, #1e130c); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+}
+
+.text-danger {
+  font-size: 12px;
+}
+
+/* Asegura que la línea divisoria sea responsive */
+@media (max-width: 576px) {
+  .text-center div[style] {
+    width: 100% !important;
+  }
+}
+
+</style>
+<div class="min-vh-100 d-flex justify-content-center align-items-center fondo-bg text-white">
+    <div class="container">
+      <div class="row w-100">
+        <div class="col-md-6 custom-bg p-5 rounded-start">
+          <div class="text-center">
+            <img src="assets/logo1.png" class="mb-3" width="150" height="150" alt="Logo">
+            <p>Desarrollo Integral de Ingeniería Eléctrica</p>
+            <button class="btn btn-admin mt-3"><i>⚙️</i> Panel Administrativo</button>
+            <p class="mt-5 small">© 2025 INTEC<br>Todos los derechos reservados</p>
+          </div>
+        </div>
+        <div class="col-md-6 bg-light text-dark p-5 rounded-end">
+          <div class="text-center mb-4">
+            <h3 class="fw-bold">Bienvenido de nuevo</h3>
+            <p>Ingresa tus credenciales para acceder al sistema</p>
+            <div style="width: 100%; max-width: 450px; height: 2px; background-color: #b1ada9; margin: 0 auto;"></div>
+          </div>
+          <form [formGroup]="loginForm" (ngSubmit)="iniciarSesion()">
+            <!-- Correo electrónico -->
+            <div class="mb-3">
+              <label class="form-label">Correo electrónico</label>
+              <div class="input-group">
+                <span class="input-group-text bg-white"><i class="bi bi-envelope-fill"></i></span>
+                <input type="email" class="form-control" placeholder="ejemplo@correo.com" formControlName="email">
+              </div>
+              @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+                <div class="text-danger mt-1">
+                  @if (loginForm.get('email')?.hasError('required')) {
+                    <small>El correo electrónico es requerido</small>
+                  }
+                  @if (loginForm.get('email')?.hasError('email')) {
+                    <small>Ingrese un correo electrónico válido</small>
+                  }
+                </div>
+              }
+            </div>
+            
+            <!-- Contraseña -->
+            <div class="mb-3">
+              <label class="form-label">Contraseña</label>
+              <div class="input-group">
+                <span class="input-group-text bg-white"><i class="bi bi-lock-fill"></i></span>
+                <input [type]="showPassword ? 'text' : 'password'" class="form-control" placeholder="********" formControlName="password">
+                <button type="button" class="btn btn-outline-secondary" (click)="togglePassword()">
+                  <i class="bi" [class]="showPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'"></i>
+                </button>
+              </div>
+              @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+                <div class="text-danger mt-1">
+                  @if (loginForm.get('password')?.hasError('required')) {
+                    <small>La contraseña es requerida</small>
+                  }
+                </div>
+              }
+            </div>
+            
+            <button type="submit" class="btn btn-orange w-100">Iniciar sesión</button>
+            
+            <div class="mt-3 text-center">
+              <small>¿Problemas para acceder? Contacta al administrador del sistema</small>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
