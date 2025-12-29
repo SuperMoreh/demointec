@@ -34,6 +34,7 @@ database.initialize()
   .then(() => console.log("Database connected"))
   .catch(console.error);
 
+
 // Rutas
 app.use('/api', userRouter);
 app.use('/api', loginRouter);
@@ -53,6 +54,12 @@ app.use('/api', employeeDocumentsRouter);
 app.use('/api', jobDescriptionRouter);
 app.use('/api', uploadRouter);
 app.use('/api', terminationRouter);
+
+// Serve Frontend Static Files
+app.use(express.static(path.join(__dirname, '../public')));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/index.html'));
+});
 
 
 
