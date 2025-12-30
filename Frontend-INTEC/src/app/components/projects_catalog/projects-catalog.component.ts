@@ -6,6 +6,8 @@ import { ToastrService } from 'ngx-toastr';
 import { ProjectsCatalogAdapterService } from '../../adapters/projects_catalog.adapter';
 import { Project } from '../../models/projects_catalog';
 import { ReportProjectsService } from '../../services/reports/report_projects.service';
+import { EmployeesAdapterService } from '../../adapters/employees.adapter';
+import { Employee } from '../../models/employees';
 
 @Component({
   selector: 'app-projects-catalog',
@@ -30,11 +32,15 @@ export class ProjectsCatalogComponent implements OnInit {
   hasConsulted: boolean = false;
   isLoading: boolean = false;
 
+  employees: Employee[] = [];
+  locationOptions: string[] = ['Local', 'Foránea'];
+
   constructor(
     private fb: FormBuilder,
     private toastr: ToastrService,
     private projectsAdapterService: ProjectsCatalogAdapterService,
-    private reportProjectsService: ReportProjectsService
+    private reportProjectsService: ReportProjectsService,
+    private employeesAdapterService: EmployeesAdapterService
   ) {
     this.projectsForm = this.fb.group({
       name_project: ['', Validators.required],
@@ -47,6 +53,16 @@ export class ProjectsCatalogComponent implements OnInit {
 
   ngOnInit(): void {
     this.setCreateMode();
+    this.loadEmployees();
+  }
+
+  loadEmployees(): void {
+    this.employeesAdapterService.getList().subscribe({
+      next: (data) => {
+        this.employees = data;
+      },
+      error: (err) => console.error('Error al cargar empleados', err)
+    });
   }
 
   loadProjects(): void {
@@ -336,7 +352,7 @@ export class ProjectsCatalogComponent implements OnInit {
   }
 
   private generateUUID(): string {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
       const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
       return v.toString(16);
     });

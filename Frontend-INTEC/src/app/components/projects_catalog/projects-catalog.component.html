@@ -15,7 +15,8 @@
     <div class="filters-row">
       <div class="filter-group">
         <label for="search">Buscar</label>
-        <input type="text" id="search" class="filter-input" placeholder="Nombre, tipo, localidad, oficial..." [(ngModel)]="searchTerm" (input)="applyFilters()">
+        <input type="text" id="search" class="filter-input" placeholder="Nombre, tipo, localidad, oficial..."
+          [(ngModel)]="searchTerm" (input)="applyFilters()">
       </div>
       <div class="filter-group">
         <select id="status" class="filter-input" [(ngModel)]="selectedStatus" (change)="applyFilters()">
@@ -105,7 +106,8 @@
       </div>
     </div>
   </div>
-  <div class="table-container placeholder-container" *ngIf="hasConsulted && !isLoading && filteredProjects.length === 0">
+  <div class="table-container placeholder-container"
+    *ngIf="hasConsulted && !isLoading && filteredProjects.length === 0">
     <div class="table-placeholder">
       <i class="bi bi-inbox"></i>
       No se encontraron obras con los filtros aplicados.
@@ -124,12 +126,14 @@
 </div>
 
 <!-- Modal para Agregar Obra -->
-<div class="modal fade" id="agregarProyectoModal" tabindex="-1" aria-labelledby="agregarProyectoModalLabel" aria-hidden="true">
+<div class="modal fade" id="agregarProyectoModal" tabindex="-1" aria-labelledby="agregarProyectoModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header justify-content-center">
         <h5 class="modal-title" id="agregarProyectoModalLabel">Agregar Obra</h5>
-        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"
+          aria-label="Cerrar"></button>
       </div>
       <div class="modal-body">
         <form [formGroup]="projectsForm" (ngSubmit)="createProject()">
@@ -137,9 +141,11 @@
           <div class="mb-3">
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-building"></i></span>
-              <input formControlName="name_project" type="text" class="form-control" placeholder="Ingresa nombre de la obra">
+              <input formControlName="name_project" type="text" class="form-control"
+                placeholder="Ingresa nombre de la obra">
             </div>
-            <div *ngIf="projectsForm.get('name_project')?.invalid && projectsForm.get('name_project')?.touched" class="text-danger mt-1">
+            <div *ngIf="projectsForm.get('name_project')?.invalid && projectsForm.get('name_project')?.touched"
+              class="text-danger mt-1">
               <small>El nombre es requerido</small>
             </div>
           </div>
@@ -147,9 +153,13 @@
           <div class="mb-3">
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-              <input formControlName="locationType" type="text" class="form-control" placeholder="Tipo de ubicación">
+              <select formControlName="locationType" class="form-select">
+                <option value="">Seleccione tipo de ubicación...</option>
+                <option *ngFor="let loc of locationOptions" [value]="loc">{{ loc }}</option>
+              </select>
             </div>
-            <div *ngIf="projectsForm.get('locationType')?.invalid && projectsForm.get('locationType')?.touched" class="text-danger mt-1">
+            <div *ngIf="projectsForm.get('locationType')?.invalid && projectsForm.get('locationType')?.touched"
+              class="text-danger mt-1">
               <small>El tipo de ubicación es requerido</small>
             </div>
           </div>
@@ -159,7 +169,8 @@
               <span class="input-group-text"><i class="bi bi-geo"></i></span>
               <input formControlName="locality" type="text" class="form-control" placeholder="Localidad">
             </div>
-            <div *ngIf="projectsForm.get('locality')?.invalid && projectsForm.get('locality')?.touched" class="text-danger mt-1">
+            <div *ngIf="projectsForm.get('locality')?.invalid && projectsForm.get('locality')?.touched"
+              class="text-danger mt-1">
               <small>La localidad es requerida</small>
             </div>
           </div>
@@ -167,9 +178,13 @@
           <div class="mb-3">
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
-              <input formControlName="official" type="text" class="form-control" placeholder="Oficial">
+              <select formControlName="official" class="form-select">
+                <option value="">Seleccione oficial...</option>
+                <option *ngFor="let emp of employees" [value]="emp.name_employee">{{ emp.name_employee }}</option>
+              </select>
             </div>
-            <div *ngIf="projectsForm.get('official')?.invalid && projectsForm.get('official')?.touched" class="text-danger mt-1">
+            <div *ngIf="projectsForm.get('official')?.invalid && projectsForm.get('official')?.touched"
+              class="text-danger mt-1">
               <small>El oficial es requerido</small>
             </div>
           </div>
@@ -186,12 +201,14 @@
 </div>
 
 <!-- Modal para visualizar obra -->
-<div class="modal fade" id="visualizarProyecto" tabindex="-1" aria-labelledby="visualizarProyectoModalLabel" aria-hidden="true">
+<div class="modal fade" id="visualizarProyecto" tabindex="-1" aria-labelledby="visualizarProyectoModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header justify-content-center">
         <h5 class="modal-title" id="visualizarProyectoModalLabel">Detalles de la Obra</h5>
-        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"
+          aria-label="Cerrar"></button>
       </div>
       <div class="modal-body" *ngIf="selectedProject">
         <div class="mb-3">
@@ -224,12 +241,14 @@
 </div>
 
 <!-- Modal para Editar obra -->
-<div class="modal fade" id="editarProyectoModal" tabindex="-1" aria-labelledby="editarProyectoModalLabel" aria-hidden="true">
+<div class="modal fade" id="editarProyectoModal" tabindex="-1" aria-labelledby="editarProyectoModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header justify-content-center">
         <h5 class="modal-title" id="editarProyectoModalLabel">Editar Obra</h5>
-        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"
+          aria-label="Cerrar"></button>
       </div>
       <div class="modal-body" *ngIf="selectedProject">
         <form [formGroup]="projectsForm" (ngSubmit)="updateProject()">
@@ -237,9 +256,11 @@
           <div class="mb-3">
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-building"></i></span>
-              <input formControlName="name_project" type="text" class="form-control" placeholder="Ingresa nombre de la obra">
+              <input formControlName="name_project" type="text" class="form-control"
+                placeholder="Ingresa nombre de la obra">
             </div>
-            <div *ngIf="projectsForm.get('name_project')?.invalid && projectsForm.get('name_project')?.touched" class="text-danger mt-1">
+            <div *ngIf="projectsForm.get('name_project')?.invalid && projectsForm.get('name_project')?.touched"
+              class="text-danger mt-1">
               <small>El nombre es requerido</small>
             </div>
           </div>
@@ -247,9 +268,13 @@
           <div class="mb-3">
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-              <input formControlName="locationType" type="text" class="form-control" placeholder="Tipo de ubicación">
+              <select formControlName="locationType" class="form-select">
+                <option value="">Seleccione tipo de ubicación...</option>
+                <option *ngFor="let loc of locationOptions" [value]="loc">{{ loc }}</option>
+              </select>
             </div>
-            <div *ngIf="projectsForm.get('locationType')?.invalid && projectsForm.get('locationType')?.touched" class="text-danger mt-1">
+            <div *ngIf="projectsForm.get('locationType')?.invalid && projectsForm.get('locationType')?.touched"
+              class="text-danger mt-1">
               <small>El tipo de ubicación es requerido</small>
             </div>
           </div>
@@ -259,7 +284,8 @@
               <span class="input-group-text"><i class="bi bi-geo"></i></span>
               <input formControlName="locality" type="text" class="form-control" placeholder="Localidad">
             </div>
-            <div *ngIf="projectsForm.get('locality')?.invalid && projectsForm.get('locality')?.touched" class="text-danger mt-1">
+            <div *ngIf="projectsForm.get('locality')?.invalid && projectsForm.get('locality')?.touched"
+              class="text-danger mt-1">
               <small>La localidad es requerida</small>
             </div>
           </div>
@@ -267,9 +293,13 @@
           <div class="mb-3">
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
-              <input formControlName="official" type="text" class="form-control" placeholder="Oficial">
+              <select formControlName="official" class="form-select">
+                <option value="">Seleccione oficial...</option>
+                <option *ngFor="let emp of employees" [value]="emp.name_employee">{{ emp.name_employee }}</option>
+              </select>
             </div>
-            <div *ngIf="projectsForm.get('official')?.invalid && projectsForm.get('official')?.touched" class="text-danger mt-1">
+            <div *ngIf="projectsForm.get('official')?.invalid && projectsForm.get('official')?.touched"
+              class="text-danger mt-1">
               <small>El oficial es requerido</small>
             </div>
           </div>
@@ -291,4 +321,4 @@
       </div>
     </div>
   </div>
-</div> 
+</div>
