@@ -1398,6 +1398,8 @@
                 <tr>
                   <th>Fecha</th>
                   <th>Hora Entrada</th>
+                  <th>Hora Salida</th>
+                  <th>Tipo</th>
                   <th>Hora Registrada</th>
                   <th>Estatus</th>
                 </tr>
@@ -1406,10 +1408,17 @@
                 <tr *ngFor="let record of attendanceRecords">
                   <td>{{ record.date | date:'dd/MM/yyyy':'UTC' }}</td>
                   <td>{{ selectedEmployeeForAttendance?.entry_time || 'N/A' }}</td>
+                  <td>{{ selectedEmployeeForAttendance?.exit_time || 'N/A' }}</td>
+                  <td>
+                    <span
+                      [ngClass]="{'badge bg-success': record.type === 'Entrada', 'badge bg-warning text-dark': record.type === 'Salida' || record.type === 'Salida Comida' || record.type === 'Regreso Comida'}">
+                      {{ record.type }}
+                    </span>
+                  </td>
                   <td>{{ record.hour }}</td>
                   <td>
                     <span class="status-badge"
-                      [ngClass]="{'on-time': record.statusLabel === 'A tiempo', 'late': record.statusLabel === 'Retardo', 'missing': record.statusLabel === 'Falta' || record.statusLabel === 'Sin H. Entrada' || record.statusLabel === 'Error H.'}">
+                      [ngClass]="{'on-time': record.statusLabel === 'A tiempo', 'late': record.statusLabel === 'Retardo', 'missing': record.statusLabel === 'Falta' || record.statusLabel === 'Sin H. Entrada' || record.statusLabel === 'Error H.', 'neutral': record.statusLabel === '-'}">
                       {{ record.statusLabel }}
                     </span>
                   </td>
