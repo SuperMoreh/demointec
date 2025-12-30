@@ -286,9 +286,7 @@
               <div class="col-md-12 mb-3">
                 <label class="form-label">Cantidad de Hijos</label>
                 <select formControlName="children_count" class="form-select" style="width: 150px;">
-                  <option [ngValue]="0">0</option>
-                  <option *ngFor="let count of childrenCountOptions" [value]="count" [disabled]="count === 0">{{ count
-                    }}</option>
+                  <option *ngFor="let count of childrenCountOptions" [value]="count">{{ count }}</option>
                 </select>
               </div>
             </div>
@@ -1069,9 +1067,7 @@
               <div class="col-md-12 mb-3">
                 <label class="form-label">Cantidad de Hijos</label>
                 <select formControlName="children_count" class="form-select" style="width: 150px;">
-                  <option [ngValue]="0">0</option>
-                  <option *ngFor="let count of childrenCountOptions" [value]="count" [disabled]="count === 0">{{ count
-                    }}</option>
+                  <option *ngFor="let count of childrenCountOptions" [value]="count">{{ count }}</option>
                 </select>
               </div>
             </div>
