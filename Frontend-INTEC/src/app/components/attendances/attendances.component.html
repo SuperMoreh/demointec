@@ -67,8 +67,8 @@
             <th>Longitud</th>
             <th>Observación</th>
             <th>Tipo</th>
-            <th>UUID</th>
             <th>Estatus</th>
+            <th>Ubicación</th>
           </tr>
         </thead>
         <tbody>
@@ -80,11 +80,18 @@
             <td>{{ att.length }}</td>
             <td>{{ att.observation }}</td>
             <td>{{ att.type }}</td>
-            <td>{{ att.uuid }}</td>
             <td>
-              <span class="status-badge" [ngClass]="att.status ? 'status-active' : 'status-inactive'">
-                {{ att.status ? 'Activo' : 'Inactivo' }}
+              <span class="status-badge"
+                [ngClass]="calculateStatus(att) === 'A tiempo' ? 'status-active' : (calculateStatus(att) === 'Retardo' ? 'status-inactive' : 'status-neutral')">
+                {{ calculateStatus(att) }}
               </span>
+            </td>
+            <td>
+              <a *ngIf="att.latitude && att.length"
+                [href]="'https://www.google.com/maps?q=' + att.latitude + ',' + att.length" target="_blank"
+                class="btn btn-sm btn-outline-primary" title="Ver en mapa">
+                <i class="bi bi-geo-alt-fill"></i>
+              </a>
             </td>
           </tr>
         </tbody>

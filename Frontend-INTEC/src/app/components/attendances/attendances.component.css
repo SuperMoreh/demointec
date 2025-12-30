@@ -229,6 +229,12 @@
     font-style: bold;
 }
 
+.status-neutral {
+    background-color: #e2e3e5;
+    color: #383d41;
+    font-weight: bold;
+}
+
 .role-badge {
     background-color: #e3f2fd;
     color: #0d47a1;

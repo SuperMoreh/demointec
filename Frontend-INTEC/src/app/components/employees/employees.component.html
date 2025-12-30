@@ -182,20 +182,7 @@
               </div>
             </div>
 
-            <!-- Role -->
-            <div class="mb-3">
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
-                <select formControlName="role" class="form-select">
-                  <option value="">Seleccione un rol</option>
-                  <option *ngFor="let role of roles" [value]="role.name_role">{{ role.name_role }}</option>
-                </select>
-              </div>
-              <div *ngIf="employeesForm.get('role')?.invalid && employeesForm.get('role')?.touched"
-                class="text-danger mt-1">
-                <small>El rol es requerido</small>
-              </div>
-            </div>
+
           </div>
 
 
@@ -234,19 +221,29 @@
             <div class="row">
               <div class="col-md-3 mb-3">
                 <label class="form-label">Sexo</label>
-                <input formControlName="gender" type="text" class="form-control">
+                <select formControlName="gender" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let option of genderOptions" [value]="option">{{ option }}</option>
+                </select>
               </div>
               <div class="col-md-3 mb-3">
                 <label class="form-label">Edad</label>
-                <input formControlName="age" type="number" class="form-control">
+                <input formControlName="age" type="text" class="form-control" readonly
+                  style="background-color: #e9ecef;">
               </div>
               <div class="col-md-3 mb-3">
                 <label class="form-label">Estado Civil</label>
-                <input formControlName="marital_status" type="text" class="form-control">
+                <select formControlName="marital_status" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let option of maritalStatusOptions" [value]="option">{{ option }}</option>
+                </select>
               </div>
               <div class="col-md-3 mb-3">
                 <label class="form-label">Nivel Estudios</label>
-                <input formControlName="education_level" type="text" class="form-control">
+                <select formControlName="education_level" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let option of educationLevelOptions" [value]="option">{{ option }}</option>
+                </select>
               </div>
             </div>
             <div class="mb-3">
@@ -288,47 +285,55 @@
             <div class="row">
               <div class="col-md-12 mb-3">
                 <label class="form-label">Cantidad de Hijos</label>
-                <input formControlName="children_count" type="number" class="form-control" style="width: 100px;">
+                <select formControlName="children_count" class="form-select" style="width: 150px;">
+                  <option [ngValue]="0">0</option>
+                  <option *ngFor="let count of childrenCountOptions" [value]="count" [disabled]="count === 0">{{ count
+                    }}</option>
+                </select>
               </div>
             </div>
             <div class="row">
-              <div class="col-md-6 mb-2">
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 1">
                 <label class="form-label">Hijo 1</label>
                 <input formControlName="child1_name" type="text" class="form-control" placeholder="Nombre">
               </div>
-              <div class="col-md-6 mb-2">
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 1">
                 <label class="form-label">Fecha Nac. Hijo 1</label>
                 <input formControlName="child1_birth_date" type="date" class="form-control">
               </div>
-              <div class="col-md-6 mb-2">
+
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 2">
                 <label class="form-label">Hijo 2</label>
                 <input formControlName="child2_name" type="text" class="form-control" placeholder="Nombre">
               </div>
-              <div class="col-md-6 mb-2">
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 2">
                 <label class="form-label">Fecha Nac. Hijo 2</label>
                 <input formControlName="child2_birth_date" type="date" class="form-control">
               </div>
-              <div class="col-md-6 mb-2">
+
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 3">
                 <label class="form-label">Hijo 3</label>
                 <input formControlName="child3_name" type="text" class="form-control" placeholder="Nombre">
               </div>
-              <div class="col-md-6 mb-2">
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 3">
                 <label class="form-label">Fecha Nac. Hijo 3</label>
                 <input formControlName="child3_birth_date" type="date" class="form-control">
               </div>
-              <div class="col-md-6 mb-2">
+
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 4">
                 <label class="form-label">Hijo 4</label>
                 <input formControlName="child4_name" type="text" class="form-control" placeholder="Nombre">
               </div>
-              <div class="col-md-6 mb-2">
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 4">
                 <label class="form-label">Fecha Nac. Hijo 4</label>
                 <input formControlName="child4_birth_date" type="date" class="form-control">
               </div>
-              <div class="col-md-6 mb-2">
+
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 5">
                 <label class="form-label">Hijo 5</label>
                 <input formControlName="child5_name" type="text" class="form-control" placeholder="Nombre">
               </div>
-              <div class="col-md-6 mb-2">
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 5">
                 <label class="form-label">Fecha Nac. Hijo 5</label>
                 <input formControlName="child5_birth_date" type="date" class="form-control">
               </div>
@@ -459,6 +464,21 @@
           <div class="section-panel">
             <div class="mb-3">
               <h6 class="mb-3">Permisos</h6>
+              <!-- Role moved here -->
+              <div class="mb-3">
+                <label class="form-label">Rol del Empleado</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                  <select formControlName="role" class="form-select">
+                    <option value="">Seleccione un rol</option>
+                    <option *ngFor="let role of roles" [value]="role.name_role">{{ role.name_role }}</option>
+                  </select>
+                </div>
+                <div *ngIf="employeesForm.get('role')?.invalid && employeesForm.get('role')?.touched"
+                  class="text-danger mt-1">
+                  <small>El rol es requerido</small>
+                </div>
+              </div>
               <div class="row">
                 <div class="col-md-6">
                   <div class="form-check mb-2">
@@ -566,12 +586,7 @@
               <input type="text" class="form-control" [value]="selectedEmployee.phone" disabled>
             </div>
           </div>
-          <div class="mb-3">
-            <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
-              <input type="text" class="form-control" [value]="selectedEmployee.role" disabled>
-            </div>
-          </div>
+
         </div>
 
         <div class="section-panel">
@@ -823,6 +838,13 @@
         <!-- Permisos -->
         <div class="section-panel">
           <div class="mb-3">
+            <label class="form-label fw-bold">Rol del Empleado</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+              <input type="text" class="form-control" [value]="selectedEmployee.role" disabled>
+            </div>
+          </div>
+          <div class="mb-3">
             <label class="form-label fw-bold">Permisos</label>
             <div class="row">
               <div class="col-md-6">
@@ -943,20 +965,7 @@
               </div>
             </div>
 
-            <!-- Role -->
-            <div class="mb-3">
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
-                <select formControlName="role" class="form-select">
-                  <option value="">Seleccione un rol</option>
-                  <option *ngFor="let role of roles" [value]="role.name_role">{{ role.name_role }}</option>
-                </select>
-              </div>
-              <div *ngIf="employeesForm.get('role')?.invalid && employeesForm.get('role')?.touched"
-                class="text-danger mt-1">
-                <small>El rol es requerido</small>
-              </div>
-            </div>
+
           </div>
 
 
@@ -995,19 +1004,29 @@
             <div class="row">
               <div class="col-md-3 mb-3">
                 <label class="form-label">Sexo</label>
-                <input formControlName="gender" type="text" class="form-control">
+                <select formControlName="gender" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let option of genderOptions" [value]="option">{{ option }}</option>
+                </select>
               </div>
               <div class="col-md-3 mb-3">
                 <label class="form-label">Edad</label>
-                <input formControlName="age" type="number" class="form-control">
+                <input formControlName="age" type="text" class="form-control" readonly
+                  style="background-color: #e9ecef;">
               </div>
               <div class="col-md-3 mb-3">
                 <label class="form-label">Estado Civil</label>
-                <input formControlName="marital_status" type="text" class="form-control">
+                <select formControlName="marital_status" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let option of maritalStatusOptions" [value]="option">{{ option }}</option>
+                </select>
               </div>
               <div class="col-md-3 mb-3">
                 <label class="form-label">Nivel Estudios</label>
-                <input formControlName="education_level" type="text" class="form-control">
+                <select formControlName="education_level" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let option of educationLevelOptions" [value]="option">{{ option }}</option>
+                </select>
               </div>
             </div>
             <div class="mb-3">
@@ -1049,47 +1068,55 @@
             <div class="row">
               <div class="col-md-12 mb-3">
                 <label class="form-label">Cantidad de Hijos</label>
-                <input formControlName="children_count" type="number" class="form-control" style="width: 100px;">
+                <select formControlName="children_count" class="form-select" style="width: 150px;">
+                  <option [ngValue]="0">0</option>
+                  <option *ngFor="let count of childrenCountOptions" [value]="count" [disabled]="count === 0">{{ count
+                    }}</option>
+                </select>
               </div>
             </div>
             <div class="row">
-              <div class="col-md-6 mb-2">
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 1">
                 <label class="form-label">Hijo 1</label>
                 <input formControlName="child1_name" type="text" class="form-control" placeholder="Nombre">
               </div>
-              <div class="col-md-6 mb-2">
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 1">
                 <label class="form-label">Fecha Nac. Hijo 1</label>
                 <input formControlName="child1_birth_date" type="date" class="form-control">
               </div>
-              <div class="col-md-6 mb-2">
+
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 2">
                 <label class="form-label">Hijo 2</label>
                 <input formControlName="child2_name" type="text" class="form-control" placeholder="Nombre">
               </div>
-              <div class="col-md-6 mb-2">
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 2">
                 <label class="form-label">Fecha Nac. Hijo 2</label>
                 <input formControlName="child2_birth_date" type="date" class="form-control">
               </div>
-              <div class="col-md-6 mb-2">
+
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 3">
                 <label class="form-label">Hijo 3</label>
                 <input formControlName="child3_name" type="text" class="form-control" placeholder="Nombre">
               </div>
-              <div class="col-md-6 mb-2">
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 3">
                 <label class="form-label">Fecha Nac. Hijo 3</label>
                 <input formControlName="child3_birth_date" type="date" class="form-control">
               </div>
-              <div class="col-md-6 mb-2">
+
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 4">
                 <label class="form-label">Hijo 4</label>
                 <input formControlName="child4_name" type="text" class="form-control" placeholder="Nombre">
               </div>
-              <div class="col-md-6 mb-2">
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 4">
                 <label class="form-label">Fecha Nac. Hijo 4</label>
                 <input formControlName="child4_birth_date" type="date" class="form-control">
               </div>
-              <div class="col-md-6 mb-2">
+
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 5">
                 <label class="form-label">Hijo 5</label>
                 <input formControlName="child5_name" type="text" class="form-control" placeholder="Nombre">
               </div>
-              <div class="col-md-6 mb-2">
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 5">
                 <label class="form-label">Fecha Nac. Hijo 5</label>
                 <input formControlName="child5_birth_date" type="date" class="form-control">
               </div>
@@ -1237,6 +1264,20 @@
           <!-- Permisos -->
           <div class="section-panel">
             <div class="mb-3">
+              <div class="mb-3">
+                <label class="form-label">Rol del Empleado</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                  <select formControlName="role" class="form-select">
+                    <option value="">Seleccione un rol</option>
+                    <option *ngFor="let role of roles" [value]="role.name_role">{{ role.name_role }}</option>
+                  </select>
+                </div>
+                <div *ngIf="employeesForm.get('role')?.invalid && employeesForm.get('role')?.touched"
+                  class="text-danger mt-1">
+                  <small>El rol es requerido</small>
+                </div>
+              </div>
               <label class="form-label fw-bold">Permisos</label>
               <div class="row">
                 <div class="col-md-6">

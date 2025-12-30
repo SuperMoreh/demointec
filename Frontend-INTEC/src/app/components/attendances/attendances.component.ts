@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angul
 import { RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { AttendancesAdapterService } from '../../adapters/attendances.adapter';
+import { EmployeesAdapterService } from '../../adapters/employees.adapter';
 import { Attendance } from '../../models/attendances';
 import { ReportAttendancesService } from '../../services/reports/report_attendances.service';
 
@@ -28,15 +29,31 @@ export class AttendancesComponent implements OnInit {
   endDate: string = '';
   hasConsulted: boolean = false;
   isLoading: boolean = false;
+  employeesMap: Map<string, string> = new Map(); // UUID -> Entry Time (HH:mm)
 
   constructor(
     private toastr: ToastrService,
     private attendancesAdapterService: AttendancesAdapterService,
-    private reportAttendancesService: ReportAttendancesService
-  ) {}
+    private reportAttendancesService: ReportAttendancesService,
+    private employeesAdapter: EmployeesAdapterService
+  ) { }
 
   ngOnInit(): void {
     this.onPeriodTypeChange();
+    this.loadEmployeesMap();
+  }
+
+  loadEmployeesMap(): void {
+    this.employeesAdapter.getList().subscribe({
+      next: (employees) => {
+        employees.forEach(emp => {
+          if (emp.id_employee && emp.entry_time) {
+            this.employeesMap.set(emp.id_employee, emp.entry_time);
+          }
+        });
+      },
+      error: (err) => console.error('Error fetching employees map', err)
+    });
   }
 
   loadAttendances(): void {
@@ -164,5 +181,32 @@ export class AttendancesComponent implements OnInit {
       console.error('Error al generar PDF:', error);
       this.toastr.error('Error al generar el reporte PDF', 'Error');
     }
+  }
+
+
+  calculateStatus(att: Attendance): string {
+    if (att.type !== 'Entrada') return '-';
+
+    // Check if we have an Entry Time for this employee (UUID)
+    const entryTimeStr = this.employeesMap.get(att.uuid);
+
+    if (att.hour && entryTimeStr) {
+      const entryTime = this.parseTime(entryTimeStr);
+      const checkInTime = this.parseTime(att.hour);
+
+      if (entryTime && checkInTime) {
+        const diffMinutes = (checkInTime.getTime() - entryTime.getTime()) / 60000;
+        return diffMinutes <= 15 ? 'A tiempo' : 'Retardo';
+      }
+    }
+    return att.status ? 'Activo' : 'Inactivo'; // Fallback if no specific calc possible
+  }
+
+  private parseTime(timeStr: string): Date | null {
+    if (!timeStr) return null;
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    const date = new Date();
+    date.setHours(hours, minutes, 0, 0);
+    return date;
   }
 } 

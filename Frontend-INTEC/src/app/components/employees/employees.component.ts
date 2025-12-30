@@ -37,6 +37,12 @@ export class EmployeesComponent implements OnInit {
   jobDescriptions: JobDescription[] = [];
   roles: any[] = [];
 
+  genderOptions = ['Masculino', 'Femenino'];
+  maritalStatusOptions = ['Soltero(a)', 'Casado(a)', 'Viudo(a)', 'Divorciado(a)'];
+  educationLevelOptions = ['Bachillerato', 'Estudios profesionales', 'Postgrado'];
+
+  childrenCountOptions = [0, 1, 2, 3, 4, 5];
+
   // Asistencia
   selectedEmployeeForAttendance: Employee | null = null;
   attendanceStartDate: string = '';
@@ -132,6 +138,28 @@ export class EmployeesComponent implements OnInit {
     this.setCreateMode();
     this.loadJobDescriptions();
     this.loadRoles();
+
+    this.employeesForm.get('birth_date')?.valueChanges.subscribe(date => {
+      this.calculateAge(date);
+    });
+
+    // Auto-load employees
+    this.consultEmployees();
+  }
+
+  calculateAge(birthDate: string): void {
+    if (!birthDate) {
+      this.employeesForm.patchValue({ age: '' }, { emitEvent: false });
+      return;
+    }
+    const today = new Date();
+    const birthDateObj = new Date(birthDate);
+    let age = today.getFullYear() - birthDateObj.getFullYear();
+    const m = today.getMonth() - birthDateObj.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDateObj.getDate())) {
+      age--;
+    }
+    this.employeesForm.patchValue({ age: age }, { emitEvent: false });
   }
 
   loadRoles(): void {
@@ -801,31 +829,40 @@ export class EmployeesComponent implements OnInit {
 
     const entryTimeStr = this.selectedEmployeeForAttendance.entry_time; // HH:mm
 
-    // Filtrar solo registros de entrada
-    const entryRecords = records.filter(r => r.type === 'Entrada');
+    // Filtrar solo registros de entrada - REMOVED to show all records per user request
+    // const entryRecords = records.filter(r => r.type === 'Entrada');
 
-    this.attendanceRecords = entryRecords.map(record => {
-      let statusLabel = 'Falta'; // Default
+    this.attendanceRecords = records.map(record => {
+      let statusLabel = ''; // Default empty
 
-      // Si hay registro de asistencia, evaluar puntualidad
-      if (record && record.hour && entryTimeStr) {
-        const entryTime = this.parseTime(entryTimeStr);
-        const checkInTime = this.parseTime(record.hour);
+      // Only calculate status for 'Entrada'
+      if (record.type === 'Entrada') {
+        statusLabel = 'Falta'; // Default if checking fails
 
-        if (entryTime && checkInTime) {
-          // Calcular diferencia en minutos
-          const diffMinutes = (checkInTime.getTime() - entryTime.getTime()) / 60000;
+        // Si hay registro de asistencia, evaluar puntualidad
+        if (record && record.hour && entryTimeStr) {
+          const entryTime = this.parseTime(entryTimeStr);
+          const checkInTime = this.parseTime(record.hour);
 
-          if (diffMinutes <= 15) {
-            statusLabel = 'A tiempo';
+          if (entryTime && checkInTime) {
+            // Calcular diferencia en minutos
+            const diffMinutes = (checkInTime.getTime() - entryTime.getTime()) / 60000;
+
+            if (diffMinutes <= 15) {
+              statusLabel = 'A tiempo';
+            } else {
+              statusLabel = 'Retardo';
+            }
           } else {
-            statusLabel = 'Retardo';
+            statusLabel = 'Error H.';
           }
-        } else {
-          statusLabel = 'Error H.';
+        } else if (record && record.hour && !entryTimeStr) {
+          statusLabel = 'Sin H. Entrada';
         }
-      } else if (record && record.hour && !entryTimeStr) {
-        statusLabel = 'Sin H. Entrada';
+      } else {
+        // For 'Salida' or others, we can either show the type or leave status empty
+        // Request says: "cálculo ... es solo para la entrada"
+        statusLabel = '-';
       }
 
       return {
