@@ -39,7 +39,7 @@ export class EmployeesComponent implements OnInit {
 
   genderOptions = ['Masculino', 'Femenino'];
   maritalStatusOptions = ['Soltero(a)', 'Casado(a)', 'Viudo(a)', 'Divorciado(a)'];
-  educationLevelOptions = ['Bachillerato', 'Estudios profesionales', 'Postgrado'];
+  educationLevelOptions = ['Primaria', 'Secundaria', 'Bachillerato', 'Estudios profesionales', 'Postgrado'];
 
   childrenCountOptions = [0, 1, 2, 3, 4, 5];
 
