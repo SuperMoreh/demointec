@@ -97,7 +97,9 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Registrar {{ requestType }}</h5>
+                <h5 class="modal-title" *ngIf="!editingRequestId">Registrar {{ requestType }}</h5>
+                <h5 class="modal-title" *ngIf="editingRequestId && !isReadOnly">Editar {{ requestType }}</h5>
+                <h5 class="modal-title" *ngIf="isReadOnly">Visualizar {{ requestType }}</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
@@ -134,17 +136,26 @@
 
                     <div class="section-panel">
                         <h6 class="mb-3">Documentación de Respaldo</h6>
-                        <p class="text-muted small">El archivo se guardará en el repositorio del colaborador.</p>
+                        <p class="text-muted small" *ngIf="!isReadOnly">El archivo se guardará en el repositorio del
+                            colaborador.</p>
+
                         <div class="mb-3">
-                            <label class="form-label">Adjuntar Archivo (PDF/Imagen)</label>
-                            <input type="file" (change)="onFileSelected($event)" class="form-control">
+                            <div *ngIf="currentDocumentUrl" class="mb-2">
+                                <a [href]="currentDocumentUrl" target="_blank" class="btn btn-sm btn-info text-white">
+                                    <i class="bi bi-file-earmark-arrow-down"></i> Ver Documento Actual
+                                </a>
+                            </div>
+                            <label class="form-label" *ngIf="!isReadOnly">Adjuntar Archivo (PDF/Imagen)</label>
+                            <input type="file" (change)="onFileSelected($event)" class="form-control"
+                                [disabled]="isReadOnly" *ngIf="!isReadOnly">
                         </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-success" (click)="saveRequest()">Guardar Registro</button>
+                <button type="button" class="btn btn-success" (click)="saveRequest()" *ngIf="!isReadOnly">Guardar
+                    Registro</button>
             </div>
         </div>
     </div>
@@ -170,7 +181,7 @@
                                 <th>Hasta</th>
                                 <th>Días</th>
                                 <th>Motivo</th>
-                                <th>Documento</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -189,10 +200,20 @@
                                 <td style="font-weight: bold; text-align: center;">{{ req.daysCount }}</td>
                                 <td>{{ req.description }}</td>
                                 <td>
-                                    <span *ngIf="req.documentUrl" class="badge bg-success">
-                                        <i class="bi bi-check-circle"></i> Subido
-                                    </span>
-                                    <span *ngIf="!req.documentUrl" class="text-muted">-</span>
+                                    <div class="action-buttons">
+                                        <button class="btn-action btn-view" title="Visualizar"
+                                            (click)="viewRequest(req, selectedEmployeeId)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn-action btn-edit" title="Editar"
+                                            (click)="editRequest(req, selectedEmployeeId)">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn-action btn-delete" title="Eliminar"
+                                            (click)="deleteRequest(req)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                             <tr *ngIf="selectedEmployeeHistory.length === 0">

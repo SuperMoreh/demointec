@@ -59,6 +59,8 @@ export class PermissionsVacationsComponent implements OnInit {
 
     // State for Edit Mode
     editingRequestId: string | null = null;
+    isReadOnly: boolean = false;
+    currentDocumentUrl: string | null = null;
 
     constructor(
         private employeesAdapter: EmployeesAdapterService,
@@ -215,8 +217,11 @@ export class PermissionsVacationsComponent implements OnInit {
     openCreateModal(type: 'Vacaciones' | 'Permiso'): void {
         this.requestType = type;
         this.requestForm.reset();
+        this.requestForm.enable();
         this.selectedFile = null;
-        this.editingRequestId = null; // Reset edit state
+        this.editingRequestId = null;
+        this.isReadOnly = false;
+        this.currentDocumentUrl = null;
         const modal = new (window as any).bootstrap.Modal(document.getElementById('createRequestModal'));
         modal.show();
     }
@@ -226,6 +231,8 @@ export class PermissionsVacationsComponent implements OnInit {
         this.requestType = record.type;
         this.editingRequestId = record.id;
         this.selectedFile = null;
+        this.isReadOnly = false;
+        this.currentDocumentUrl = record.documentUrl || null;
 
         this.requestForm.patchValue({
             employeeId: employeeId,
@@ -233,8 +240,58 @@ export class PermissionsVacationsComponent implements OnInit {
             endDate: record.endDate,
             description: record.description
         });
+        this.requestForm.enable();
 
-        // Close history modal first
+        this.switchModal();
+    }
+
+    viewRequest(record: RequestRecord, employeeId: string): void {
+        this.requestType = record.type;
+        this.editingRequestId = record.id;
+        this.selectedFile = null;
+        this.isReadOnly = true;
+        this.currentDocumentUrl = record.documentUrl || null;
+
+        this.requestForm.patchValue({
+            employeeId: employeeId,
+            startDate: record.startDate,
+            endDate: record.endDate,
+            description: record.description
+        });
+        this.requestForm.disable();
+
+        this.switchModal();
+    }
+
+    deleteRequest(record: RequestRecord): void {
+        if (!confirm('¿Está seguro de que desea eliminar este registro?')) return;
+
+        let savedRequests: any[] = [];
+        if (typeof localStorage !== 'undefined') {
+            const saved = localStorage.getItem('vacation_requests');
+            if (saved) savedRequests = JSON.parse(saved);
+        }
+
+        const initialLength = savedRequests.length;
+        savedRequests = savedRequests.filter(r => r.id !== record.id);
+
+        if (savedRequests.length < initialLength) {
+            localStorage.setItem('vacation_requests', JSON.stringify(savedRequests));
+            this.toastr.success('Registro eliminado');
+            this.loadEmployees(); // Reload to update lists
+
+            // Also need to refresh the open history modal if it's open
+            // Simplest way is to close it or re-fetch data for it.
+            // Since loadEmployees refreshes allRows, we can re-find the row and update selectedEmployeeHistory
+            // However, `loadEmployees` is async observable... so we might need to handle that.
+            // Ideally we just remove it from `selectedEmployeeHistory` locally too.
+            this.selectedEmployeeHistory = this.selectedEmployeeHistory.filter(r => r.id !== record.id);
+        } else {
+            this.toastr.error('No se pudo encontrar el registro para eliminar');
+        }
+    }
+
+    private switchModal(): void {
         const historyModalEl = document.getElementById('historyModal');
         if (historyModalEl) {
             const historyModal = (window as any).bootstrap.Modal.getInstance(historyModalEl);
@@ -246,18 +303,23 @@ export class PermissionsVacationsComponent implements OnInit {
     }
 
     onFileSelected(event: any): void {
+        if (this.isReadOnly) return;
         if (event.target.files && event.target.files.length > 0) {
             this.selectedFile = event.target.files[0];
         }
     }
 
     async saveRequest(): Promise<void> {
+        if (this.isReadOnly) return; // Prevention
         if (this.requestForm.invalid) {
             this.toastr.warning('Por favor complete los campos requeridos');
             return;
         }
 
-        const formValues = this.requestForm.value;
+        const formValues = this.requestForm.value; // Note: if disabled, value might be missing fields depending on Angular version/config. 
+        // But we re-enable before save? No, readOnly shouldn't save.
+        // For Edit, form is enabled.
+
         const start = new Date(formValues.startDate);
         const end = new Date(formValues.endDate);
         const daysCount = Math.ceil((end.getTime() - start.getTime()) / (1000 * 3600 * 24)) + 1;
