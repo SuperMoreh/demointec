@@ -15,6 +15,7 @@ export class Employee {
   private pHistorial: string | undefined;
   private pUsuarios: string | undefined;
   private pVerCats: string | undefined;
+  private pPermisosVacaciones: string | undefined;
   private status: boolean | undefined;
 
   private admission_date: string | undefined;
@@ -166,6 +167,13 @@ export class Employee {
   }
   public set setpVerCats(pVerCats: string | undefined) {
     this.pVerCats = pVerCats;
+  }
+
+  public get getpPermisosVacaciones(): string | undefined {
+    return this.pPermisosVacaciones;
+  }
+  public set setpPermisosVacaciones(pPermisosVacaciones: string | undefined) {
+    this.pPermisosVacaciones = pPermisosVacaciones;
   }
 
   public get getStatus(): boolean | undefined {
