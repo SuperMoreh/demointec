@@ -909,6 +909,11 @@
                     disabled>
                   <label class="form-check-label">Descripciones de Puestos</label>
                 </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" [checked]="selectedEmployee.pPermisosVacaciones"
+                    disabled>
+                  <label class="form-check-label">Permisos y Vacaciones</label>
+                </div>
               </div>
             </div>
           </div>
@@ -1338,6 +1343,10 @@
                   <div class="form-check mb-2">
                     <input class="form-check-input" type="checkbox" formControlName="pDescripcionesPuestos">
                     <label class="form-check-label">Descripciones de Puestos</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pPermisosVacaciones">
+                    <label class="form-check-label">Permisos y Vacaciones</label>
                   </div>
                 </div>
               </div>
