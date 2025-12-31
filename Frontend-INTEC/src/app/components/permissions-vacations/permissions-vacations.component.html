@@ -65,7 +65,7 @@
                         <td style="font-weight: bold;">{{ item.saldoTotal }}</td>
                         <td style="text-align: left; font-size: 0.8em; max-width: 200px;">{{ item.detalles }}</td>
                         <td>
-                            <button class="btn-action" (click)="openHistoryModal(item)">
+                            <button class="btn-action btn-view-records" (click)="openHistoryModal(item)">
                                 <i class="bi bi-eye"></i> Ver Registros
                             </button>
                         </td>
@@ -201,15 +201,15 @@
                                 <td>{{ req.description }}</td>
                                 <td>
                                     <div class="action-buttons">
-                                        <button class="btn-action btn-view" title="Visualizar"
+                                        <button class="btn-action btn-icon btn-view" title="Visualizar"
                                             (click)="viewRequest(req, selectedEmployeeId)">
                                             <i class="bi bi-eye"></i>
                                         </button>
-                                        <button class="btn-action btn-edit" title="Editar"
+                                        <button class="btn-action btn-icon btn-edit" title="Editar"
                                             (click)="editRequest(req, selectedEmployeeId)">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <button class="btn-action btn-delete" title="Eliminar"
+                                        <button class="btn-action btn-icon btn-delete" title="Eliminar"
                                             (click)="deleteRequest(req)">
                                             <i class="bi bi-trash"></i>
                                         </button>
