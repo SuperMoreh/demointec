@@ -54,13 +54,17 @@ export class PermissionsVacationsComponent implements OnInit {
 
     // History Modal State
     selectedEmployeeName: string = '';
+    selectedEmployeeId: string = '';
     selectedEmployeeHistory: RequestRecord[] = [];
+
+    // State for Edit Mode
+    editingRequestId: string | null = null;
 
     constructor(
         private employeesAdapter: EmployeesAdapterService,
-        private docService: EmployeeDocumentsAdapterService, // Injected for real uploads
+        private docService: EmployeeDocumentsAdapterService,
         private fb: FormBuilder,
-        private uploadService: UploadAdapterService, // Keep for generic uploads if needed, but preferring docService for Repo
+        private uploadService: UploadAdapterService,
         private toastr: ToastrService
     ) {
         this.requestForm = this.fb.group({
@@ -212,8 +216,33 @@ export class PermissionsVacationsComponent implements OnInit {
         this.requestType = type;
         this.requestForm.reset();
         this.selectedFile = null;
+        this.editingRequestId = null; // Reset edit state
         const modal = new (window as any).bootstrap.Modal(document.getElementById('createRequestModal'));
         modal.show();
+    }
+
+    // Helper to open edit from history
+    editRequest(record: RequestRecord, employeeId: string): void {
+        this.requestType = record.type;
+        this.editingRequestId = record.id;
+        this.selectedFile = null;
+
+        this.requestForm.patchValue({
+            employeeId: employeeId,
+            startDate: record.startDate,
+            endDate: record.endDate,
+            description: record.description
+        });
+
+        // Close history modal first
+        const historyModalEl = document.getElementById('historyModal');
+        if (historyModalEl) {
+            const historyModal = (window as any).bootstrap.Modal.getInstance(historyModalEl);
+            if (historyModal) historyModal.hide();
+        }
+
+        const createModal = new (window as any).bootstrap.Modal(document.getElementById('createRequestModal'));
+        createModal.show();
     }
 
     onFileSelected(event: any): void {
@@ -245,16 +274,13 @@ export class PermissionsVacationsComponent implements OnInit {
         // 1. Upload File to Document Repository if exists
         if (this.selectedFile) {
             try {
-                // Prepare FormData for EmployeeDocumentsAdapter
                 const formData = new FormData();
                 formData.append('id_employee', formValues.employeeId);
                 formData.append('document_type', `Justificante ${this.requestType}`);
                 formData.append('document', this.selectedFile);
 
-                // Assuming backend returns some object, we wait for it
                 const uploadRes = await firstValueFrom(this.docService.saveDocument(formData));
                 this.toastr.success('Documento guardado en repositorio');
-                // Use a generic path or the one returned if available
                 docPath = uploadRes?.path || 'Repositorio';
             } catch (err) {
                 console.error('Upload Error', err);
@@ -262,19 +288,6 @@ export class PermissionsVacationsComponent implements OnInit {
                 return;
             }
         }
-
-        // 2. Save Request Locally (Persistence)
-        const newRequest: any = {
-            id: Math.random().toString(36).substr(2, 9),
-            employeeId: formValues.employeeId, // Critical for filtering!
-            type: this.requestType,
-            startDate: formValues.startDate,
-            endDate: formValues.endDate,
-            daysCount: daysCount,
-            description: formValues.description,
-            documentUrl: docPath,
-            requestDate: new Date().toISOString().split('T')[0]
-        };
 
         // Load existing
         let savedRequests: any[] = [];
@@ -287,21 +300,53 @@ export class PermissionsVacationsComponent implements OnInit {
             }
         }
 
-        savedRequests.push(newRequest);
-        localStorage.setItem('vacation_requests', JSON.stringify(savedRequests));
+        if (this.editingRequestId) {
+            // UPDATE
+            const index = savedRequests.findIndex(r => r.id === this.editingRequestId);
+            if (index !== -1) {
+                savedRequests[index] = {
+                    ...savedRequests[index],
+                    employeeId: formValues.employeeId,
+                    type: this.requestType,
+                    startDate: formValues.startDate,
+                    endDate: formValues.endDate,
+                    daysCount: daysCount,
+                    description: formValues.description,
+                    // Only update docUrl if new one uploaded, else keep old
+                    documentUrl: docPath || savedRequests[index].documentUrl
+                };
+                this.toastr.success('Registro actualizado exitosamente');
+            }
+        } else {
+            // CREATE
+            const newRequest: any = {
+                id: Math.random().toString(36).substr(2, 9),
+                employeeId: formValues.employeeId,
+                type: this.requestType,
+                startDate: formValues.startDate,
+                endDate: formValues.endDate,
+                daysCount: daysCount,
+                description: formValues.description,
+                documentUrl: docPath,
+                requestDate: new Date().toISOString().split('T')[0]
+            };
+            savedRequests.push(newRequest);
+            this.toastr.success(`${this.requestType} registrado exitosamente`);
+        }
 
-        this.toastr.success(`${this.requestType} registrado exitosamente`);
+        localStorage.setItem('vacation_requests', JSON.stringify(savedRequests));
 
         // Close Modal
         const modalEl = document.getElementById('createRequestModal');
         const modal = (window as any).bootstrap.Modal.getInstance(modalEl);
         modal.hide();
 
-        this.loadEmployees(); // Refresh view to calculate new totals
+        this.loadEmployees(); // Refresh view
     }
 
     openHistoryModal(row: VacationRow): void {
         this.selectedEmployeeName = row.nombre;
+        this.selectedEmployeeId = row.id;
         this.selectedEmployeeHistory = row.history;
         const modal = new (window as any).bootstrap.Modal(document.getElementById('historyModal'));
         modal.show();

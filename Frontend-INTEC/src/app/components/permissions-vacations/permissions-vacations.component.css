@@ -159,6 +159,54 @@
     background-color: #f8f9fa;
 }
 
+/* User Table Styles (Copied from Employees for consistency) */
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+}
+
+.users-table th {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 400;
+    color: #555;
+    border-bottom: 2px solid #eee;
+}
+
+.users-table td {
+    padding: 0.5rem;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.users-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.status-active {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-late {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
 /* Column specifics from user request/image */
 .col-antiguedad {
     background-color: #dbeafe !important;
