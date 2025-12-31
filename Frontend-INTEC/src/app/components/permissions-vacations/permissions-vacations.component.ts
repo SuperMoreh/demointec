@@ -163,7 +163,6 @@ export class PermissionsVacationsComponent implements OnInit {
                     totalVacaciones: vacationDays,
                     diasTomados: diasTomados,
                     diasPorTomar2025: diasPorTomar2025,
-                    diasPorTomar2025: diasPorTomar2025,
                     saldoTotal: saldoTotal,
                     history: empHistory
                 };
