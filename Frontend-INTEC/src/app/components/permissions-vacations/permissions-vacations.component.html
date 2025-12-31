@@ -1,41 +1,59 @@
 <div class="content-container">
+    <!-- Header -->
     <div class="page-header">
-        <div class="d-flex align-items-center">
+        <div>
             <h1 class="page-title">Permisos y Vacaciones</h1>
-            <span class="sub-title">INTEC DE JALISCO SA DE CV - VACACIONES 2025</span>
         </div>
-        <button class="btn-back" routerLink="/dashboard/colaboradores">
-            <i class="bi bi-arrow-left"></i>
-            Volver
-        </button>
+        <div class="d-flex gap-2">
+            <button class="btn-primary" (click)="openCreateModal('Permiso')">
+                <i class="bi bi-file-earmark-medical"></i>
+                Agregar Permiso
+            </button>
+            <button class="btn-secondary" (click)="openCreateModal('Vacaciones')">
+                <i class="bi bi-sun"></i>
+                Agregar Vacaciones
+            </button>
+        </div>
     </div>
 
-    <div class="search-container">
-        <input type="text" class="search-input" placeholder="Buscar por nombre..." [(ngModel)]="searchTerm"
-            (input)="applyFilter()">
+    <!-- Filters -->
+    <div class="filters-section">
+        <div class="filters-row">
+            <div class="filter-group">
+                <label for="search">Buscar</label>
+                <input type="text" id="search" class="filter-input" placeholder="Nombre del colaborador..."
+                    [(ngModel)]="searchTerm" (input)="applyFilter()">
+            </div>
+            <button class="btn-primary" style="background-color: #2a7ae4; height: fit-content; align-self: flex-end;"
+                (click)="loadEmployees()">
+                <i class="bi bi-arrow-repeat"></i> Consultar
+            </button>
+        </div>
     </div>
 
-    <div class="table-container">
+    <!-- Table -->
+    <div class="table-container" *ngIf="!loading && filteredData.length > 0">
         <div class="table-responsive">
             <table class="vacations-table">
                 <thead>
                     <tr>
-                        <th class="col-antiguedad">ANTIGÜEDAD (Años)</th>
+                        <th class="col-antiguedad">ANTIGÜEDAD</th>
                         <th>NUM.</th>
                         <th>NOMBRE</th>
                         <th>FECHA INGRESO</th>
-                        <th class="col-vacaciones-tomar-2024">DIAS VACACIONES X TOMAR 2024</th>
+                        <th class="col-vacaciones-tomar-2024">DIAS POR TOMAR 2024</th>
                         <th>ANIVERSARIO 2025</th>
-                        <th>TOTAL DIAS VACACIONES</th>
-                        <th>DIAS VACACIONES TOMADAS</th>
-                        <th class="col-vacaciones-tomar-2025">DIAS VACACIONES X TOMAR 2025</th>
+                        <th>TOTAL DIAS LEY</th>
+                        <th>DIAS TOMADOS</th>
+                        <th class="col-vacaciones-tomar-2025">DIAS POR TOMAR 2025</th>
                         <th>SALDO TOTAL</th>
-                        <th>DETALLES (FECHAS TOMADAS)</th>
+                        <th>DETALLES</th>
+                        <th>ACCIONES</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr *ngFor="let item of filteredData">
-                        <td class="col-antiguedad">{{ item.antiguedad }}</td>
+                        <td class="col-antiguedad">{{ item.antiguedad }} Años</td>
                         <td>{{ item.num }}</td>
                         <td style="text-align: left;">{{ item.nombre }}</td>
                         <td>{{ item.fechaIngreso }}</td>
@@ -44,14 +62,148 @@
                         <td>{{ item.totalVacaciones }}</td>
                         <td>{{ item.diasTomados }}</td>
                         <td class="col-vacaciones-tomar-2025">{{ item.diasPorTomar2025 }}</td>
-                        <td><strong>{{ item.saldoTotal }}</strong></td>
-                        <td style="text-align: left; font-size: 0.8em;">{{ item.detalles }}</td>
-                    </tr>
-                    <tr *ngIf="filteredData.length === 0">
-                        <td colspan="11" class="text-muted p-4">No se encontraron colaboradores.</td>
+                        <td style="font-weight: bold;">{{ item.saldoTotal }}</td>
+                        <td style="text-align: left; font-size: 0.8em; max-width: 200px;">{{ item.detalles }}</td>
+                        <td>
+                            <button class="btn-action" (click)="openHistoryModal(item)">
+                                <i class="bi bi-eye"></i> Ver Registros
+                            </button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="placeholder-container" *ngIf="loading">
+        <div class="table-placeholder">
+            <i class="bi bi-arrow-repeat spin" style="font-size: 2rem;"></i>
+            <p>Cargando información...</p>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="placeholder-container" *ngIf="!loading && filteredData.length === 0">
+        <div class="table-placeholder">
+            <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+            <p>No se encontraron colaboradores.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Crear Solicitud -->
+<div class="modal fade" id="createRequestModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Registrar {{ requestType }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form *ngIf="requestForm" [formGroup]="requestForm">
+                    <div class="section-panel">
+                        <h6 class="mb-3">Datos del Colaborador</h6>
+                        <div class="mb-3">
+                            <label class="form-label">Colaborador</label>
+                            <select formControlName="employeeId" class="form-select">
+                                <option value="">Seleccione un colaborador...</option>
+                                <option *ngFor="let emp of allRows" [value]="emp.id">{{ emp.nombre }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="section-panel">
+                        <h6 class="mb-3">Detalle de la Solicitud</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Fecha Inicio</label>
+                                <input type="date" formControlName="startDate" class="form-control">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Fecha Fin</label>
+                                <input type="date" formControlName="endDate" class="form-control">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descripción / Motivo</label>
+                            <textarea formControlName="description" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="section-panel">
+                        <h6 class="mb-3">Documentación de Respaldo</h6>
+                        <p class="text-muted small">El archivo se guardará en el repositorio del colaborador.</p>
+                        <div class="mb-3">
+                            <label class="form-label">Adjuntar Archivo (PDF/Imagen)</label>
+                            <input type="file" (change)="onFileSelected($event)" class="form-control">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" (click)="saveRequest()">Guardar Registro</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Historial -->
+<div class="modal fade" id="historyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Historial de Permisos y Vacaciones - {{ selectedEmployeeName }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Fecha Solicitud</th>
+                                <th>Desde</th>
+                                <th>Hasta</th>
+                                <th>Días</th>
+                                <th>Motivo</th>
+                                <th>Documento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let req of selectedEmployeeHistory">
+                                <td>
+                                    <span class="badge"
+                                        [ngClass]="req.type === 'Vacaciones' ? 'bg-info' : 'bg-warning text-dark'">
+                                        {{ req.type }}
+                                    </span>
+                                </td>
+                                <td>{{ req.requestDate }}</td>
+                                <td>{{ req.startDate }}</td>
+                                <td>{{ req.endDate }}</td>
+                                <td>{{ req.daysCount }}</td>
+                                <td>{{ req.description }}</td>
+                                <td>
+                                    <a *ngIf="req.documentUrl" [href]="req.documentUrl" target="_blank"
+                                        class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-file-earmark-text"></i> Ver
+                                    </a>
+                                    <span *ngIf="!req.documentUrl" class="text-muted">-</span>
+                                </td>
+                            </tr>
+                            <tr *ngIf="selectedEmployeeHistory.length === 0">
+                                <td colspan="7" class="text-center py-4">No hay registros encontrados.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
         </div>
     </div>
 </div>

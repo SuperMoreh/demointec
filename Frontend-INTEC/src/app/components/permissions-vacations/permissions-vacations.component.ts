@@ -1,22 +1,38 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Observable, firstValueFrom } from 'rxjs';
 import { EmployeesAdapterService } from '../../adapters/employees.adapter';
 import { Employee } from '../../models/employees';
+import { UploadAdapterService } from '../../adapters/upload.adapter';
+import { ToastrService } from 'ngx-toastr';
 
 interface VacationRow {
+    id: string; // Employee ID
     antiguedad: number;
-    num: string; // Using ID or a generated number
+    num: string;
     nombre: string;
     fechaIngreso: string;
-    diasPorTomar2024: number; // Placeholder/Mock for now
-    aniversario: string; // Anniversary date in 2025
-    totalVacaciones: number; // Calculated based on law
-    diasTomados: number; // Placeholder/Mock for now
-    diasPorTomar2025: number; // Calculated
-    saldoTotal: number; // Calculated
-    detalles: string; // Placeholder text
+    diasPorTomar2024: number;
+    aniversario: string;
+    totalVacaciones: number;
+    diasTomados: number;
+    diasPorTomar2025: number;
+    saldoTotal: number;
+    detalles: string;
+    history: RequestRecord[];
+}
+
+interface RequestRecord {
+    id: string;
+    type: 'Vacaciones' | 'Permiso';
+    startDate: string;
+    endDate: string;
+    daysCount: number;
+    description: string;
+    documentUrl?: string;
+    requestDate: string;
 }
 
 @Component({
@@ -24,28 +40,34 @@ interface VacationRow {
     templateUrl: './permissions-vacations.component.html',
     styleUrls: ['./permissions-vacations.component.css'],
     standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule]
+    imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule]
 })
 export class PermissionsVacationsComponent implements OnInit {
     allRows: VacationRow[] = [];
     filteredData: VacationRow[] = [];
     searchTerm: string = '';
     loading: boolean = true;
+    requestForm: FormGroup;
+    requestType: 'Vacaciones' | 'Permiso' = 'Vacaciones';
+    selectedFile: File | null = null;
 
-    // Mexican Labor Law (Vacaciones Dignas) Table
-    // Years -> Days
-    // 1 -> 12
-    // 2 -> 14
-    // 3 -> 16
-    // 4 -> 18
-    // 5 -> 20
-    // 6-10 -> 22
-    // 11-15 -> 24
-    // 16-20 -> 26
-    // 21-25 -> 28
-    // ...
+    // History Modal State
+    selectedEmployeeName: string = '';
+    selectedEmployeeHistory: RequestRecord[] = [];
 
-    constructor(private employeesAdapter: EmployeesAdapterService) { }
+    constructor(
+        private employeesAdapter: EmployeesAdapterService,
+        private fb: FormBuilder,
+        private uploadService: UploadAdapterService,
+        private toastr: ToastrService
+    ) {
+        this.requestForm = this.fb.group({
+            employeeId: ['', Validators.required],
+            startDate: ['', Validators.required],
+            endDate: ['', Validators.required],
+            description: ['']
+        });
+    }
 
     ngOnInit(): void {
         this.loadEmployees();
@@ -61,17 +83,16 @@ export class PermissionsVacationsComponent implements OnInit {
             error: (err) => {
                 console.error('Error loading employees for vacations', err);
                 this.loading = false;
+                this.toastr.error('Error al cargar empleados');
             }
         });
     }
 
     processEmployees(employees: Employee[]): void {
-        const today = new Date(); // Or hardcode to 2025 if looking into future as per request "Vacaciones 2025"
-        // Since the image says "Vacaciones 2025", let's assume we are calculating for year 2025.
         const currentYear = 2025;
 
         this.allRows = employees
-            .filter(emp => emp.status) // Only active employees usually
+            .filter(emp => emp.status)
             .map((emp, index) => {
                 const admissionDateStr = emp.admission_date;
                 if (!admissionDateStr) return null;
@@ -79,34 +100,26 @@ export class PermissionsVacationsComponent implements OnInit {
                 const admissionDate = new Date(admissionDateStr);
                 const admissionYear = admissionDate.getFullYear();
 
-                // Calculate Seniority (Antigüedad) in Years aimed at 2025 Anniversary
+                // Calculate Seniority
                 let yearsOfService = currentYear - admissionYear;
-                // Adjust if they joined in 2025 (0 years) or future (negative - should not happen for existing)
                 if (yearsOfService < 0) yearsOfService = 0;
 
-                // Calculate Days based on Law
                 const vacationDays = this.calculateVacationDays(yearsOfService);
 
                 // Format dates
-                // Anniversary in 2025
                 const anniversaryDate2025 = new Date(currentYear, admissionDate.getMonth(), admissionDate.getDate());
                 const anniversaryStr = this.formatDate(anniversaryDate2025);
                 const admissionStr = this.formatDate(admissionDate);
 
-                // Placeholder logic for "Dias por tomar 2024" and "Dias tomados"
-                // In a real app, these would come from a database of separate vacation requests.
-                // For now, we initialize them to 0 or random for demo purposes BUT best to keep clean 0.
+                // Mock Data for demonstration since we don't have a backend table for this yet
                 const diasPorTomar2024 = 0;
                 const diasTomados = 0;
-
                 const diasPorTomar2025 = vacationDays - diasTomados;
                 const saldoTotal = diasPorTomar2024 + diasPorTomar2025;
-
-                // Generate ID like 0001, 0002... if not present. 
-                // Using index + 1 padded.
                 const num = (index + 1).toString().padStart(4, '0');
 
                 return {
+                    id: emp.id_employee,
                     antiguedad: yearsOfService,
                     num: num,
                     nombre: emp.name_employee,
@@ -117,57 +130,31 @@ export class PermissionsVacationsComponent implements OnInit {
                     diasTomados: diasTomados,
                     diasPorTomar2025: diasPorTomar2025,
                     saldoTotal: saldoTotal,
-                    detalles: '' // Placeholder
+                    detalles: '',
+                    history: [] // Initially empty, would come from backend
                 };
             })
             .filter(row => row !== null) as VacationRow[];
 
         this.applyFilter();
-
-        // Console test output
-        console.log('--- TABLE DATA PROCESSED (Console Verification) ---');
-        console.table(this.allRows);
     }
 
     calculateVacationDays(years: number): number {
-        if (years <= 0) return 0; // Or maybe proportional if < 1, but usually legal entitlement is after 1 year. 
-        // Current law says 12 days after 1st year.
+        if (years <= 0) return 0;
         if (years === 1) return 12;
         if (years === 2) return 14;
         if (years === 3) return 16;
         if (years === 4) return 18;
         if (years === 5) return 20;
 
-        // From 6 onwards, +2 every 5 years
-        // 6-10: 22
-        // 11-15: 24
-        // 16-20: 26
-        // etc.
+        // 6-10 -> 22, etc.
         if (years >= 6 && years <= 10) return 22;
         if (years >= 11 && years <= 15) return 24;
         if (years >= 16 && years <= 20) return 26;
         if (years >= 21 && years <= 25) return 28;
         if (years >= 26 && years <= 30) return 30;
 
-        // Generic formula for > 5
-        // Base 20 for 5 years.
-        // Cycles of 5 years add 2 days.
-        // floor((years - 1) / 5) gives us the bracket index roughly? 
-        // Let's stick to the explicit blocks or a simple loop if needed, but the blocks cover most cases.
-        // Fallback formula:
-        // 6-10 -> 1 cycle past 5. 20 + 2 = 22.
-        // 11-15 -> 2 cycles past 5. 20 + 4 = 24.
         const cycles5 = Math.floor((years - 1) / 5);
-        // Base 20 at 5 years. For years > 5:
-        // cycles5 for 6-10 is 1. (6-1)/5 = 1. (10-1)/5 = 1.
-        // Days = 20 + (cycles5 - 1) * 2 ??? No.
-        // 6-10: 22. 
-        // 11-15: 24.
-        // Formula: 22 + (cycles5 - 1) * 2
-        // Let's check:
-        // Years 6 -> cycles5 = 1 -> 22 + 0 = 22. Correct.
-        // Years 11 -> cycles5 = 2 -> 22 + 2 = 24. Correct.
-        // Years 16 -> cycles5 = 3 -> 22 + 4 = 26. Correct.
         return 22 + (cycles5 - 1) * 2;
     }
 
@@ -188,5 +175,93 @@ export class PermissionsVacationsComponent implements OnInit {
                 r.num.includes(term)
             );
         }
+    }
+
+    // --- Modal Logic ---
+
+    openCreateModal(type: 'Vacaciones' | 'Permiso'): void {
+        this.requestType = type;
+        this.requestForm.reset();
+        this.selectedFile = null;
+        const modal = new (window as any).bootstrap.Modal(document.getElementById('createRequestModal'));
+        modal.show();
+    }
+
+    onFileSelected(event: any): void {
+        if (event.target.files && event.target.files.length > 0) {
+            this.selectedFile = event.target.files[0];
+        }
+    }
+
+    async saveRequest(): Promise<void> {
+        if (this.requestForm.invalid) {
+            this.toastr.warning('Por favor complete los campos requeridos');
+            return;
+        }
+
+        const formValues = this.requestForm.value;
+        const start = new Date(formValues.startDate);
+        const end = new Date(formValues.endDate);
+        const daysCount = Math.ceil((end.getTime() - start.getTime()) / (1000 * 3600 * 24)) + 1;
+
+        if (daysCount <= 0) {
+            this.toastr.error('La fecha fin debe ser posterior a la fecha inicio');
+            return;
+        }
+
+        this.toastr.info('Procesando solicitud...');
+
+        let docUrl = '';
+        // 1. Upload File if exists
+        if (this.selectedFile) {
+            try {
+                const uploadRes = await firstValueFrom(this.uploadService.uploadFile(this.selectedFile));
+                if (uploadRes) {
+                    docUrl = uploadRes.path; // Assuming facade returns object with path/url
+                }
+            } catch (err) {
+                console.error('Upload Error', err);
+                this.toastr.error('Error al subir el documento');
+                return;
+            }
+        }
+
+        // 2. Create Request Record (Mocking Backend Persistence)
+        const newRequest: RequestRecord = {
+            id: Math.random().toString(36).substr(2, 9),
+            type: this.requestType,
+            startDate: formValues.startDate,
+            endDate: formValues.endDate,
+            daysCount: daysCount,
+            description: formValues.description,
+            documentUrl: docUrl,
+            requestDate: new Date().toISOString().split('T')[0]
+        };
+
+        // 3. Update "Local" State to simulate immediate update
+        const empIndex = this.allRows.findIndex(row => row.id === formValues.employeeId);
+        if (empIndex >= 0) {
+            this.allRows[empIndex].history.push(newRequest);
+
+            // Update totals if it matches current year context? 
+            // For now, just adding to history list.
+
+            this.toastr.success(`${this.requestType} registrado exitosamente`);
+
+            // Close Modal
+            const modalEl = document.getElementById('createRequestModal');
+            const modal = (window as any).bootstrap.Modal.getInstance(modalEl);
+            modal.hide();
+            this.loadEmployees(); // Refresh view
+        } else {
+            this.toastr.error('Empleado no encontrado en la lista local');
+        }
+    }
+
+    openHistoryModal(row: VacationRow): void {
+        this.selectedEmployeeName = row.nombre;
+        this.selectedEmployeeHistory = row.history;
+        const modal = new (window as any).bootstrap.Modal(document.getElementById('historyModal'));
+        modal.show();
     }
 }
