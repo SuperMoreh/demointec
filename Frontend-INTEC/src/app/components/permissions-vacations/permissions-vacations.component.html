@@ -4,91 +4,91 @@
         <div>
             <h1 class="page-title">Permisos y Vacaciones</h1>
         </div>
-    </div>
-    <div class="d-flex gap-2" *ngIf="canManage">
-        <button class="btn-primary" (click)="openCreateModal('Permiso')">
-            <i class="bi bi-file-earmark-medical"></i>
-            Agregar Permiso
-        </button>
-        <button class="btn-secondary" (click)="openCreateModal('Vacaciones')">
-            <i class="bi bi-sun"></i>
-            Agregar Vacaciones
-        </button>
-    </div>
-</div>
 
-<!-- Filters -->
-<div class="filters-section">
-    <div class="filters-row">
-        <div class="filter-group">
-            <label for="search">Buscar</label>
-            <input type="text" id="search" class="filter-input" placeholder="Nombre del colaborador..."
-                [(ngModel)]="searchTerm" (input)="applyFilter()">
+        <div class="d-flex gap-2" *ngIf="canManage">
+            <button class="btn-primary" (click)="openCreateModal('Permiso')">
+                <i class="bi bi-file-earmark-medical"></i>
+                Agregar Permiso
+            </button>
+            <button class="btn-secondary" (click)="openCreateModal('Vacaciones')">
+                <i class="bi bi-sun"></i>
+                Agregar Vacaciones
+            </button>
         </div>
-        <button class="btn-primary" style="background-color: #2a7ae4; height: fit-content; align-self: flex-end;"
-            (click)="loadEmployees()">
-            <i class="bi bi-arrow-repeat"></i> Consultar
-        </button>
     </div>
-</div>
 
-<!-- Table -->
-<div class="table-container" *ngIf="!loading && filteredData.length > 0">
-    <div class="table-responsive">
-        <table class="vacations-table">
-            <thead>
-                <tr>
-                    <th class="col-antiguedad">ANTIGÜEDAD</th>
-                    <th>NUM.</th>
-                    <th>NOMBRE</th>
-                    <th>FECHA INGRESO</th>
-                    <th class="col-vacaciones-tomar-2024">DIAS POR TOMAR 2024</th>
-                    <th>ANIVERSARIO 2025</th>
-                    <th>TOTAL DIAS LEY</th>
-                    <th>DIAS TOMADOS</th>
-                    <th class="col-vacaciones-tomar-2025">DIAS POR TOMAR 2025</th>
-                    <th>SALDO TOTAL</th>
-                    <th>ACCIONES</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let item of filteredData">
-                    <td class="col-antiguedad">{{ item.antiguedad }} Años</td>
-                    <td>{{ item.num }}</td>
-                    <td style="text-align: left;">{{ item.nombre }}</td>
-                    <td>{{ item.fechaIngreso }}</td>
-                    <td class="col-vacaciones-tomar-2024">{{ item.diasPorTomar2024 }}</td>
-                    <td>{{ item.aniversario }}</td>
-                    <td>{{ item.totalVacaciones }}</td>
-                    <td>{{ item.diasTomados }}</td>
-                    <td class="col-vacaciones-tomar-2025">{{ item.diasPorTomar2025 }}</td>
-                    <td style="font-weight: bold;">{{ item.saldoTotal }}</td>
-                    <td>
-                        <button class="btn-action btn-view-records" (click)="openHistoryModal(item)">
-                            <i class="bi bi-eye"></i> Ver Registros
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- Filters -->
+    <div class="filters-section">
+        <div class="filters-row">
+            <div class="filter-group">
+                <label for="search">Buscar</label>
+                <input type="text" id="search" class="filter-input" placeholder="Nombre del colaborador..."
+                    [(ngModel)]="searchTerm" (input)="applyFilter()">
+            </div>
+            <button class="btn-primary" style="background-color: #2a7ae4; height: fit-content; align-self: flex-end;"
+                (click)="loadEmployees()">
+                <i class="bi bi-arrow-repeat"></i> Consultar
+            </button>
+        </div>
     </div>
-</div>
 
-<!-- Loading State -->
-<div class="placeholder-container" *ngIf="loading">
-    <div class="table-placeholder">
-        <i class="bi bi-arrow-repeat spin" style="font-size: 2rem;"></i>
-        <p>Cargando información...</p>
+    <!-- Table -->
+    <div class="table-container" *ngIf="!loading && filteredData.length > 0">
+        <div class="table-responsive">
+            <table class="vacations-table">
+                <thead>
+                    <tr>
+                        <th class="col-antiguedad">ANTIGÜEDAD</th>
+                        <th>NUM.</th>
+                        <th>NOMBRE</th>
+                        <th>FECHA INGRESO</th>
+                        <th class="col-vacaciones-tomar-2024">DIAS POR TOMAR 2024</th>
+                        <th>ANIVERSARIO 2025</th>
+                        <th>TOTAL DIAS LEY</th>
+                        <th>DIAS TOMADOS</th>
+                        <th class="col-vacaciones-tomar-2025">DIAS POR TOMAR 2025</th>
+                        <th>SALDO TOTAL</th>
+                        <th>ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of filteredData">
+                        <td class="col-antiguedad">{{ item.antiguedad }} Años</td>
+                        <td>{{ item.num }}</td>
+                        <td style="text-align: left;">{{ item.nombre }}</td>
+                        <td>{{ item.fechaIngreso }}</td>
+                        <td class="col-vacaciones-tomar-2024">{{ item.diasPorTomar2024 }}</td>
+                        <td>{{ item.aniversario }}</td>
+                        <td>{{ item.totalVacaciones }}</td>
+                        <td>{{ item.diasTomados }}</td>
+                        <td class="col-vacaciones-tomar-2025">{{ item.diasPorTomar2025 }}</td>
+                        <td style="font-weight: bold;">{{ item.saldoTotal }}</td>
+                        <td>
+                            <button class="btn-action btn-view-records" (click)="openHistoryModal(item)">
+                                <i class="bi bi-eye"></i> Ver Registros
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 
-<!-- Empty State -->
-<div class="placeholder-container" *ngIf="!loading && filteredData.length === 0">
-    <div class="table-placeholder">
-        <i class="bi bi-inbox" style="font-size: 2rem;"></i>
-        <p>No se encontraron colaboradores.</p>
+    <!-- Loading State -->
+    <div class="placeholder-container" *ngIf="loading">
+        <div class="table-placeholder">
+            <i class="bi bi-arrow-repeat spin" style="font-size: 2rem;"></i>
+            <p>Cargando información...</p>
+        </div>
     </div>
-</div>
+
+    <!-- Empty State -->
+    <div class="placeholder-container" *ngIf="!loading && filteredData.length === 0">
+        <div class="table-placeholder">
+            <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+            <p>No se encontraron colaboradores.</p>
+        </div>
+    </div>
 </div>
 
 <!-- Modal Crear Solicitud -->
