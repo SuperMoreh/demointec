@@ -58,7 +58,8 @@ export interface Employee {
   pVerCats?: string;
   pEliminarDocsRH?: string;
   pDescripcionesPuestos?: string;
-  status: boolean;
+  pPermisosVacaciones?: string;
+  status?: boolean;
   imss_salary?: number;
   base_salary?: number;
   bonuses?: string;

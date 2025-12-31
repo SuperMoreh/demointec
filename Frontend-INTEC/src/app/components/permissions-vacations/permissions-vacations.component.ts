@@ -56,6 +56,9 @@ export class PermissionsVacationsComponent implements OnInit {
     selectedEmployeeId: string = '';
     selectedEmployeeHistory: RequestRecord[] = [];
 
+    // Permission State
+    canManage: boolean = false;
+
     // State for Edit Mode
     editingRequestId: string | null = null;
     isReadOnly: boolean = false;
@@ -97,6 +100,20 @@ export class PermissionsVacationsComponent implements OnInit {
 
     processEmployees(employees: Employee[]): void {
         const currentYear = 2025;
+
+        // Check Permissions
+        if (typeof localStorage !== 'undefined') {
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    // Check if user has pPermisosVacaciones === '1'
+                    this.canManage = user.pPermisosVacaciones === '1';
+                } catch (e) {
+                    console.error('Error parsing user for permissions', e);
+                }
+            }
+        }
 
         // Load persistency
         let savedRequests: RequestRecord[] = [];
