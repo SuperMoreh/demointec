@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Observable, firstValueFrom } from 'rxjs';
 import { EmployeesAdapterService } from '../../adapters/employees.adapter';
+import { EmployeeDocumentsAdapterService } from '../../adapters/employee-documents.adapter';
 import { Employee } from '../../models/employees';
 import { UploadAdapterService } from '../../adapters/upload.adapter';
 import { ToastrService } from 'ngx-toastr';
@@ -57,8 +58,9 @@ export class PermissionsVacationsComponent implements OnInit {
 
     constructor(
         private employeesAdapter: EmployeesAdapterService,
+        private docService: EmployeeDocumentsAdapterService, // Injected for real uploads
         private fb: FormBuilder,
-        private uploadService: UploadAdapterService,
+        private uploadService: UploadAdapterService, // Keep for generic uploads if needed, but preferring docService for Repo
         private toastr: ToastrService
     ) {
         this.requestForm = this.fb.group({
@@ -91,6 +93,19 @@ export class PermissionsVacationsComponent implements OnInit {
     processEmployees(employees: Employee[]): void {
         const currentYear = 2025;
 
+        // Load persistency
+        let savedRequests: RequestRecord[] = [];
+        if (typeof localStorage !== 'undefined') {
+            const saved = localStorage.getItem('vacation_requests');
+            if (saved) {
+                try {
+                    savedRequests = JSON.parse(saved);
+                } catch (e) {
+                    console.error('Error parsing saved requests', e);
+                }
+            }
+        }
+
         this.allRows = employees
             .filter(emp => emp.status)
             .map((emp, index) => {
@@ -111,9 +126,23 @@ export class PermissionsVacationsComponent implements OnInit {
                 const anniversaryStr = this.formatDate(anniversaryDate2025);
                 const admissionStr = this.formatDate(admissionDate);
 
-                // Mock Data for demonstration since we don't have a backend table for this yet
+                // Filter history for this employee
+                // Using generic 'id' property in RequestRecord which actually stores employeeId in my new logic
+                // But wait, RequestRecord definition has 'id' as unique request ID.
+                // I need to add employeeId to RequestRecord or filter by some other means.
+                // Let's assume I will add `employeeId` to RequestRecord interface implicitly or handle it here.
+                // Actually, let's update RequestRecord interface in a separate edit or cast it here.
+                // For now, I will assume savedRequests contains an 'employeeId' field.
+
+                const empHistory = savedRequests.filter((r: any) => r.employeeId === emp.id_employee);
+
                 const diasPorTomar2024 = 0;
-                const diasTomados = 0;
+
+                // Calculate diasTomados from History (only type 'Vacaciones')
+                const diasTomados = empHistory
+                    .filter((r: any) => r.type === 'Vacaciones')
+                    .reduce((sum: number, r: any) => sum + (r.daysCount || 0), 0);
+
                 const diasPorTomar2025 = vacationDays - diasTomados;
                 const saldoTotal = diasPorTomar2024 + diasPorTomar2025;
                 const num = (index + 1).toString().padStart(4, '0');
@@ -131,7 +160,7 @@ export class PermissionsVacationsComponent implements OnInit {
                     diasPorTomar2025: diasPorTomar2025,
                     saldoTotal: saldoTotal,
                     detalles: '',
-                    history: [] // Initially empty, would come from backend
+                    history: empHistory
                 };
             })
             .filter(row => row !== null) as VacationRow[];
@@ -211,51 +240,64 @@ export class PermissionsVacationsComponent implements OnInit {
 
         this.toastr.info('Procesando solicitud...');
 
-        let docUrl = '';
-        // 1. Upload File if exists
+        let docPath = '';
+
+        // 1. Upload File to Document Repository if exists
         if (this.selectedFile) {
             try {
-                const uploadRes = await firstValueFrom(this.uploadService.uploadFile(this.selectedFile));
-                if (uploadRes) {
-                    docUrl = uploadRes.path; // Assuming facade returns object with path/url
-                }
+                // Prepare FormData for EmployeeDocumentsAdapter
+                const formData = new FormData();
+                formData.append('id_employee', formValues.employeeId);
+                formData.append('document_type', `Justificante ${this.requestType}`);
+                formData.append('document', this.selectedFile);
+
+                // Assuming backend returns some object, we wait for it
+                const uploadRes = await firstValueFrom(this.docService.saveDocument(formData));
+                this.toastr.success('Documento guardado en repositorio');
+                // Use a generic path or the one returned if available
+                docPath = uploadRes?.path || 'Repositorio';
             } catch (err) {
                 console.error('Upload Error', err);
-                this.toastr.error('Error al subir el documento');
+                this.toastr.error('Error al subir el documento al repositorio');
                 return;
             }
         }
 
-        // 2. Create Request Record (Mocking Backend Persistence)
-        const newRequest: RequestRecord = {
+        // 2. Save Request Locally (Persistence)
+        const newRequest: any = {
             id: Math.random().toString(36).substr(2, 9),
+            employeeId: formValues.employeeId, // Critical for filtering!
             type: this.requestType,
             startDate: formValues.startDate,
             endDate: formValues.endDate,
             daysCount: daysCount,
             description: formValues.description,
-            documentUrl: docUrl,
+            documentUrl: docPath,
             requestDate: new Date().toISOString().split('T')[0]
         };
 
-        // 3. Update "Local" State to simulate immediate update
-        const empIndex = this.allRows.findIndex(row => row.id === formValues.employeeId);
-        if (empIndex >= 0) {
-            this.allRows[empIndex].history.push(newRequest);
-
-            // Update totals if it matches current year context? 
-            // For now, just adding to history list.
-
-            this.toastr.success(`${this.requestType} registrado exitosamente`);
-
-            // Close Modal
-            const modalEl = document.getElementById('createRequestModal');
-            const modal = (window as any).bootstrap.Modal.getInstance(modalEl);
-            modal.hide();
-            this.loadEmployees(); // Refresh view
-        } else {
-            this.toastr.error('Empleado no encontrado en la lista local');
+        // Load existing
+        let savedRequests: any[] = [];
+        if (typeof localStorage !== 'undefined') {
+            const saved = localStorage.getItem('vacation_requests');
+            if (saved) {
+                try {
+                    savedRequests = JSON.parse(saved);
+                } catch (e) { }
+            }
         }
+
+        savedRequests.push(newRequest);
+        localStorage.setItem('vacation_requests', JSON.stringify(savedRequests));
+
+        this.toastr.success(`${this.requestType} registrado exitosamente`);
+
+        // Close Modal
+        const modalEl = document.getElementById('createRequestModal');
+        const modal = (window as any).bootstrap.Modal.getInstance(modalEl);
+        modal.hide();
+
+        this.loadEmployees(); // Refresh view to calculate new totals
     }
 
     openHistoryModal(row: VacationRow): void {

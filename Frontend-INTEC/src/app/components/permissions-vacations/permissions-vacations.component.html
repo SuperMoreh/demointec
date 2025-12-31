@@ -161,7 +161,7 @@
             </div>
             <div class="modal-body">
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover">
+                    <table class="users-table">
                         <thead>
                             <tr>
                                 <th>Tipo</th>
@@ -176,21 +176,22 @@
                         <tbody>
                             <tr *ngFor="let req of selectedEmployeeHistory">
                                 <td>
-                                    <span class="badge"
-                                        [ngClass]="req.type === 'Vacaciones' ? 'bg-info' : 'bg-warning text-dark'">
+                                    <span class="status-badge"
+                                        [ngClass]="req.type === 'Vacaciones' ? 'status-active' : 'status-late'">
+                                        <i class="bi"
+                                            [ngClass]="req.type === 'Vacaciones' ? 'bi-sun' : 'bi-file-earmark-medical'"></i>
                                         {{ req.type }}
                                     </span>
                                 </td>
                                 <td>{{ req.requestDate }}</td>
                                 <td>{{ req.startDate }}</td>
                                 <td>{{ req.endDate }}</td>
-                                <td>{{ req.daysCount }}</td>
+                                <td style="font-weight: bold; text-align: center;">{{ req.daysCount }}</td>
                                 <td>{{ req.description }}</td>
                                 <td>
-                                    <a *ngIf="req.documentUrl" [href]="req.documentUrl" target="_blank"
-                                        class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-file-earmark-text"></i> Ver
-                                    </a>
+                                    <span *ngIf="req.documentUrl" class="badge bg-success">
+                                        <i class="bi bi-check-circle"></i> Subido
+                                    </span>
                                     <span *ngIf="!req.documentUrl" class="text-muted">-</span>
                                 </td>
                             </tr>
