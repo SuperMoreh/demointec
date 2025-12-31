@@ -130,7 +130,7 @@ export class EmployeesAdapterRepository implements EmployeesRepository<EmployeeE
           pHistorial: item.pHistorial || '0',
           pUsuarios: item.pUsuarios || '0',
           pVerCats: item.pVerCats || '0',
-          pVerCats: item.pVerCats || '0',
+
           pDescripcionesPuestos: item.pDescripcionesPuestos || '0',
           pPermisosVacaciones: item.pPermisosVacaciones || '0',
           phone: item.telefono || '',
@@ -244,7 +244,7 @@ export class EmployeesAdapterRepository implements EmployeesRepository<EmployeeE
       pHistorial: employee.pHistorial || '0',
       pUsuarios: employee.pUsuarios || '0',
       pVerCats: employee.pVerCats || '0',
-      pVerCats: employee.pVerCats || '0',
+
       pDescripcionesPuestos: employee.pDescripcionesPuestos || '0',
       pPermisosVacaciones: employee.pPermisosVacaciones || '0',
       // New fields
@@ -318,7 +318,7 @@ export class EmployeesAdapterRepository implements EmployeesRepository<EmployeeE
       pHistorial: employee.pHistorial || '0',
       pUsuarios: employee.pUsuarios || '0',
       pVerCats: employee.pVerCats || '0',
-      pVerCats: employee.pVerCats || '0',
+
       pDescripcionesPuestos: employee.pDescripcionesPuestos || '0',
       pPermisosVacaciones: employee.pPermisosVacaciones || '0',
       // New fields
