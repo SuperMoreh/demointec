@@ -252,15 +252,20 @@
     background-color: #138496;
 }
 
-.btn-edit {
-    background-color: #ffc107;
-    /* Warning Yellow */
-    color: #333;
-    /* Dark text for contrast */
+/* For the "Ver Registros" button (with text) */
+.btn-view-records {
+    background-color: #dcd0ff;
+    /* Stronger Lavender */
+    color: #4a148c;
+    /* Darker text */
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1c4e9;
+    /* Adding border for better definition */
 }
 
-.btn-edit:hover {
-    background-color: #e0a800;
+.btn-view-records:hover {
+    background-color: #c5b3fa;
 }
 
 .btn-delete {

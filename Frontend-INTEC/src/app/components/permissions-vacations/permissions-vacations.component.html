@@ -47,7 +47,6 @@
                         <th>DIAS TOMADOS</th>
                         <th class="col-vacaciones-tomar-2025">DIAS POR TOMAR 2025</th>
                         <th>SALDO TOTAL</th>
-                        <th>DETALLES</th>
                         <th>ACCIONES</th>
                     </tr>
                 </thead>
@@ -63,7 +62,6 @@
                         <td>{{ item.diasTomados }}</td>
                         <td class="col-vacaciones-tomar-2025">{{ item.diasPorTomar2025 }}</td>
                         <td style="font-weight: bold;">{{ item.saldoTotal }}</td>
-                        <td style="text-align: left; font-size: 0.8em; max-width: 200px;">{{ item.detalles }}</td>
                         <td>
                             <button class="btn-action btn-view-records" (click)="openHistoryModal(item)">
                                 <i class="bi bi-eye"></i> Ver Registros

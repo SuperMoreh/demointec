@@ -21,7 +21,6 @@ interface VacationRow {
     diasTomados: number;
     diasPorTomar2025: number;
     saldoTotal: number;
-    detalles: string;
     history: RequestRecord[];
 }
 
@@ -164,8 +163,8 @@ export class PermissionsVacationsComponent implements OnInit {
                     totalVacaciones: vacationDays,
                     diasTomados: diasTomados,
                     diasPorTomar2025: diasPorTomar2025,
+                    diasPorTomar2025: diasPorTomar2025,
                     saldoTotal: saldoTotal,
-                    detalles: '',
                     history: empHistory
                 };
             })
