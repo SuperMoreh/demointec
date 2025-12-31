@@ -101,14 +101,24 @@ export class PermissionsVacationsComponent implements OnInit {
     processEmployees(employees: Employee[]): void {
         const currentYear = 2025;
 
-        // Check Permissions
+        // Check Permissions (Live Update)
         if (typeof localStorage !== 'undefined') {
             const userStr = localStorage.getItem('user');
             if (userStr) {
                 try {
                     const user = JSON.parse(userStr);
-                    // Check if user has pPermisosVacaciones === '1'
-                    this.canManage = user.pPermisosVacaciones === '1';
+                    const currentUserEmail = user.email;
+
+                    // Find current user in the fresh employees list
+                    const currentEmployee = employees.find(e => e.email === currentUserEmail);
+
+                    if (currentEmployee) {
+                        // Use fresh permission from DB
+                        this.canManage = currentEmployee.pPermisosVacaciones === '1';
+                    } else {
+                        // Fallback to localStorage if not found in list (e.g. admin not in employee list)
+                        this.canManage = user.pPermisosVacaciones === '1';
+                    }
                 } catch (e) {
                     console.error('Error parsing user for permissions', e);
                 }
