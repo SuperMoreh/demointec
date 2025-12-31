@@ -22,36 +22,37 @@ export class LoginController {
         { expiresIn: '8h' }
       );
 
-      res.status(200).json({
-        msg: 'Login exitoso',
-        token,
-        user: {
-          name: user.name_user,
-          email: user.email,
-          role_id: user.role_id.name_role,
-          photo: user.photo ? `data:image/png;base64,${user.photo.toString('base64')}` : null,
-          pPermisosVacaciones: '0' // Default
-        };
+      // Construct User Response Object
+      const responseUser: any = {
+        name: user.name_user,
+        email: user.email,
+        role_id: user.role_id.name_role,
+        photo: user.photo ? `data:image/png;base64,${user.photo.toString('base64')}` : null,
+        pPermisosVacaciones: '0' // Default
+      };
 
-        // Fetch Employee Permissions
+      // Fetch Employee Permissions to override default
+      try {
         const employeeRepo = database.getRepository(EmployeeEntity);
         const employee = await employeeRepo.findOne({ where: { email: user.email } });
 
-        if(employee) {
+        if (employee) {
           responseUser.pPermisosVacaciones = employee.pPermisosVacaciones;
-          // Map other permissions if needed
-          // responseUser.pAut1 = employee.pAut1;
         }
-
-        res.status(200).json({
-          msg: 'Login exitoso',
-          token,
-          user: responseUser
-        });
-
-      } catch (error: any) {
-        console.error('Error en login:', error);
-        res.status(error.status || 500).json({ message: error.message });
+      } catch (err) {
+        console.error('Error fetching linked employee for permissions', err);
+        // Continue login even if permission fetch fails
       }
+
+      res.status(200).json({
+        msg: 'Login exitoso',
+        token,
+        user: responseUser
+      });
+
+    } catch (error: any) {
+      console.error('Error en login:', error);
+      res.status(error.status || 500).json({ message: error.message });
     }
+  }
 }
