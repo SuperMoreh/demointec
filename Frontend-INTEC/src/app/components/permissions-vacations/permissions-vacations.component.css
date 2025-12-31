@@ -1,0 +1,138 @@
+.content-container {
+    padding: 20px;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.sub-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-left: 20px;
+}
+
+.btn-back {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.btn-back:hover {
+    background-color: #5a6268;
+    transform: translateY(-1px);
+}
+
+.table-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    margin-top: 1rem;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.vacations-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.vacations-table th,
+.vacations-table td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px solid #e9ecef;
+    vertical-align: middle;
+}
+
+.vacations-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+    white-space: normal;
+    /* Allow wrap for long headers */
+    vertical-align: top;
+    border-right: 1px solid #dee2e6;
+}
+
+.vacations-table th:last-child {
+    border-right: none;
+}
+
+.vacations-table td {
+    border-right: 1px solid #f1f3f5;
+}
+
+.vacations-table td:last-child {
+    border-right: none;
+}
+
+.vacations-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Specific column styles based on image */
+.col-antiguedad {
+    background-color: #dbeafe;
+    /* Light blue similar to image */
+    font-weight: bold;
+}
+
+.col-vacaciones-tomar-2024 {
+    background-color: #dbeafe;
+    /* Light blue similar to image */
+}
+
+.col-vacaciones-tomar-2025 {
+    background-color: #dbeafe;
+    /* Light blue similar to image */
+}
+
+/* Header customization to match "INTEC DE JALISCO SA DE CV" look */
+.table-super-header {
+    background-color: #e9ecef;
+    padding: 10px;
+    font-weight: bold;
+    font-size: 1.1em;
+    border-bottom: 2px solid #dee2e6;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+}
+
+.search-container {
+    margin-bottom: 1rem;
+}
+
+.search-input {
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    width: 300px;
+}

@@ -1,0 +1,57 @@
+<div class="content-container">
+    <div class="page-header">
+        <div class="d-flex align-items-center">
+            <h1 class="page-title">Permisos y Vacaciones</h1>
+            <span class="sub-title">INTEC DE JALISCO SA DE CV - VACACIONES 2025</span>
+        </div>
+        <button class="btn-back" routerLink="/dashboard/colaboradores">
+            <i class="bi bi-arrow-left"></i>
+            Volver
+        </button>
+    </div>
+
+    <div class="search-container">
+        <input type="text" class="search-input" placeholder="Buscar por nombre..." [(ngModel)]="searchTerm"
+            (input)="applyFilter()">
+    </div>
+
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="vacations-table">
+                <thead>
+                    <tr>
+                        <th class="col-antiguedad">ANTIGÜEDAD (Años)</th>
+                        <th>NUM.</th>
+                        <th>NOMBRE</th>
+                        <th>FECHA INGRESO</th>
+                        <th class="col-vacaciones-tomar-2024">DIAS VACACIONES X TOMAR 2024</th>
+                        <th>ANIVERSARIO 2025</th>
+                        <th>TOTAL DIAS VACACIONES</th>
+                        <th>DIAS VACACIONES TOMADAS</th>
+                        <th class="col-vacaciones-tomar-2025">DIAS VACACIONES X TOMAR 2025</th>
+                        <th>SALDO TOTAL</th>
+                        <th>DETALLES (FECHAS TOMADAS)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of filteredData">
+                        <td class="col-antiguedad">{{ item.antiguedad }}</td>
+                        <td>{{ item.num }}</td>
+                        <td style="text-align: left;">{{ item.nombre }}</td>
+                        <td>{{ item.fechaIngreso }}</td>
+                        <td class="col-vacaciones-tomar-2024">{{ item.diasPorTomar2024 }}</td>
+                        <td>{{ item.aniversario }}</td>
+                        <td>{{ item.totalVacaciones }}</td>
+                        <td>{{ item.diasTomados }}</td>
+                        <td class="col-vacaciones-tomar-2025">{{ item.diasPorTomar2025 }}</td>
+                        <td><strong>{{ item.saldoTotal }}</strong></td>
+                        <td style="text-align: left; font-size: 0.8em;">{{ item.detalles }}</td>
+                    </tr>
+                    <tr *ngIf="filteredData.length === 0">
+                        <td colspan="11" class="text-muted p-4">No se encontraron colaboradores.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -37,6 +37,7 @@ export const routes: Routes = [
       { path: 'repositorio-documental', component: DocumentRepositoryComponent },
       { path: 'descripciones-puestos', component: JobDescriptionComponent },
       { path: 'control-bajas', component: TerminationsComponent },
+      { path: 'permisos-vacaciones', loadComponent: () => import('./components/permissions-vacations/permissions-vacations.component').then(m => m.PermissionsVacationsComponent) },
     ]
   },
 
