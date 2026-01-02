@@ -15,11 +15,11 @@ interface VacationRow {
     num: string;
     nombre: string;
     fechaIngreso: string;
-    diasPorTomar2024: number;
-    aniversario: string;
+    diasPorTomarPrevious: number;
+    aniversarioCurrent: string;
     totalVacaciones: number;
-    diasTomados: number;
-    diasPorTomar2025: number;
+    diasTomados: number; // Current year taken
+    diasPorTomarCurrent: number;
     saldoTotal: number;
     history: RequestRecord[];
 }
@@ -50,6 +50,10 @@ export class PermissionsVacationsComponent implements OnInit {
     requestForm: FormGroup;
     requestType: 'Vacaciones' | 'Permiso' = 'Vacaciones';
     selectedFile: File | null = null;
+
+    // Dynamic Years
+    currentYear: number = new Date().getFullYear();
+    previousYear: number = new Date().getFullYear() - 1;
 
     // History Modal State
     selectedEmployeeName: string = '';
@@ -99,7 +103,8 @@ export class PermissionsVacationsComponent implements OnInit {
     }
 
     processEmployees(employees: Employee[]): void {
-        const currentYear = 2025;
+        const currentYear = this.currentYear;
+        const previousYear = this.previousYear;
 
         // Check Permissions (Live Update)
         if (typeof localStorage !== 'undefined') {
@@ -147,49 +152,56 @@ export class PermissionsVacationsComponent implements OnInit {
                 const admissionDate = new Date(admissionDateStr);
                 const admissionYear = admissionDate.getFullYear();
 
-                // Calculate Seniority
-                let yearsOfService = currentYear - admissionYear;
-                if (yearsOfService < 0) yearsOfService = 0;
+                // Calculate Seniority for Current Year
+                let yearsOfServiceCurrent = currentYear - admissionYear;
+                if (yearsOfServiceCurrent < 0) yearsOfServiceCurrent = 0;
 
-                const vacationDays = this.calculateVacationDays(yearsOfService);
+                // Calculate Seniority for Previous Year
+                let yearsOfServicePrev = previousYear - admissionYear;
+                if (yearsOfServicePrev < 0) yearsOfServicePrev = 0;
+
+                const entitlementCurrent = this.calculateVacationDays(yearsOfServiceCurrent);
+                const entitlementPrevious = this.calculateVacationDays(yearsOfServicePrev);
 
                 // Format dates
-                const anniversaryDate2025 = new Date(currentYear, admissionDate.getMonth(), admissionDate.getDate());
-                const anniversaryStr = this.formatDate(anniversaryDate2025);
+                const anniversaryDateCurrent = new Date(currentYear, admissionDate.getMonth(), admissionDate.getDate());
+                const anniversaryStr = this.formatDate(anniversaryDateCurrent);
                 const admissionStr = this.formatDate(admissionDate);
-
-                // Filter history for this employee
-                // Using generic 'id' property in RequestRecord which actually stores employeeId in my new logic
-                // But wait, RequestRecord definition has 'id' as unique request ID.
-                // I need to add employeeId to RequestRecord or filter by some other means.
-                // Let's assume I will add `employeeId` to RequestRecord interface implicitly or handle it here.
-                // Actually, let's update RequestRecord interface in a separate edit or cast it here.
-                // For now, I will assume savedRequests contains an 'employeeId' field.
 
                 const empHistory = savedRequests.filter((r: any) => r.employeeId === emp.id_employee);
 
-                const diasPorTomar2024 = 0;
-
-                // Calculate diasTomados from History (only type 'Vacaciones')
-                const diasTomados = empHistory
-                    .filter((r: any) => r.type === 'Vacaciones')
+                // Calculate Taken Days for Previous Year
+                const takenPrevious = empHistory
+                    .filter((r: any) => r.type === 'Vacaciones' && new Date(r.startDate).getFullYear() === previousYear)
                     .reduce((sum: number, r: any) => sum + (r.daysCount || 0), 0);
 
-                const diasPorTomar2025 = vacationDays - diasTomados;
-                const saldoTotal = diasPorTomar2024 + diasPorTomar2025;
+                // Calculate Taken Days for Current Year
+                const takenCurrent = empHistory
+                    .filter((r: any) => r.type === 'Vacaciones' && new Date(r.startDate).getFullYear() === currentYear)
+                    .reduce((sum: number, r: any) => sum + (r.daysCount || 0), 0);
+
+                let diasPorTomarPrevious = entitlementPrevious - takenPrevious;
+                // Optional: Clamp negative previous balance if needed, but usually it can be negative or 0.
+                // Assuming standard logic where unused days carry over, but here we just show strict year math as requested.
+                // However, if yearsOfServicePrev was 0 (new employee last year), existing logic works.
+                // If employee joined THIS year, Previous Entitlement is 0. Balance 0. Correct.
+
+                let diasPorTomarCurrent = entitlementCurrent - takenCurrent;
+
+                const saldoTotal = diasPorTomarPrevious + diasPorTomarCurrent;
                 const num = (index + 1).toString().padStart(4, '0');
 
                 return {
                     id: emp.id_employee,
-                    antiguedad: yearsOfService,
+                    antiguedad: yearsOfServiceCurrent,
                     num: num,
                     nombre: emp.name_employee,
                     fechaIngreso: admissionStr,
-                    diasPorTomar2024: diasPorTomar2024,
-                    aniversario: anniversaryStr,
-                    totalVacaciones: vacationDays,
-                    diasTomados: diasTomados,
-                    diasPorTomar2025: diasPorTomar2025,
+                    diasPorTomarPrevious: diasPorTomarPrevious,
+                    aniversarioCurrent: anniversaryStr,
+                    totalVacaciones: entitlementCurrent, // Label is 'TOTAL DIAS LEY', usually refers to current entitlement
+                    diasTomados: takenCurrent, // Showing Current Year Usage to match the 'Current' row logic visually
+                    diasPorTomarCurrent: diasPorTomarCurrent,
                     saldoTotal: saldoTotal,
                     history: empHistory
                 };
