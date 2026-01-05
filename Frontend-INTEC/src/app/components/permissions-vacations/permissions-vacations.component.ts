@@ -542,4 +542,20 @@ export class PermissionsVacationsComponent implements OnInit {
     private formatDateIso(date: Date): string {
         return date.toISOString().split('T')[0];
     }
+
+    onEventClick(event: any): void {
+        // Must close calendar modal first to show the detail modal properly or handle stacking
+        // For simplicity and to reuse existing logic:
+        const calendarModalEl = document.getElementById('calendarModal');
+        if (calendarModalEl) {
+            const calendarModal = (window as any).bootstrap.Modal.getInstance(calendarModalEl);
+            if (calendarModal) calendarModal.hide();
+        }
+
+        // Use setTimeout to ensure previous modal finishes hiding if animations conflict, 
+        // though Bootstrap 5 usually handles stacking if configured, but 'hide' is safer for now.
+        setTimeout(() => {
+            this.viewRequest(event, event.employeeId);
+        }, 150);
+    }
 }

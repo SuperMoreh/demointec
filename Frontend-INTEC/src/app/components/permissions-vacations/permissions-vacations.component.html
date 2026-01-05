@@ -272,7 +272,8 @@
                             <div class="events-list" *ngIf="dayObj.day">
                                 <div *ngFor="let event of dayObj.events" class="event-pill"
                                     [ngClass]="event.type === 'Vacaciones' ? 'event-vacation' : 'event-permission'"
-                                    [title]="event.employeeName + ' - ' + event.description">
+                                    [title]="event.employeeName + ' - ' + event.description"
+                                    (click)="onEventClick(event)">
                                     <span class="event-name">{{ event.employeeName }}</span>
                                 </div>
                             </div>
