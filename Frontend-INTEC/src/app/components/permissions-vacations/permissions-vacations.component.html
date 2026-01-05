@@ -103,7 +103,7 @@
                 <h5 class="modal-title" *ngIf="!editingRequestId">Registrar {{ requestType }}</h5>
                 <h5 class="modal-title" *ngIf="editingRequestId && !isReadOnly">Editar {{ requestType }}</h5>
                 <h5 class="modal-title" *ngIf="isReadOnly">Visualizar {{ requestType }}</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                <button type="button" class="btn-close btn-close-white" (click)="closeRequestModal()"
                     aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -156,7 +156,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-secondary" (click)="closeRequestModal()">Cancelar</button>
                 <button type="button" class="btn btn-success" (click)="saveRequest()" *ngIf="!isReadOnly">Guardar
                     Registro</button>
             </div>

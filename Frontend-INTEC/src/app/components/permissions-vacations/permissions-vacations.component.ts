@@ -60,6 +60,7 @@ export class PermissionsVacationsComponent implements OnInit {
     weekDays: string[] = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
     calendarDays: any[] = [];
     calendarMonthLabel: string = '';
+    private isOpenedFromCalendar: boolean = false;
 
     // History Modal State
     selectedEmployeeName: string = '';
@@ -544,6 +545,7 @@ export class PermissionsVacationsComponent implements OnInit {
     }
 
     onEventClick(event: any): void {
+        this.isOpenedFromCalendar = true;
         // Must close calendar modal first to show the detail modal properly or handle stacking
         // For simplicity and to reuse existing logic:
         const calendarModalEl = document.getElementById('calendarModal');
@@ -557,5 +559,20 @@ export class PermissionsVacationsComponent implements OnInit {
         setTimeout(() => {
             this.viewRequest(event, event.employeeId);
         }, 150);
+    }
+
+    closeRequestModal(): void {
+        const modalEl = document.getElementById('createRequestModal');
+        if (modalEl) {
+            const modal = (window as any).bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+        }
+
+        if (this.isOpenedFromCalendar) {
+            this.isOpenedFromCalendar = false;
+            setTimeout(() => {
+                this.openCalendarModal();
+            }, 150);
+        }
     }
 }
