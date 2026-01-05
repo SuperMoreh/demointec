@@ -64,6 +64,26 @@
     background-color: #138496;
 }
 
+.btn-calendar {
+    background-color: #6f42c1;
+    /* Bootstrap Purple or similar distinct color */
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    color: white;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    transition: background-color 0.3s;
+    cursor: pointer;
+}
+
+.btn-calendar:hover {
+    background-color: #59359a;
+}
+
 .btn-back {
     display: flex;
     align-items: center;
