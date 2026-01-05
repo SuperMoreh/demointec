@@ -55,6 +55,12 @@ export class PermissionsVacationsComponent implements OnInit {
     currentYear: number = new Date().getFullYear();
     previousYear: number = new Date().getFullYear() - 1;
 
+    // Calendar State
+    calendarCurrentDate: Date = new Date();
+    weekDays: string[] = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    calendarDays: any[] = [];
+    calendarMonthLabel: string = '';
+
     // History Modal State
     selectedEmployeeName: string = '';
     selectedEmployeeId: string = '';
@@ -449,5 +455,91 @@ export class PermissionsVacationsComponent implements OnInit {
         this.selectedEmployeeHistory = row.history;
         const modal = new (window as any).bootstrap.Modal(document.getElementById('historyModal'));
         modal.show();
+    }
+
+    // --- Calendar Logic ---
+
+    openCalendarModal(): void {
+        this.calendarCurrentDate = new Date(); // Reset to today
+        this.buildCalendar();
+        const modal = new (window as any).bootstrap.Modal(document.getElementById('calendarModal'));
+        modal.show();
+    }
+
+    changeMonth(delta: number): void {
+        this.calendarCurrentDate.setMonth(this.calendarCurrentDate.getMonth() + delta);
+        // Force update reference to trigger change detection if needed (though mutation works usually in Angular default strategy)
+        this.calendarCurrentDate = new Date(this.calendarCurrentDate);
+        this.buildCalendar();
+    }
+
+    buildCalendar(): void {
+        const year = this.calendarCurrentDate.getFullYear();
+        const month = this.calendarCurrentDate.getMonth();
+
+        // Month Label
+        const monthNames = [
+            'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+            'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+        ];
+        this.calendarMonthLabel = `${monthNames[month]} ${year}`;
+
+        // First day of the month
+        const firstDay = new Date(year, month, 1);
+        // Last day of the month
+        const lastDay = new Date(year, month + 1, 0);
+
+        // Days in month
+        const daysInMonth = lastDay.getDate();
+
+        // Day of week for the first day (0 = Sunday, 1 = Monday, etc.)
+        const startDayOfWeek = firstDay.getDay();
+
+        this.calendarDays = [];
+
+        // Add empty padding days for start
+        for (let i = 0; i < startDayOfWeek; i++) {
+            this.calendarDays.push({ day: null, events: [] });
+        }
+
+        // Collect all events from all employees
+        // We need to flatten the history of all rows
+        const allEvents = this.allRows.flatMap(row =>
+            row.history.map(h => ({
+                ...h,
+                employeeName: row.nombre
+            }))
+        );
+
+        // Add actual days
+        for (let i = 1; i <= daysInMonth; i++) {
+            const currentDayDate = new Date(year, month, i);
+            const dateStr = this.formatDateIso(currentDayDate); // YYYY-MM-DD for comparison
+
+            // Filter events that include this day
+            const dayEvents = allEvents.filter(event => {
+                const start = new Date(event.startDate);
+                const end = new Date(event.endDate);
+                // Reset times to compare strictly dates
+                start.setHours(0, 0, 0, 0);
+                end.setHours(0, 0, 0, 0);
+
+                // Check if currentDayDate is within range [start, end]
+                return currentDayDate >= start && currentDayDate <= end;
+            });
+
+            this.calendarDays.push({
+                day: i,
+                date: currentDayDate,
+                events: dayEvents
+            });
+        }
+    }
+
+    // Helper to format date as YYYY-MM-DD for simpler comparison if needed, 
+    // although direct Date object comparison (normalized) is often safer.
+    // Kept this for reference or debugging.
+    private formatDateIso(date: Date): string {
+        return date.toISOString().split('T')[0];
     }
 }

@@ -365,3 +365,116 @@
     color: #666;
     text-align: center;
 }
+
+/* Calendar Styles */
+.calendar-container {
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+}
+
+.calendar-header-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background-color: #f1f3f5;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.calendar-weekday {
+    padding: 10px;
+    text-align: center;
+    font-weight: 600;
+    color: #495057;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background-color: #dee2e6;
+    /* Grid lines color */
+    gap: 1px;
+    /* Creates grid lines */
+}
+
+.calendar-day {
+    background-color: white;
+    min-height: 120px;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-day.empty {
+    background-color: #f8f9fa;
+}
+
+.day-number {
+    font-weight: 700;
+    color: #343a40;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    text-align: right;
+    padding-right: 5px;
+}
+
+.events-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-y: auto;
+    max-height: 90px;
+}
+
+/* Event Pills */
+.event-pill {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: white;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.event-pill:hover {
+    opacity: 0.9;
+}
+
+.event-vacation {
+    background-color: #ffc107;
+    /* Bootstrap Warning/Yellow */
+    color: #212529;
+    /* Contrast text for yellow */
+    border-left: 3px solid #bba508;
+}
+
+.event-permission {
+    background-color: #0d6efd;
+    /* Bootstrap Primary/Blue */
+    color: white;
+    border-left: 3px solid #063e91;
+}
+
+/* Legend */
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+/* Scrollbar within day cell */
+.events-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.events-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.events-list::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 2px;
+}
