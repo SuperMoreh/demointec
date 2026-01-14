@@ -234,6 +234,4 @@ export class AttendancesComponent implements OnInit {
     XLSX.utils.book_append_sheet(wb, ws, 'Asistencias');
     XLSX.writeFile(wb, 'Reporte_Asistencias.xlsx');
   }
-}
-  }
 } 
