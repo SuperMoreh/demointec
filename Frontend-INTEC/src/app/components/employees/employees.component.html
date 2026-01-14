@@ -147,6 +147,13 @@
         <form [formGroup]="employeesForm" (ngSubmit)="createEmployee()">
           <div class="section-panel">
             <h6 class="mb-3">Información Principal</h6>
+            <!-- Codigo de Empleado -->
+            <div class="mb-3">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                <input formControlName="employee_code" type="text" class="form-control" placeholder="ID de colaborador">
+              </div>
+            </div>
             <!-- Nombre -->
             <div class="mb-3">
               <div class="input-group">
