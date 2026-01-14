@@ -694,17 +694,35 @@
               <input type="text" class="form-control" [value]="selectedEmployee.education_status" disabled>
             </div>
           </div>
-          <div class="mb-3">
-            <label class="form-label">Domicilio Completo</label>
-            <input type="text" class="form-control" [value]="selectedEmployee.address" disabled>
-          </div>
-          <!-- Detailed Address View (Optional, but good to have if data exists individually) -->
-          <div class="row" *ngIf="selectedEmployee.street">
-            <div class="col-md-12">
-              <small class="text-muted">Detalle: {{selectedEmployee.street}} #{{selectedEmployee.outdoor_number}}
-                {{selectedEmployee.interior_number ? 'Int ' + selectedEmployee.interior_number : ''}}, Col.
-                {{selectedEmployee.colony}}, CP {{selectedEmployee.zip_code}}, {{selectedEmployee.city}},
-                {{selectedEmployee.state}}</small>
+          <label class="form-label fw-bold">Domicilio</label>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Calle</label>
+              <input type="text" class="form-control" [value]="selectedEmployee.street" disabled>
+            </div>
+            <div class="col-md-2 mb-3">
+              <label class="form-label">No. Ext</label>
+              <input type="text" class="form-control" [value]="selectedEmployee.outdoor_number" disabled>
+            </div>
+            <div class="col-md-2 mb-3">
+              <label class="form-label">No. Int</label>
+              <input type="text" class="form-control" [value]="selectedEmployee.interior_number" disabled>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Colonia</label>
+              <input type="text" class="form-control" [value]="selectedEmployee.colony" disabled>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label class="form-label">C.P.</label>
+              <input type="text" class="form-control" [value]="selectedEmployee.zip_code" disabled>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Ciudad</label>
+              <input type="text" class="form-control" [value]="selectedEmployee.city" disabled>
+            </div>
+            <div class="col-md-5 mb-3">
+              <label class="form-label">Estado</label>
+              <input type="text" class="form-control" [value]="selectedEmployee.state" disabled>
             </div>
           </div>
           <div class="row">
@@ -1003,6 +1021,13 @@
         <form [formGroup]="employeesForm" (ngSubmit)="updateEmployee()">
           <div class="section-panel">
             <h6 class="mb-3">Información Principal</h6>
+            <!-- Codigo de Empleado -->
+            <div class="mb-3">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                <input formControlName="employee_code" type="text" class="form-control" placeholder="ID de colaborador">
+              </div>
+            </div>
             <!-- Nombre -->
             <div class="mb-3">
               <div class="input-group">
@@ -1051,6 +1076,10 @@
                 <input formControlName="admission_date" type="date" class="form-control">
               </div>
               <div class="col-md-4 mb-3">
+                <label class="form-label">Fecha de Alta IMSS</label>
+                <input formControlName="imss_registration_date" type="date" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
                 <label class="form-label">Puesto</label>
                 <select formControlName="position" class="form-select">
                   <option value="">Seleccione un puesto</option>
@@ -1096,15 +1125,53 @@
                   <option *ngFor="let option of educationLevelOptions" [value]="option">{{ option }}</option>
                 </select>
               </div>
+              <div class="col-md-4 mb-3"
+                *ngIf="['Bachillerato', 'Estudios profesionales', 'Postgrado'].includes(employeesForm.get('education_level')?.value)">
+                <label class="form-label">Carrera/Específicidad</label>
+                <input formControlName="education_status" type="text" class="form-control"
+                  placeholder="Especifique carrera">
+              </div>
             </div>
-            <div class="mb-3">
-              <label class="form-label">Domicilio</label>
-              <input formControlName="address" type="text" class="form-control">
+
+            <label class="form-label fw-bold">Domicilio</label>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Calle</label>
+                <input formControlName="street" type="text" class="form-control">
+              </div>
+              <div class="col-md-2 mb-3">
+                <label class="form-label">No. Ext</label>
+                <input formControlName="outdoor_number" type="text" class="form-control">
+              </div>
+              <div class="col-md-2 mb-3">
+                <label class="form-label">No. Int</label>
+                <input formControlName="interior_number" type="text" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Colonia</label>
+                <input formControlName="colony" type="text" class="form-control">
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">C.P.</label>
+                <input formControlName="zip_code" type="text" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Ciudad</label>
+                <input formControlName="city" type="text" class="form-control">
+              </div>
+              <div class="col-md-5 mb-3">
+                <label class="form-label">Estado</label>
+                <input formControlName="state" type="text" class="form-control">
+              </div>
             </div>
+
             <div class="row">
               <div class="col-md-3 mb-3">
                 <label class="form-label">Lugar de Nacimiento</label>
-                <input formControlName="birth_place" type="text" class="form-control">
+                <select formControlName="birth_place" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let state of mexicoStates" [value]="state">{{ state }}</option>
+                </select>
               </div>
               <div class="col-md-3 mb-3">
                 <label class="form-label">Fecha de Nacimiento</label>
