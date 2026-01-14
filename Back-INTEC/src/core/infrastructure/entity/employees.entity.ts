@@ -13,6 +13,9 @@ export class EmployeeEntity {
   @Column({ name: 'name_employee', type: 'varchar', length: 100 })
   name_employee!: string;
 
+  @Column({ name: 'employee_code', type: 'varchar', length: 50, nullable: true })
+  employee_code!: string;
+
   @Column({ name: 'email', type: 'varchar', length: 100, unique: true })
   email!: string;
 
@@ -24,6 +27,9 @@ export class EmployeeEntity {
 
   @Column({ name: 'admission_date', type: 'varchar', length: 100, nullable: true })
   admission_date!: string;
+
+  @Column({ name: 'imss_registration_date', type: 'varchar', length: 100, nullable: true })
+  imss_registration_date!: string;
 
   @Column({ name: 'position', type: 'varchar', length: 100, nullable: true })
   position!: string;
@@ -49,11 +55,35 @@ export class EmployeeEntity {
   @Column({ name: 'education_level', type: 'varchar', length: 100, nullable: true })
   education_level!: string;
 
+  @Column({ name: 'education_status', type: 'varchar', length: 100, nullable: true })
+  education_status!: string;
+
   @Column({ name: 'ine_code', type: 'varchar', length: 100, nullable: true })
   ine_code!: string;
 
   @Column({ name: 'address', type: 'text', nullable: true })
   address!: string;
+
+  @Column({ name: 'street', type: 'varchar', length: 150, nullable: true })
+  street!: string;
+
+  @Column({ name: 'outdoor_number', type: 'varchar', length: 50, nullable: true })
+  outdoor_number!: string;
+
+  @Column({ name: 'interior_number', type: 'varchar', length: 50, nullable: true })
+  interior_number!: string;
+
+  @Column({ name: 'colony', type: 'varchar', length: 100, nullable: true })
+  colony!: string;
+
+  @Column({ name: 'zip_code', type: 'varchar', length: 10, nullable: true })
+  zip_code!: string;
+
+  @Column({ name: 'city', type: 'varchar', length: 100, nullable: true })
+  city!: string;
+
+  @Column({ name: 'state', type: 'varchar', length: 100, nullable: true })
+  state!: string;
 
   @Column({ name: 'birth_place', type: 'varchar', length: 100, nullable: true })
   birth_place!: string;

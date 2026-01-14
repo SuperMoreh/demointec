@@ -2,10 +2,12 @@
 export interface Employee {
   id_employee: string;
   name_employee: string;
+  employee_code?: string;
   email: string;
   phone: string;
   role: string;
   admission_date?: string;
+  imss_registration_date?: string;
   position?: string;
   entry_time?: string;
   exit_time?: string;
@@ -14,8 +16,16 @@ export interface Employee {
   age?: number;
   marital_status?: string;
   education_level?: string;
+  education_status?: string;
   ine_code?: string;
   address?: string;
+  street?: string;
+  outdoor_number?: string;
+  interior_number?: string;
+  colony?: string;
+  zip_code?: string;
+  city?: string;
+  state?: string;
   birth_place?: string;
   birth_date?: string;
   nss?: string;
