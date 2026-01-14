@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import * as XLSX from 'xlsx';
 import { EmployeesAdapterService } from '../../adapters/employees.adapter';
 import { RoleAdapterService } from '../../adapters/roles.adapter';
 import { Employee } from '../../models/employees';
@@ -41,7 +42,8 @@ export class EmployeesComponent implements OnInit {
   maritalStatusOptions = ['Soltero(a)', 'Casado(a)', 'Viudo(a)', 'Divorciado(a)', 'Unión Libre'];
   educationLevelOptions = ['Primaria', 'Secundaria', 'Bachillerato', 'Estudios profesionales', 'Postgrado'];
 
-  childrenCountOptions = [0, 1, 2, 3, 4, 5];
+  childrenCountOptions = ['0', '1', '2', '3', '4', '5 o más'];
+  beneficiariesCountOptions = [0, 1, 2, 3];
 
   // Asistencia
   selectedEmployeeForAttendance: Employee | null = null;
@@ -112,14 +114,23 @@ export class EmployeesComponent implements OnInit {
       child4_birth_date: [''],
       child5_name: [''],
       child5_birth_date: [''],
+      beneficiaries_count: [0],
       beneficiary: [''],
       beneficiary_relationship: [''],
       beneficiary_percentage: [''],
+      beneficiary2_name: [''],
+      beneficiary2_relationship: [''],
+      beneficiary2_percentage: [''],
+      beneficiary3_name: [''],
+      beneficiary3_relationship: [''],
+      beneficiary3_percentage: [''],
       infonavit_credit_number: [''],
       infonavit_factor: [''],
       blood_type: [''],
       weight: [''],
       height: [''],
+      shirt_size: [''],
+      diseases: [''],
       emergency_phone: [''],
       emergency_contact_name: [''],
       emergency_contact_relationship: [''],
@@ -289,14 +300,23 @@ export class EmployeesComponent implements OnInit {
       child4_birth_date: '',
       child5_name: '',
       child5_birth_date: '',
+      beneficiaries_count: 0,
       beneficiary: '',
       beneficiary_relationship: '',
       beneficiary_percentage: '',
+      beneficiary2_name: '',
+      beneficiary2_relationship: '',
+      beneficiary2_percentage: '',
+      beneficiary3_name: '',
+      beneficiary3_relationship: '',
+      beneficiary3_percentage: '',
       infonavit_credit_number: '',
       infonavit_factor: '',
       blood_type: '',
       weight: '',
       height: '',
+      shirt_size: '',
+      diseases: '',
       emergency_phone: '',
       emergency_contact_name: '',
       emergency_contact_relationship: '',
@@ -383,14 +403,23 @@ export class EmployeesComponent implements OnInit {
       child4_birth_date: formVal.child4_birth_date,
       child5_name: formVal.child5_name,
       child5_birth_date: formVal.child5_birth_date,
+      beneficiaries_count: formVal.beneficiaries_count,
       beneficiary: formVal.beneficiary,
       beneficiary_relationship: formVal.beneficiary_relationship,
       beneficiary_percentage: formVal.beneficiary_percentage,
+      beneficiary2_name: formVal.beneficiary2_name,
+      beneficiary2_relationship: formVal.beneficiary2_relationship,
+      beneficiary2_percentage: formVal.beneficiary2_percentage,
+      beneficiary3_name: formVal.beneficiary3_name,
+      beneficiary3_relationship: formVal.beneficiary3_relationship,
+      beneficiary3_percentage: formVal.beneficiary3_percentage,
       infonavit_credit_number: formVal.infonavit_credit_number,
       infonavit_factor: formVal.infonavit_factor,
       blood_type: formVal.blood_type,
       weight: formVal.weight,
       height: formVal.height,
+      shirt_size: formVal.shirt_size,
+      diseases: formVal.diseases,
       emergency_phone: formVal.emergency_phone,
       emergency_contact_name: formVal.emergency_contact_name,
       emergency_contact_relationship: formVal.emergency_contact_relationship,
@@ -529,14 +558,23 @@ export class EmployeesComponent implements OnInit {
       child4_birth_date: employee.child4_birth_date,
       child5_name: employee.child5_name,
       child5_birth_date: employee.child5_birth_date,
+      beneficiaries_count: employee.beneficiaries_count || 0,
       beneficiary: employee.beneficiary,
       beneficiary_relationship: employee.beneficiary_relationship,
       beneficiary_percentage: employee.beneficiary_percentage,
+      beneficiary2_name: employee.beneficiary2_name,
+      beneficiary2_relationship: employee.beneficiary2_relationship,
+      beneficiary2_percentage: employee.beneficiary2_percentage,
+      beneficiary3_name: employee.beneficiary3_name,
+      beneficiary3_relationship: employee.beneficiary3_relationship,
+      beneficiary3_percentage: employee.beneficiary3_percentage,
       infonavit_credit_number: employee.infonavit_credit_number,
       infonavit_factor: employee.infonavit_factor,
       blood_type: employee.blood_type,
       weight: employee.weight,
       height: employee.height,
+      shirt_size: employee.shirt_size,
+      diseases: employee.diseases,
       emergency_phone: employee.emergency_phone,
       emergency_contact_name: employee.emergency_contact_name,
       emergency_contact_relationship: employee.emergency_contact_relationship,
@@ -647,14 +685,23 @@ export class EmployeesComponent implements OnInit {
         child4_birth_date: formVal.child4_birth_date,
         child5_name: formVal.child5_name,
         child5_birth_date: formVal.child5_birth_date,
+        beneficiaries_count: formVal.beneficiaries_count,
         beneficiary: formVal.beneficiary,
         beneficiary_relationship: formVal.beneficiary_relationship,
         beneficiary_percentage: formVal.beneficiary_percentage,
+        beneficiary2_name: formVal.beneficiary2_name,
+        beneficiary2_relationship: formVal.beneficiary2_relationship,
+        beneficiary2_percentage: formVal.beneficiary2_percentage,
+        beneficiary3_name: formVal.beneficiary3_name,
+        beneficiary3_relationship: formVal.beneficiary3_relationship,
+        beneficiary3_percentage: formVal.beneficiary3_percentage,
         infonavit_credit_number: formVal.infonavit_credit_number,
         infonavit_factor: formVal.infonavit_factor,
         blood_type: formVal.blood_type,
         weight: formVal.weight,
         height: formVal.height,
+        shirt_size: formVal.shirt_size,
+        diseases: formVal.diseases,
         emergency_phone: formVal.emergency_phone,
         emergency_contact_name: formVal.emergency_contact_name,
         emergency_contact_relationship: formVal.emergency_contact_relationship,
@@ -960,5 +1007,64 @@ export class EmployeesComponent implements OnInit {
     if (this.employeesForm.value.bonus_hiring) bonuses.push('Contratación');
     if (this.employeesForm.value.bonus_referral) bonuses.push('Recomendación');
     return bonuses.join(', ');
+  }
+
+  exportToExcel(): void {
+    if (!this.employees || this.employees.length === 0) {
+      this.toastr.warning('No hay datos para exportar', 'Advertencia');
+      return;
+    }
+
+    const dataToExport = this.employees.map(emp => ({
+      'ID Colaborador': emp.employee_code,
+      'Nombre': emp.name_employee,
+      'Email': emp.email,
+      'Teléfono': emp.phone,
+      'Puesto': emp.position,
+      'Rol': emp.role,
+      'Fecha Ingreso': emp.admission_date,
+      'Fecha Alta IMSS': emp.imss_registration_date,
+      'Ubicación': emp.location,
+      'Domicilio': emp.address,
+      'Calle': emp.street,
+      'No. Ext': emp.outdoor_number,
+      'No. Int': emp.interior_number,
+      'Colonia': emp.colony,
+      'CP': emp.zip_code,
+      'Ciudad': emp.city,
+      'Estado': emp.state,
+      'Lugar Nacimiento': emp.birth_place,
+      'Fecha Nacimiento': emp.birth_date,
+      'Edad': emp.age,
+      'Sexo': emp.gender,
+      'Estado Civil': emp.marital_status,
+      'Nivel Estudios': emp.education_level,
+      'Carrera/Especif.': emp.education_status,
+      'INE': emp.ine_code,
+      'CURP': emp.curp,
+      'RFC': emp.rfc,
+      'NSS': emp.nss,
+      'Tipo Sangre': emp.blood_type,
+      'Peso': emp.weight,
+      'Estatura': emp.height,
+      'Talla': emp.shirt_size || '',
+      'Enfermedades': emp.diseases || '',
+      'Alergias': emp.allergies,
+      'Contacto Emergencia': emp.emergency_contact_name,
+      'Relación Emergencia': emp.emergency_contact_relationship,
+      'Tel. Emergencia': emp.emergency_phone,
+      'Hijos': emp.children_count,
+      'Beneficiarios': emp.beneficiaries_count || 0,
+      'Infonavit Crédito': emp.infonavit_credit_number,
+      'Salario IMSS': emp.imss_salary,
+      'Salario Base': emp.base_salary,
+      'Bonos': emp.bonuses,
+      'Estatus': emp.status ? 'Activo' : 'Inactivo'
+    }));
+
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataToExport);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Colaboradores');
+    XLSX.writeFile(wb, 'Catálogo_Colaboradores.xlsx');
   }
 } 

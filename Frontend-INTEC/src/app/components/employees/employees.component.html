@@ -45,9 +45,9 @@
         <span *ngIf="hasActiveFilters()" class="text-muted">(filtrados)</span>
       </div>
       <div class="table-actions">
-        <button class="btn-filter1" (click)="exportEmployees()">
-          <i class="bi bi-download"></i>
-          Exportar
+        <button class="btn-filter1" (click)="exportToExcel()">
+          <i class="bi bi-file-earmark-excel"></i>
+          Exportar a Excel
         </button>
       </div>
     </div>
@@ -335,7 +335,7 @@
               <div class="col-md-12 mb-3">
                 <label class="form-label">Cantidad de Hijos</label>
                 <select formControlName="children_count" class="form-select" style="width: 150px;">
-                  <option *ngFor="let count of childrenCountOptions" [value]="count">{{ count }}</option>
+                  <option *ngFor="let count of childrenCountOptions; let i = index" [value]="i">{{ count }}</option>
                 </select>
               </div>
             </div>
@@ -386,18 +386,70 @@
               </div>
             </div>
 
+            <!-- Beneficiaries -->
             <div class="row mt-2">
-              <div class="col-md-4 mb-3">
-                <label class="form-label">Beneficiario</label>
-                <input formControlName="beneficiary" type="text" class="form-control">
+              <div class="col-md-12 mb-3">
+                <label class="form-label">Cantidad de Beneficiarios</label>
+                <select formControlName="beneficiaries_count" class="form-select" style="width: 150px;">
+                  <option *ngFor="let count of beneficiariesCountOptions" [value]="count">{{ count }}</option>
+                </select>
               </div>
-              <div class="col-md-4 mb-3">
-                <label class="form-label">Parentesco</label>
-                <input formControlName="beneficiary_relationship" type="text" class="form-control">
+            </div>
+
+            <!-- Beneficiary 1 -->
+            <div *ngIf="employeesForm.get('beneficiaries_count')?.value >= 1">
+              <hr>
+              <div class="row mt-2">
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Beneficiario 1</label>
+                  <input formControlName="beneficiary" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Parentesco</label>
+                  <input formControlName="beneficiary_relationship" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Porcentaje (%)</label>
+                  <input formControlName="beneficiary_percentage" type="text" class="form-control">
+                </div>
               </div>
-              <div class="col-md-4 mb-3">
-                <label class="form-label">Porcentaje (%)</label>
-                <input formControlName="beneficiary_percentage" type="text" class="form-control">
+            </div>
+
+            <!-- Beneficiary 2 -->
+            <div *ngIf="employeesForm.get('beneficiaries_count')?.value >= 2">
+              <hr>
+              <div class="row mt-2">
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Beneficiario 2</label>
+                  <input formControlName="beneficiary2_name" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Parentesco</label>
+                  <input formControlName="beneficiary2_relationship" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Porcentaje (%)</label>
+                  <input formControlName="beneficiary2_percentage" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+
+            <!-- Beneficiary 3 -->
+            <div *ngIf="employeesForm.get('beneficiaries_count')?.value >= 3">
+              <hr>
+              <div class="row mt-2">
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Beneficiario 3</label>
+                  <input formControlName="beneficiary3_name" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Parentesco</label>
+                  <input formControlName="beneficiary3_relationship" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Porcentaje (%)</label>
+                  <input formControlName="beneficiary3_percentage" type="text" class="form-control">
+                </div>
               </div>
             </div>
           </div>
@@ -416,6 +468,16 @@
               <div class="col-md-4 mb-3">
                 <label class="form-label">Estatura</label>
                 <input formControlName="height" type="text" class="form-control">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Talla</label>
+                <input formControlName="shirt_size" type="text" class="form-control">
+              </div>
+              <div class="col-md-8 mb-3">
+                <label class="form-label">Enfermedades (Crónicas/Alergias)</label>
+                <textarea formControlName="diseases" class="form-control" rows="2"></textarea>
               </div>
             </div>
             <div class="mb-3">
@@ -767,65 +829,109 @@
           <div class="row">
             <div class="col-md-12 mb-3">
               <label class="form-label">Cantidad de Hijos</label>
-              <input type="text" class="form-control" [value]="selectedEmployee.children_count" disabled
+              <input type="text" class="form-control" [value]="selectedEmployee?.children_count" disabled
                 style="width: 100px;">
             </div>
           </div>
           <div class="row">
-            <div class="col-md-6 mb-2">
+            <div class="col-md-6 mb-2" *ngIf="(selectedEmployee?.children_count || 0) >= 1">
               <label class="form-label">Hijo 1</label>
-              <input type="text" class="form-control" [value]="selectedEmployee.child1_name" disabled>
+              <input type="text" class="form-control" [value]="selectedEmployee?.child1_name" disabled>
             </div>
-            <div class="col-md-6 mb-2">
+            <div class="col-md-6 mb-2" *ngIf="(selectedEmployee?.children_count || 0) >= 1">
               <label class="form-label">Fecha Nac. Hijo 1</label>
-              <input type="text" class="form-control" [value]="selectedEmployee.child1_birth_date" disabled>
+              <input type="text" class="form-control" [value]="selectedEmployee?.child1_birth_date" disabled>
             </div>
-            <div class="col-md-6 mb-2">
+            <div class="col-md-6 mb-2" *ngIf="(selectedEmployee?.children_count || 0) >= 2">
               <label class="form-label">Hijo 2</label>
-              <input type="text" class="form-control" [value]="selectedEmployee.child2_name" disabled>
+              <input type="text" class="form-control" [value]="selectedEmployee?.child2_name" disabled>
             </div>
-            <div class="col-md-6 mb-2">
+            <div class="col-md-6 mb-2" *ngIf="(selectedEmployee?.children_count || 0) >= 2">
               <label class="form-label">Fecha Nac. Hijo 2</label>
-              <input type="text" class="form-control" [value]="selectedEmployee.child2_birth_date" disabled>
+              <input type="text" class="form-control" [value]="selectedEmployee?.child2_birth_date" disabled>
             </div>
-            <div class="col-md-6 mb-2">
+            <div class="col-md-6 mb-2" *ngIf="(selectedEmployee?.children_count || 0) >= 3">
               <label class="form-label">Hijo 3</label>
-              <input type="text" class="form-control" [value]="selectedEmployee.child3_name" disabled>
+              <input type="text" class="form-control" [value]="selectedEmployee?.child3_name" disabled>
             </div>
-            <div class="col-md-6 mb-2">
+            <div class="col-md-6 mb-2" *ngIf="(selectedEmployee?.children_count || 0) >= 3">
               <label class="form-label">Fecha Nac. Hijo 3</label>
-              <input type="text" class="form-control" [value]="selectedEmployee.child3_birth_date" disabled>
+              <input type="text" class="form-control" [value]="selectedEmployee?.child3_birth_date" disabled>
             </div>
-            <div class="col-md-6 mb-2">
+            <div class="col-md-6 mb-2" *ngIf="(selectedEmployee?.children_count || 0) >= 4">
               <label class="form-label">Hijo 4</label>
-              <input type="text" class="form-control" [value]="selectedEmployee.child4_name" disabled>
+              <input type="text" class="form-control" [value]="selectedEmployee?.child4_name" disabled>
             </div>
-            <div class="col-md-6 mb-2">
+            <div class="col-md-6 mb-2" *ngIf="(selectedEmployee?.children_count || 0) >= 4">
               <label class="form-label">Fecha Nac. Hijo 4</label>
-              <input type="text" class="form-control" [value]="selectedEmployee.child4_birth_date" disabled>
+              <input type="text" class="form-control" [value]="selectedEmployee?.child4_birth_date" disabled>
             </div>
-            <div class="col-md-6 mb-2">
+            <div class="col-md-6 mb-2" *ngIf="(selectedEmployee?.children_count || 0) >= 5">
               <label class="form-label">Hijo 5</label>
-              <input type="text" class="form-control" [value]="selectedEmployee.child5_name" disabled>
+              <input type="text" class="form-control" [value]="selectedEmployee?.child5_name" disabled>
             </div>
-            <div class="col-md-6 mb-2">
+            <div class="col-md-6 mb-2" *ngIf="(selectedEmployee?.children_count || 0) >= 5">
               <label class="form-label">Fecha Nac. Hijo 5</label>
-              <input type="text" class="form-control" [value]="selectedEmployee.child5_birth_date" disabled>
+              <input type="text" class="form-control" [value]="selectedEmployee?.child5_birth_date" disabled>
             </div>
           </div>
 
           <div class="row mt-2">
+            <div class="col-md-12 mb-3">
+              <label class="form-label">Cantidad de Beneficiarios</label>
+              <input type="text" class="form-control" [value]="selectedEmployee?.beneficiaries_count || 0" disabled
+                style="width: 100px;">
+            </div>
+          </div>
+
+          <div class="row mt-2" *ngIf="(selectedEmployee?.beneficiaries_count || 0) >= 1">
             <div class="col-md-4 mb-3">
-              <label class="form-label">Beneficiario</label>
-              <input type="text" class="form-control" [value]="selectedEmployee.beneficiary" disabled>
+              <label class="form-label">Beneficiario 1</label>
+              <input type="text" class="form-control" [value]="selectedEmployee?.beneficiary" disabled>
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label">Parentesco</label>
-              <input type="text" class="form-control" [value]="selectedEmployee.beneficiary_relationship" disabled>
+              <input type="text" class="form-control" [value]="selectedEmployee?.beneficiary_relationship" disabled>
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label">Porcentaje (%)</label>
-              <input type="text" class="form-control" [value]="selectedEmployee.beneficiary_percentage" disabled>
+              <input type="text" class="form-control" [value]="selectedEmployee?.beneficiary_percentage" disabled>
+            </div>
+          </div>
+
+          <div class="row mt-2" *ngIf="(selectedEmployee?.beneficiaries_count || 0) >= 2">
+            <div class="col-md-12">
+              <hr>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Beneficiario 2</label>
+              <input type="text" class="form-control" [value]="selectedEmployee?.beneficiary2_name" disabled>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Parentesco</label>
+              <input type="text" class="form-control" [value]="selectedEmployee?.beneficiary2_relationship" disabled>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Porcentaje (%)</label>
+              <input type="text" class="form-control" [value]="selectedEmployee?.beneficiary2_percentage" disabled>
+            </div>
+          </div>
+
+          <div class="row mt-2" *ngIf="(selectedEmployee?.beneficiaries_count || 0) >= 3">
+            <div class="col-md-12">
+              <hr>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Beneficiario 3</label>
+              <input type="text" class="form-control" [value]="selectedEmployee?.beneficiary3_name" disabled>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Parentesco</label>
+              <input type="text" class="form-control" [value]="selectedEmployee?.beneficiary3_relationship" disabled>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Porcentaje (%)</label>
+              <input type="text" class="form-control" [value]="selectedEmployee?.beneficiary3_percentage" disabled>
             </div>
           </div>
         </div>
@@ -835,15 +941,25 @@
           <div class="row">
             <div class="col-md-4 mb-3">
               <label class="form-label">Tipo de Sangre</label>
-              <input type="text" class="form-control" [value]="selectedEmployee.blood_type" disabled>
+              <input type="text" class="form-control" [value]="selectedEmployee?.blood_type" disabled>
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label">Peso</label>
-              <input type="text" class="form-control" [value]="selectedEmployee.weight" disabled>
+              <input type="text" class="form-control" [value]="selectedEmployee?.weight" disabled>
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label">Estatura</label>
-              <input type="text" class="form-control" [value]="selectedEmployee.height" disabled>
+              <input type="text" class="form-control" [value]="selectedEmployee?.height" disabled>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Talla</label>
+              <input type="text" class="form-control" [value]="selectedEmployee?.shirt_size" disabled>
+            </div>
+            <div class="col-md-8 mb-3">
+              <label class="form-label">Enfermedades</label>
+              <textarea class="form-control" rows="2" [value]="selectedEmployee?.diseases" disabled></textarea>
             </div>
           </div>
           <div class="mb-3">
@@ -1216,7 +1332,7 @@
               <div class="col-md-12 mb-3">
                 <label class="form-label">Cantidad de Hijos</label>
                 <select formControlName="children_count" class="form-select" style="width: 150px;">
-                  <option *ngFor="let count of childrenCountOptions" [value]="count">{{ count }}</option>
+                  <option *ngFor="let count of childrenCountOptions; let i = index" [value]="i">{{ count }}</option>
                 </select>
               </div>
             </div>
@@ -1267,18 +1383,70 @@
               </div>
             </div>
 
+            <!-- Beneficiaries -->
             <div class="row mt-2">
-              <div class="col-md-4 mb-3">
-                <label class="form-label">Beneficiario</label>
-                <input formControlName="beneficiary" type="text" class="form-control">
+              <div class="col-md-12 mb-3">
+                <label class="form-label">Cantidad de Beneficiarios</label>
+                <select formControlName="beneficiaries_count" class="form-select" style="width: 150px;">
+                  <option *ngFor="let count of beneficiariesCountOptions" [value]="count">{{ count }}</option>
+                </select>
               </div>
-              <div class="col-md-4 mb-3">
-                <label class="form-label">Parentesco</label>
-                <input formControlName="beneficiary_relationship" type="text" class="form-control">
+            </div>
+
+            <!-- Beneficiary 1 -->
+            <div *ngIf="employeesForm.get('beneficiaries_count')?.value >= 1">
+              <hr>
+              <div class="row mt-2">
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Beneficiario 1</label>
+                  <input formControlName="beneficiary" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Parentesco</label>
+                  <input formControlName="beneficiary_relationship" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Porcentaje (%)</label>
+                  <input formControlName="beneficiary_percentage" type="text" class="form-control">
+                </div>
               </div>
-              <div class="col-md-4 mb-3">
-                <label class="form-label">Porcentaje (%)</label>
-                <input formControlName="beneficiary_percentage" type="text" class="form-control">
+            </div>
+
+            <!-- Beneficiary 2 -->
+            <div *ngIf="employeesForm.get('beneficiaries_count')?.value >= 2">
+              <hr>
+              <div class="row mt-2">
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Beneficiario 2</label>
+                  <input formControlName="beneficiary2_name" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Parentesco</label>
+                  <input formControlName="beneficiary2_relationship" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Porcentaje (%)</label>
+                  <input formControlName="beneficiary2_percentage" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+
+            <!-- Beneficiary 3 -->
+            <div *ngIf="employeesForm.get('beneficiaries_count')?.value >= 3">
+              <hr>
+              <div class="row mt-2">
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Beneficiario 3</label>
+                  <input formControlName="beneficiary3_name" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Parentesco</label>
+                  <input formControlName="beneficiary3_relationship" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Porcentaje (%)</label>
+                  <input formControlName="beneficiary3_percentage" type="text" class="form-control">
+                </div>
               </div>
             </div>
           </div>

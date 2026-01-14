@@ -50,9 +50,13 @@
         <span *ngIf="searchTerm || startDate || endDate" class="text-muted">(filtradas)</span>
       </div>
       <div class="table-actions">
-        <button class="btn-filter1" (click)="exportAttendances()">
-          <i class="bi bi-download"></i>
-          Exportar
+        <button class="btn-filter1 me-2" (click)="exportAttendances()">
+          <i class="bi bi-file-earmark-pdf"></i>
+          Exportar PDF
+        </button>
+        <button class="btn-filter1" (click)="exportToExcel()">
+          <i class="bi bi-file-earmark-excel"></i>
+          Exportar Excel
         </button>
       </div>
     </div>

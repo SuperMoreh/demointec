@@ -42,14 +42,23 @@ export interface Employee {
   child4_birth_date?: string;
   child5_name?: string;
   child5_birth_date?: string;
-  beneficiary?: string;
+  beneficiaries_count?: number;
+  beneficiary?: string; // Beneficiary 1
   beneficiary_relationship?: string;
   beneficiary_percentage?: string;
+  beneficiary2_name?: string;
+  beneficiary2_relationship?: string;
+  beneficiary2_percentage?: string;
+  beneficiary3_name?: string;
+  beneficiary3_relationship?: string;
+  beneficiary3_percentage?: string;
   infonavit_credit_number?: string;
   infonavit_factor?: string;
   blood_type?: string;
   weight?: string;
   height?: string;
+  shirt_size?: string;
+  diseases?: string;
   emergency_phone?: string;
   emergency_contact_name?: string;
   emergency_contact_relationship?: string;

@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import * as XLSX from 'xlsx';
 import { AttendancesAdapterService } from '../../adapters/attendances.adapter';
 import { EmployeesAdapterService } from '../../adapters/employees.adapter';
 import { Attendance } from '../../models/attendances';
@@ -208,5 +209,31 @@ export class AttendancesComponent implements OnInit {
     const date = new Date();
     date.setHours(hours, minutes, 0, 0);
     return date;
+  }
+
+  exportToExcel(): void {
+    if (!this.filteredAttendances || this.filteredAttendances.length === 0) {
+      this.toastr.warning('No hay datos para exportar', 'Advertencia');
+      return;
+    }
+
+    const dataToExport = this.filteredAttendances.map(att => ({
+      'Nombre': att.name_user,
+      'Fecha': att.date,
+      'Hora': att.hour,
+      'Latitud': att.latitude,
+      'Longitud': att.length,
+      'Observación': att.observation,
+      'Tipo': att.type,
+      'Estatus': this.calculateStatus(att),
+      'Ubicación': (att.latitude && att.length) ? `${att.latitude}, ${att.length}` : ''
+    }));
+
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataToExport);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Asistencias');
+    XLSX.writeFile(wb, 'Reporte_Asistencias.xlsx');
+  }
+}
   }
 } 
