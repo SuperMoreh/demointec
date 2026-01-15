@@ -233,446 +233,446 @@
               </div>
             </div>
           </div>
+
+          <div class="section-panel">
+            <h6 class="mb-3">Datos Personales</h6>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Sexo</label>
+                <select formControlName="gender" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let option of genderOptions" [value]="option">{{ option }}</option>
+                </select>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Estado Civil</label>
+                <select formControlName="marital_status" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let option of maritalStatusOptions" [value]="option">{{ option }}</option>
+                </select>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Nivel Estudios</label>
+                <select formControlName="education_level" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let option of educationLevelOptions" [value]="option">{{ option }}</option>
+                </select>
+              </div>
+              <div class="col-md-4 mb-3"
+                *ngIf="['Bachillerato', 'Estudios profesionales', 'Postgrado'].includes(employeesForm.get('education_level')?.value)">
+                <label class="form-label">Carrera/Específicidad</label>
+                <input formControlName="education_status" type="text" class="form-control"
+                  placeholder="Especifique carrera">
+              </div>
+            </div>
+
+            <label class="form-label fw-bold">Domicilio</label>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Calle</label>
+                <input formControlName="street" type="text" class="form-control">
+              </div>
+              <div class="col-md-2 mb-3">
+                <label class="form-label">No. Ext</label>
+                <input formControlName="outdoor_number" type="text" class="form-control">
+              </div>
+              <div class="col-md-2 mb-3">
+                <label class="form-label">No. Int</label>
+                <input formControlName="interior_number" type="text" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Colonia</label>
+                <input formControlName="colony" type="text" class="form-control">
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">C.P.</label>
+                <input formControlName="zip_code" type="text" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Ciudad</label>
+                <input formControlName="city" type="text" class="form-control">
+              </div>
+              <div class="col-md-5 mb-3">
+                <label class="form-label">Estado</label>
+                <input formControlName="state" type="text" class="form-control">
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Lugar de Nacimiento</label>
+                <select formControlName="birth_place" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let state of mexicoStates" [value]="state">{{ state }}</option>
+                </select>
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Fecha de Nacimiento</label>
+                <input formControlName="birth_date" type="date" class="form-control">
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Edad</label>
+                <input formControlName="age" type="text" class="form-control" readonly
+                  style="background-color: #e9ecef;">
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Código INE</label>
+                <input formControlName="ine_code" type="text" class="form-control">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">CURP</label>
+                <input formControlName="curp" type="text" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">RFC</label>
+                <input formControlName="rfc" type="text" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">NSS</label>
+                <input formControlName="nss" type="text" class="form-control">
+              </div>
+            </div>
+          </div>
+
+          <div class="section-panel">
+            <h6 class="mb-3">Familia y Beneficiarios</h6>
+            <div class="row">
+              <div class="col-md-12 mb-3">
+                <label class="form-label">Cantidad de Hijos</label>
+                <select formControlName="children_count" class="form-select" style="width: 150px;">
+                  <option *ngFor="let count of childrenCountOptions; let i = index" [value]="i">{{ count }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 1">
+                <label class="form-label">Hijo 1</label>
+                <input formControlName="child1_name" type="text" class="form-control" placeholder="Nombre">
+              </div>
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 1">
+                <label class="form-label">Fecha Nac. Hijo 1</label>
+                <input formControlName="child1_birth_date" type="date" class="form-control">
+              </div>
+
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 2">
+                <label class="form-label">Hijo 2</label>
+                <input formControlName="child2_name" type="text" class="form-control" placeholder="Nombre">
+              </div>
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 2">
+                <label class="form-label">Fecha Nac. Hijo 2</label>
+                <input formControlName="child2_birth_date" type="date" class="form-control">
+              </div>
+
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 3">
+                <label class="form-label">Hijo 3</label>
+                <input formControlName="child3_name" type="text" class="form-control" placeholder="Nombre">
+              </div>
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 3">
+                <label class="form-label">Fecha Nac. Hijo 3</label>
+                <input formControlName="child3_birth_date" type="date" class="form-control">
+              </div>
+
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 4">
+                <label class="form-label">Hijo 4</label>
+                <input formControlName="child4_name" type="text" class="form-control" placeholder="Nombre">
+              </div>
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 4">
+                <label class="form-label">Fecha Nac. Hijo 4</label>
+                <input formControlName="child4_birth_date" type="date" class="form-control">
+              </div>
+
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 5">
+                <label class="form-label">Hijo 5</label>
+                <input formControlName="child5_name" type="text" class="form-control" placeholder="Nombre">
+              </div>
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 5">
+                <label class="form-label">Fecha Nac. Hijo 5</label>
+                <input formControlName="child5_birth_date" type="date" class="form-control">
+              </div>
+            </div>
+
+            <!-- Beneficiaries -->
+            <div class="row mt-2">
+              <div class="col-md-12 mb-3">
+                <label class="form-label">Cantidad de Beneficiarios</label>
+                <select formControlName="beneficiaries_count" class="form-select" style="width: 150px;">
+                  <option *ngFor="let count of beneficiariesCountOptions" [value]="count">{{ count }}</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Beneficiary 1 -->
+            <div *ngIf="employeesForm.get('beneficiaries_count')?.value >= 1">
+              <hr>
+              <div class="row mt-2">
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Beneficiario 1</label>
+                  <input formControlName="beneficiary" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Parentesco</label>
+                  <input formControlName="beneficiary_relationship" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Porcentaje (%)</label>
+                  <input formControlName="beneficiary_percentage" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+
+            <!-- Beneficiary 2 -->
+            <div *ngIf="employeesForm.get('beneficiaries_count')?.value >= 2">
+              <hr>
+              <div class="row mt-2">
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Beneficiario 2</label>
+                  <input formControlName="beneficiary2_name" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Parentesco</label>
+                  <input formControlName="beneficiary2_relationship" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Porcentaje (%)</label>
+                  <input formControlName="beneficiary2_percentage" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+
+            <!-- Beneficiary 3 -->
+            <div *ngIf="employeesForm.get('beneficiaries_count')?.value >= 3">
+              <hr>
+              <div class="row mt-2">
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Beneficiario 3</label>
+                  <input formControlName="beneficiary3_name" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Parentesco</label>
+                  <input formControlName="beneficiary3_relationship" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Porcentaje (%)</label>
+                  <input formControlName="beneficiary3_percentage" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-panel">
+            <h6 class="mb-3">Salud y Emergencia</h6>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Tipo de Sangre</label>
+                <input formControlName="blood_type" type="text" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Peso</label>
+                <input formControlName="weight" type="text" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Estatura</label>
+                <input formControlName="height" type="text" class="form-control">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Talla</label>
+                <input formControlName="shirt_size" type="text" class="form-control">
+              </div>
+              <div class="col-md-8 mb-3">
+                <label class="form-label">Enfermedades (Crónicas/Alergias)</label>
+                <textarea formControlName="diseases" class="form-control" rows="2"></textarea>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Alergias</label>
+              <textarea formControlName="allergies" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Contacto Emergencia</label>
+                <input formControlName="emergency_contact_name" type="text" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Parentesco</label>
+                <input formControlName="emergency_contact_relationship" type="text" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Tel. Emergencia</label>
+                <input formControlName="emergency_phone" type="text" class="form-control">
+              </div>
+            </div>
+          </div>
+
+          <div class="section-panel">
+            <h6 class="mb-3">Infonavit</h6>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Número de Crédito</label>
+                <input formControlName="infonavit_credit_number" type="text" class="form-control">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Factor</label>
+                <input formControlName="infonavit_factor" type="text" class="form-control">
+              </div>
+            </div>
+          </div>
+
+          <div class="section-panel">
+            <h6 class="mb-3">Información Administrativa y Salarial</h6>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Salario ante el IMSS</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input formControlName="imss_salary" type="number" class="form-control">
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Salario Base</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input formControlName="base_salary" type="number" class="form-control">
+                </div>
+              </div>
+
+            </div>
+
+            <label class="form-label fw-bold mt-2">Bonos</label>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" formControlName="bonus_punctuality" id="bonus1">
+                  <label class="form-check-label" for="bonus1">Puntualidad y asistencia</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" formControlName="bonus_productivity" id="bonus2">
+                  <label class="form-check-label" for="bonus2">Productividad</label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" formControlName="bonus_transport" id="bonus3">
+                  <label class="form-check-label" for="bonus3">Transporte</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" formControlName="bonus_permanence" id="bonus4">
+                  <label class="form-check-label" for="bonus4">Permanencia</label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" formControlName="bonus_hiring" id="bonus5">
+                  <label class="form-check-label" for="bonus5">Contratación</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" formControlName="bonus_referral" id="bonus6">
+                  <label class="form-check-label" for="bonus6">Recomendación</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Permisos -->
+          <!-- Permisos -->
+          <div class="section-panel">
+            <div class="mb-3">
+              <h6 class="mb-3">Permisos</h6>
+              <!-- Role moved here -->
+              <div class="mb-3">
+                <label class="form-label">Rol del Empleado</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                  <select formControlName="role" class="form-select">
+                    <option value="">Seleccione un rol</option>
+                    <option *ngFor="let role of roles" [value]="role.name_role">{{ role.name_role }}</option>
+                  </select>
+                </div>
+                <div *ngIf="employeesForm.get('role')?.invalid && employeesForm.get('role')?.touched"
+                  class="text-danger mt-1">
+                  <small>El rol es requerido</small>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pAut1">
+                    <label class="form-check-label">Autorización 1</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pAut2">
+                    <label class="form-check-label">Autorización 2</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pAut3">
+                    <label class="form-check-label">Autorización 3</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pCapSol">
+                    <label class="form-check-label">Capturar Solicitudes</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pComSol">
+                    <label class="form-check-label">Comentar Solicitudes</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pControlSol">
+                    <label class="form-check-label">Control de Solicitudes</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pEdCats">
+                    <label class="form-check-label">Editar Catálogos</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pEdSol">
+                    <label class="form-check-label">Editar Solicitudes</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pEstadisticas">
+                    <label class="form-check-label">Estadísticas</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pHistorial">
+                    <label class="form-check-label">Historial</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pUsuarios">
+                    <label class="form-check-label">Usuarios</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pVerCats">
+                    <label class="form-check-label">Ver Catálogos</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pEliminarDocsRH">
+                    <label class="form-check-label">Eliminar Documentos RH</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pDescripcionesPuestos">
+                    <label class="form-check-label">Descripciones de Puestos</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pPermisosVacaciones">
+                    <label class="form-check-label">Permisos y Vacaciones</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Botón guardar -->
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-success px-4" [disabled]="employeesForm.invalid">
+              <i class="bi bi-check-circle-fill"></i> Guardar
+            </button>
+          </div>
+        </form>
       </div>
-
-      <div class="section-panel">
-        <h6 class="mb-3">Datos Personales</h6>
-        <div class="row">
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Sexo</label>
-            <select formControlName="gender" class="form-select">
-              <option value="">Seleccione...</option>
-              <option *ngFor="let option of genderOptions" [value]="option">{{ option }}</option>
-            </select>
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Estado Civil</label>
-            <select formControlName="marital_status" class="form-select">
-              <option value="">Seleccione...</option>
-              <option *ngFor="let option of maritalStatusOptions" [value]="option">{{ option }}</option>
-            </select>
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Nivel Estudios</label>
-            <select formControlName="education_level" class="form-select">
-              <option value="">Seleccione...</option>
-              <option *ngFor="let option of educationLevelOptions" [value]="option">{{ option }}</option>
-            </select>
-          </div>
-          <div class="col-md-4 mb-3"
-            *ngIf="['Bachillerato', 'Estudios profesionales', 'Postgrado'].includes(employeesForm.get('education_level')?.value)">
-            <label class="form-label">Carrera/Específicidad</label>
-            <input formControlName="education_status" type="text" class="form-control"
-              placeholder="Especifique carrera">
-          </div>
-        </div>
-
-        <label class="form-label fw-bold">Domicilio</label>
-        <div class="row">
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Calle</label>
-            <input formControlName="street" type="text" class="form-control">
-          </div>
-          <div class="col-md-2 mb-3">
-            <label class="form-label">No. Ext</label>
-            <input formControlName="outdoor_number" type="text" class="form-control">
-          </div>
-          <div class="col-md-2 mb-3">
-            <label class="form-label">No. Int</label>
-            <input formControlName="interior_number" type="text" class="form-control">
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Colonia</label>
-            <input formControlName="colony" type="text" class="form-control">
-          </div>
-          <div class="col-md-3 mb-3">
-            <label class="form-label">C.P.</label>
-            <input formControlName="zip_code" type="text" class="form-control">
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Ciudad</label>
-            <input formControlName="city" type="text" class="form-control">
-          </div>
-          <div class="col-md-5 mb-3">
-            <label class="form-label">Estado</label>
-            <input formControlName="state" type="text" class="form-control">
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-3 mb-3">
-            <label class="form-label">Lugar de Nacimiento</label>
-            <select formControlName="birth_place" class="form-select">
-              <option value="">Seleccione...</option>
-              <option *ngFor="let state of mexicoStates" [value]="state">{{ state }}</option>
-            </select>
-          </div>
-          <div class="col-md-3 mb-3">
-            <label class="form-label">Fecha de Nacimiento</label>
-            <input formControlName="birth_date" type="date" class="form-control">
-          </div>
-          <div class="col-md-3 mb-3">
-            <label class="form-label">Edad</label>
-            <input formControlName="age" type="text" class="form-control" readonly style="background-color: #e9ecef;">
-          </div>
-          <div class="col-md-3 mb-3">
-            <label class="form-label">Código INE</label>
-            <input formControlName="ine_code" type="text" class="form-control">
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-4 mb-3">
-            <label class="form-label">CURP</label>
-            <input formControlName="curp" type="text" class="form-control">
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">RFC</label>
-            <input formControlName="rfc" type="text" class="form-control">
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">NSS</label>
-            <input formControlName="nss" type="text" class="form-control">
-          </div>
-        </div>
-      </div>
-
-      <div class="section-panel">
-        <h6 class="mb-3">Familia y Beneficiarios</h6>
-        <div class="row">
-          <div class="col-md-12 mb-3">
-            <label class="form-label">Cantidad de Hijos</label>
-            <select formControlName="children_count" class="form-select" style="width: 150px;">
-              <option *ngFor="let count of childrenCountOptions; let i = index" [value]="i">{{ count }}</option>
-            </select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 1">
-            <label class="form-label">Hijo 1</label>
-            <input formControlName="child1_name" type="text" class="form-control" placeholder="Nombre">
-          </div>
-          <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 1">
-            <label class="form-label">Fecha Nac. Hijo 1</label>
-            <input formControlName="child1_birth_date" type="date" class="form-control">
-          </div>
-
-          <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 2">
-            <label class="form-label">Hijo 2</label>
-            <input formControlName="child2_name" type="text" class="form-control" placeholder="Nombre">
-          </div>
-          <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 2">
-            <label class="form-label">Fecha Nac. Hijo 2</label>
-            <input formControlName="child2_birth_date" type="date" class="form-control">
-          </div>
-
-          <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 3">
-            <label class="form-label">Hijo 3</label>
-            <input formControlName="child3_name" type="text" class="form-control" placeholder="Nombre">
-          </div>
-          <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 3">
-            <label class="form-label">Fecha Nac. Hijo 3</label>
-            <input formControlName="child3_birth_date" type="date" class="form-control">
-          </div>
-
-          <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 4">
-            <label class="form-label">Hijo 4</label>
-            <input formControlName="child4_name" type="text" class="form-control" placeholder="Nombre">
-          </div>
-          <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 4">
-            <label class="form-label">Fecha Nac. Hijo 4</label>
-            <input formControlName="child4_birth_date" type="date" class="form-control">
-          </div>
-
-          <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 5">
-            <label class="form-label">Hijo 5</label>
-            <input formControlName="child5_name" type="text" class="form-control" placeholder="Nombre">
-          </div>
-          <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 5">
-            <label class="form-label">Fecha Nac. Hijo 5</label>
-            <input formControlName="child5_birth_date" type="date" class="form-control">
-          </div>
-        </div>
-
-        <!-- Beneficiaries -->
-        <div class="row mt-2">
-          <div class="col-md-12 mb-3">
-            <label class="form-label">Cantidad de Beneficiarios</label>
-            <select formControlName="beneficiaries_count" class="form-select" style="width: 150px;">
-              <option *ngFor="let count of beneficiariesCountOptions" [value]="count">{{ count }}</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Beneficiary 1 -->
-        <div *ngIf="employeesForm.get('beneficiaries_count')?.value >= 1">
-          <hr>
-          <div class="row mt-2">
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Beneficiario 1</label>
-              <input formControlName="beneficiary" type="text" class="form-control">
-            </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Parentesco</label>
-              <input formControlName="beneficiary_relationship" type="text" class="form-control">
-            </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Porcentaje (%)</label>
-              <input formControlName="beneficiary_percentage" type="text" class="form-control">
-            </div>
-          </div>
-        </div>
-
-        <!-- Beneficiary 2 -->
-        <div *ngIf="employeesForm.get('beneficiaries_count')?.value >= 2">
-          <hr>
-          <div class="row mt-2">
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Beneficiario 2</label>
-              <input formControlName="beneficiary2_name" type="text" class="form-control">
-            </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Parentesco</label>
-              <input formControlName="beneficiary2_relationship" type="text" class="form-control">
-            </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Porcentaje (%)</label>
-              <input formControlName="beneficiary2_percentage" type="text" class="form-control">
-            </div>
-          </div>
-        </div>
-
-        <!-- Beneficiary 3 -->
-        <div *ngIf="employeesForm.get('beneficiaries_count')?.value >= 3">
-          <hr>
-          <div class="row mt-2">
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Beneficiario 3</label>
-              <input formControlName="beneficiary3_name" type="text" class="form-control">
-            </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Parentesco</label>
-              <input formControlName="beneficiary3_relationship" type="text" class="form-control">
-            </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Porcentaje (%)</label>
-              <input formControlName="beneficiary3_percentage" type="text" class="form-control">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section-panel">
-        <h6 class="mb-3">Salud y Emergencia</h6>
-        <div class="row">
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Tipo de Sangre</label>
-            <input formControlName="blood_type" type="text" class="form-control">
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Peso</label>
-            <input formControlName="weight" type="text" class="form-control">
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Estatura</label>
-            <input formControlName="height" type="text" class="form-control">
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Talla</label>
-            <input formControlName="shirt_size" type="text" class="form-control">
-          </div>
-          <div class="col-md-8 mb-3">
-            <label class="form-label">Enfermedades (Crónicas/Alergias)</label>
-            <textarea formControlName="diseases" class="form-control" rows="2"></textarea>
-          </div>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Alergias</label>
-          <textarea formControlName="allergies" class="form-control" rows="2"></textarea>
-        </div>
-        <div class="row">
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Contacto Emergencia</label>
-            <input formControlName="emergency_contact_name" type="text" class="form-control">
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Parentesco</label>
-            <input formControlName="emergency_contact_relationship" type="text" class="form-control">
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Tel. Emergencia</label>
-            <input formControlName="emergency_phone" type="text" class="form-control">
-          </div>
-        </div>
-      </div>
-
-      <div class="section-panel">
-        <h6 class="mb-3">Infonavit</h6>
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label class="form-label">Número de Crédito</label>
-            <input formControlName="infonavit_credit_number" type="text" class="form-control">
-          </div>
-          <div class="col-md-6 mb-3">
-            <label class="form-label">Factor</label>
-            <input formControlName="infonavit_factor" type="text" class="form-control">
-          </div>
-        </div>
-      </div>
-
-      <div class="section-panel">
-        <h6 class="mb-3">Información Administrativa y Salarial</h6>
-        <div class="row">
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Salario ante el IMSS</label>
-            <div class="input-group">
-              <span class="input-group-text">$</span>
-              <input formControlName="imss_salary" type="number" class="form-control">
-            </div>
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Salario Base</label>
-            <div class="input-group">
-              <span class="input-group-text">$</span>
-              <input formControlName="base_salary" type="number" class="form-control">
-            </div>
-          </div>
-
-        </div>
-
-        <label class="form-label fw-bold mt-2">Bonos</label>
-        <div class="row">
-          <div class="col-md-4">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" formControlName="bonus_punctuality" id="bonus1">
-              <label class="form-check-label" for="bonus1">Puntualidad y asistencia</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" formControlName="bonus_productivity" id="bonus2">
-              <label class="form-check-label" for="bonus2">Productividad</label>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" formControlName="bonus_transport" id="bonus3">
-              <label class="form-check-label" for="bonus3">Transporte</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" formControlName="bonus_permanence" id="bonus4">
-              <label class="form-check-label" for="bonus4">Permanencia</label>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" formControlName="bonus_hiring" id="bonus5">
-              <label class="form-check-label" for="bonus5">Contratación</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" formControlName="bonus_referral" id="bonus6">
-              <label class="form-check-label" for="bonus6">Recomendación</label>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Permisos -->
-      <!-- Permisos -->
-      <div class="section-panel">
-        <div class="mb-3">
-          <h6 class="mb-3">Permisos</h6>
-          <!-- Role moved here -->
-          <div class="mb-3">
-            <label class="form-label">Rol del Empleado</label>
-            <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
-              <select formControlName="role" class="form-select">
-                <option value="">Seleccione un rol</option>
-                <option *ngFor="let role of roles" [value]="role.name_role">{{ role.name_role }}</option>
-              </select>
-            </div>
-            <div *ngIf="employeesForm.get('role')?.invalid && employeesForm.get('role')?.touched"
-              class="text-danger mt-1">
-              <small>El rol es requerido</small>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pAut1">
-                <label class="form-check-label">Autorización 1</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pAut2">
-                <label class="form-check-label">Autorización 2</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pAut3">
-                <label class="form-check-label">Autorización 3</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pCapSol">
-                <label class="form-check-label">Capturar Solicitudes</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pComSol">
-                <label class="form-check-label">Comentar Solicitudes</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pControlSol">
-                <label class="form-check-label">Control de Solicitudes</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pEdCats">
-                <label class="form-check-label">Editar Catálogos</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pEdSol">
-                <label class="form-check-label">Editar Solicitudes</label>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pEstadisticas">
-                <label class="form-check-label">Estadísticas</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pHistorial">
-                <label class="form-check-label">Historial</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pUsuarios">
-                <label class="form-check-label">Usuarios</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pVerCats">
-                <label class="form-check-label">Ver Catálogos</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pEliminarDocsRH">
-                <label class="form-check-label">Eliminar Documentos RH</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pDescripcionesPuestos">
-                <label class="form-check-label">Descripciones de Puestos</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pPermisosVacaciones">
-                <label class="form-check-label">Permisos y Vacaciones</label>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Botón guardar -->
-      <div class="text-center mt-4">
-        <button type="submit" class="btn btn-success px-4" [disabled]="employeesForm.invalid">
-          <i class="bi bi-check-circle-fill"></i> Guardar
-        </button>
-      </div>
-      </form>
     </div>
   </div>
-</div>
 </div>
 
 <!-- Modal para visualizar empleado -->
@@ -1241,460 +1241,461 @@
               </div>
             </div>
           </div>
-      </div>
 
-      <div class="section-panel">
-        <h6 class="mb-3">Datos Personales</h6>
-        <div class="row">
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Sexo</label>
-            <select formControlName="gender" class="form-select">
-              <option value="">Seleccione...</option>
-              <option *ngFor="let option of genderOptions" [value]="option">{{ option }}</option>
-            </select>
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Estado Civil</label>
-            <select formControlName="marital_status" class="form-select">
-              <option value="">Seleccione...</option>
-              <option *ngFor="let option of maritalStatusOptions" [value]="option">{{ option }}</option>
-            </select>
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Nivel Estudios</label>
-            <select formControlName="education_level" class="form-select">
-              <option value="">Seleccione...</option>
-              <option *ngFor="let option of educationLevelOptions" [value]="option">{{ option }}</option>
-            </select>
-          </div>
-          <div class="col-md-4 mb-3"
-            *ngIf="['Bachillerato', 'Estudios profesionales', 'Postgrado'].includes(employeesForm.get('education_level')?.value)">
-            <label class="form-label">Carrera/Específicidad</label>
-            <input formControlName="education_status" type="text" class="form-control"
-              placeholder="Especifique carrera">
-          </div>
-        </div>
-
-        <label class="form-label fw-bold">Domicilio</label>
-        <div class="row">
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Calle</label>
-            <input formControlName="street" type="text" class="form-control">
-          </div>
-          <div class="col-md-2 mb-3">
-            <label class="form-label">No. Ext</label>
-            <input formControlName="outdoor_number" type="text" class="form-control">
-          </div>
-          <div class="col-md-2 mb-3">
-            <label class="form-label">No. Int</label>
-            <input formControlName="interior_number" type="text" class="form-control">
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Colonia</label>
-            <input formControlName="colony" type="text" class="form-control">
-          </div>
-          <div class="col-md-3 mb-3">
-            <label class="form-label">C.P.</label>
-            <input formControlName="zip_code" type="text" class="form-control">
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Ciudad</label>
-            <input formControlName="city" type="text" class="form-control">
-          </div>
-          <div class="col-md-5 mb-3">
-            <label class="form-label">Estado</label>
-            <input formControlName="state" type="text" class="form-control">
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-3 mb-3">
-            <label class="form-label">Lugar de Nacimiento</label>
-            <select formControlName="birth_place" class="form-select">
-              <option value="">Seleccione...</option>
-              <option *ngFor="let state of mexicoStates" [value]="state">{{ state }}</option>
-            </select>
-          </div>
-          <div class="col-md-3 mb-3">
-            <label class="form-label">Fecha de Nacimiento</label>
-            <input formControlName="birth_date" type="date" class="form-control">
-          </div>
-          <div class="col-md-3 mb-3">
-            <label class="form-label">Edad</label>
-            <input formControlName="age" type="text" class="form-control" readonly style="background-color: #e9ecef;">
-          </div>
-          <div class="col-md-3 mb-3">
-            <label class="form-label">Código INE</label>
-            <input formControlName="ine_code" type="text" class="form-control">
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-4 mb-3">
-            <label class="form-label">CURP</label>
-            <input formControlName="curp" type="text" class="form-control">
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">RFC</label>
-            <input formControlName="rfc" type="text" class="form-control">
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">NSS</label>
-            <input formControlName="nss" type="text" class="form-control">
-          </div>
-        </div>
-      </div>
-
-      <div class="section-panel">
-        <h6 class="mb-3">Familia</h6>
-        <div class="row">
-          <div class="col-md-12 mb-3">
-            <label class="form-label">Cantidad de Hijos</label>
-            <select formControlName="children_count" class="form-select" style="width: 150px;">
-              <option *ngFor="let count of childrenCountOptions; let i = index" [value]="i">{{ count }}</option>
-            </select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 1">
-            <label class="form-label">Hijo 1</label>
-            <input formControlName="child1_name" type="text" class="form-control" placeholder="Nombre">
-          </div>
-          <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 1">
-            <label class="form-label">Fecha Nac. Hijo 1</label>
-            <input formControlName="child1_birth_date" type="date" class="form-control">
-          </div>
-
-          <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 2">
-            <label class="form-label">Hijo 2</label>
-            <input formControlName="child2_name" type="text" class="form-control" placeholder="Nombre">
-          </div>
-          <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 2">
-            <label class="form-label">Fecha Nac. Hijo 2</label>
-            <input formControlName="child2_birth_date" type="date" class="form-control">
-          </div>
-
-          <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 3">
-            <label class="form-label">Hijo 3</label>
-            <input formControlName="child3_name" type="text" class="form-control" placeholder="Nombre">
-          </div>
-          <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 3">
-            <label class="form-label">Fecha Nac. Hijo 3</label>
-            <input formControlName="child3_birth_date" type="date" class="form-control">
-          </div>
-
-          <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 4">
-            <label class="form-label">Hijo 4</label>
-            <input formControlName="child4_name" type="text" class="form-control" placeholder="Nombre">
-          </div>
-          <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 4">
-            <label class="form-label">Fecha Nac. Hijo 4</label>
-            <input formControlName="child4_birth_date" type="date" class="form-control">
-          </div>
-
-          <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 5">
-            <label class="form-label">Hijo 5</label>
-            <input formControlName="child5_name" type="text" class="form-control" placeholder="Nombre">
-          </div>
-          <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 5">
-            <label class="form-label">Fecha Nac. Hijo 5</label>
-            <input formControlName="child5_birth_date" type="date" class="form-control">
-          </div>
-        </div>
-
-        <!-- Beneficiaries -->
-        <div class="row mt-2">
-          <div class="col-md-12 mb-3">
-            <label class="form-label">Cantidad de Beneficiarios</label>
-            <select formControlName="beneficiaries_count" class="form-select" style="width: 150px;">
-              <option *ngFor="let count of beneficiariesCountOptions" [value]="count">{{ count }}</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Beneficiary 1 -->
-        <div *ngIf="employeesForm.get('beneficiaries_count')?.value >= 1">
-          <hr>
-          <div class="row mt-2">
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Beneficiario 1</label>
-              <input formControlName="beneficiary" type="text" class="form-control">
+          <div class="section-panel">
+            <h6 class="mb-3">Datos Personales</h6>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Sexo</label>
+                <select formControlName="gender" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let option of genderOptions" [value]="option">{{ option }}</option>
+                </select>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Estado Civil</label>
+                <select formControlName="marital_status" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let option of maritalStatusOptions" [value]="option">{{ option }}</option>
+                </select>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Nivel Estudios</label>
+                <select formControlName="education_level" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let option of educationLevelOptions" [value]="option">{{ option }}</option>
+                </select>
+              </div>
+              <div class="col-md-4 mb-3"
+                *ngIf="['Bachillerato', 'Estudios profesionales', 'Postgrado'].includes(employeesForm.get('education_level')?.value)">
+                <label class="form-label">Carrera/Específicidad</label>
+                <input formControlName="education_status" type="text" class="form-control"
+                  placeholder="Especifique carrera">
+              </div>
             </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Parentesco</label>
-              <input formControlName="beneficiary_relationship" type="text" class="form-control">
-            </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Porcentaje (%)</label>
-              <input formControlName="beneficiary_percentage" type="text" class="form-control">
-            </div>
-          </div>
-        </div>
 
-        <!-- Beneficiary 2 -->
-        <div *ngIf="employeesForm.get('beneficiaries_count')?.value >= 2">
-          <hr>
-          <div class="row mt-2">
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Beneficiario 2</label>
-              <input formControlName="beneficiary2_name" type="text" class="form-control">
+            <label class="form-label fw-bold">Domicilio</label>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Calle</label>
+                <input formControlName="street" type="text" class="form-control">
+              </div>
+              <div class="col-md-2 mb-3">
+                <label class="form-label">No. Ext</label>
+                <input formControlName="outdoor_number" type="text" class="form-control">
+              </div>
+              <div class="col-md-2 mb-3">
+                <label class="form-label">No. Int</label>
+                <input formControlName="interior_number" type="text" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Colonia</label>
+                <input formControlName="colony" type="text" class="form-control">
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">C.P.</label>
+                <input formControlName="zip_code" type="text" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Ciudad</label>
+                <input formControlName="city" type="text" class="form-control">
+              </div>
+              <div class="col-md-5 mb-3">
+                <label class="form-label">Estado</label>
+                <input formControlName="state" type="text" class="form-control">
+              </div>
             </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Parentesco</label>
-              <input formControlName="beneficiary2_relationship" type="text" class="form-control">
-            </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Porcentaje (%)</label>
-              <input formControlName="beneficiary2_percentage" type="text" class="form-control">
-            </div>
-          </div>
-        </div>
 
-        <!-- Beneficiary 3 -->
-        <div *ngIf="employeesForm.get('beneficiaries_count')?.value >= 3">
-          <hr>
-          <div class="row mt-2">
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Beneficiario 3</label>
-              <input formControlName="beneficiary3_name" type="text" class="form-control">
+            <div class="row">
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Lugar de Nacimiento</label>
+                <select formControlName="birth_place" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let state of mexicoStates" [value]="state">{{ state }}</option>
+                </select>
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Fecha de Nacimiento</label>
+                <input formControlName="birth_date" type="date" class="form-control">
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Edad</label>
+                <input formControlName="age" type="text" class="form-control" readonly
+                  style="background-color: #e9ecef;">
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Código INE</label>
+                <input formControlName="ine_code" type="text" class="form-control">
+              </div>
             </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Parentesco</label>
-              <input formControlName="beneficiary3_relationship" type="text" class="form-control">
-            </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Porcentaje (%)</label>
-              <input formControlName="beneficiary3_percentage" type="text" class="form-control">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section-panel">
-        <h6 class="mb-3">Salud y Emergencia</h6>
-        <div class="row">
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Tipo de Sangre</label>
-            <input formControlName="blood_type" type="text" class="form-control">
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Peso</label>
-            <input formControlName="weight" type="text" class="form-control">
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Estatura</label>
-            <input formControlName="height" type="text" class="form-control">
-          </div>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Alergias</label>
-          <textarea formControlName="allergies" class="form-control" rows="2"></textarea>
-        </div>
-        <div class="row">
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Contacto Emergencia</label>
-            <input formControlName="emergency_contact_name" type="text" class="form-control">
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Parentesco</label>
-            <input formControlName="emergency_contact_relationship" type="text" class="form-control">
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Tel. Emergencia</label>
-            <input formControlName="emergency_phone" type="text" class="form-control">
-          </div>
-        </div>
-      </div>
-
-      <div class="section-panel">
-        <h6 class="mb-3">Infonavit</h6>
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label class="form-label">Número de Crédito</label>
-            <input formControlName="infonavit_credit_number" type="text" class="form-control">
-          </div>
-          <div class="col-md-6 mb-3">
-            <label class="form-label">Factor</label>
-            <input formControlName="infonavit_factor" type="text" class="form-control">
-          </div>
-        </div>
-      </div>
-
-      <div class="section-panel">
-        <h6 class="mb-3">Información Administrativa y Salarial</h6>
-        <div class="row">
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Salario ante el IMSS</label>
-            <div class="input-group">
-              <span class="input-group-text">$</span>
-              <input formControlName="imss_salary" type="number" class="form-control">
-            </div>
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Salario Base</label>
-            <div class="input-group">
-              <span class="input-group-text">$</span>
-              <input formControlName="base_salary" type="number" class="form-control">
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">CURP</label>
+                <input formControlName="curp" type="text" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">RFC</label>
+                <input formControlName="rfc" type="text" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">NSS</label>
+                <input formControlName="nss" type="text" class="form-control">
+              </div>
             </div>
           </div>
 
-        </div>
+          <div class="section-panel">
+            <h6 class="mb-3">Familia</h6>
+            <div class="row">
+              <div class="col-md-12 mb-3">
+                <label class="form-label">Cantidad de Hijos</label>
+                <select formControlName="children_count" class="form-select" style="width: 150px;">
+                  <option *ngFor="let count of childrenCountOptions; let i = index" [value]="i">{{ count }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 1">
+                <label class="form-label">Hijo 1</label>
+                <input formControlName="child1_name" type="text" class="form-control" placeholder="Nombre">
+              </div>
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 1">
+                <label class="form-label">Fecha Nac. Hijo 1</label>
+                <input formControlName="child1_birth_date" type="date" class="form-control">
+              </div>
 
-        <label class="form-label fw-bold mt-2">Bonos</label>
-        <div class="row">
-          <div class="col-md-4">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" formControlName="bonus_punctuality" id="bonus1Edit">
-              <label class="form-check-label" for="bonus1Edit">Puntualidad y asistencia</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" formControlName="bonus_productivity" id="bonus2Edit">
-              <label class="form-check-label" for="bonus2Edit">Productividad</label>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" formControlName="bonus_transport" id="bonus3Edit">
-              <label class="form-check-label" for="bonus3Edit">Transporte</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" formControlName="bonus_permanence" id="bonus4Edit">
-              <label class="form-check-label" for="bonus4Edit">Permanencia</label>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" formControlName="bonus_hiring" id="bonus5Edit">
-              <label class="form-check-label" for="bonus5Edit">Contratación</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" formControlName="bonus_referral" id="bonus6Edit">
-              <label class="form-check-label" for="bonus6Edit">Recomendación</label>
-            </div>
-          </div>
-        </div>
-      </div>
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 2">
+                <label class="form-label">Hijo 2</label>
+                <input formControlName="child2_name" type="text" class="form-control" placeholder="Nombre">
+              </div>
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 2">
+                <label class="form-label">Fecha Nac. Hijo 2</label>
+                <input formControlName="child2_birth_date" type="date" class="form-control">
+              </div>
 
-      <div class="section-panel">
-        <h6 class="mb-3">Información de Reingreso</h6>
-        <div class="row">
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Fecha de Reingreso</label>
-            <input formControlName="rehire_date" type="date" class="form-control">
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 3">
+                <label class="form-label">Hijo 3</label>
+                <input formControlName="child3_name" type="text" class="form-control" placeholder="Nombre">
+              </div>
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 3">
+                <label class="form-label">Fecha Nac. Hijo 3</label>
+                <input formControlName="child3_birth_date" type="date" class="form-control">
+              </div>
+
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 4">
+                <label class="form-label">Hijo 4</label>
+                <input formControlName="child4_name" type="text" class="form-control" placeholder="Nombre">
+              </div>
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 4">
+                <label class="form-label">Fecha Nac. Hijo 4</label>
+                <input formControlName="child4_birth_date" type="date" class="form-control">
+              </div>
+
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 5">
+                <label class="form-label">Hijo 5</label>
+                <input formControlName="child5_name" type="text" class="form-control" placeholder="Nombre">
+              </div>
+              <div class="col-md-6 mb-2" *ngIf="employeesForm.get('children_count')?.value >= 5">
+                <label class="form-label">Fecha Nac. Hijo 5</label>
+                <input formControlName="child5_birth_date" type="date" class="form-control">
+              </div>
+            </div>
+
+            <!-- Beneficiaries -->
+            <div class="row mt-2">
+              <div class="col-md-12 mb-3">
+                <label class="form-label">Cantidad de Beneficiarios</label>
+                <select formControlName="beneficiaries_count" class="form-select" style="width: 150px;">
+                  <option *ngFor="let count of beneficiariesCountOptions" [value]="count">{{ count }}</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Beneficiary 1 -->
+            <div *ngIf="employeesForm.get('beneficiaries_count')?.value >= 1">
+              <hr>
+              <div class="row mt-2">
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Beneficiario 1</label>
+                  <input formControlName="beneficiary" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Parentesco</label>
+                  <input formControlName="beneficiary_relationship" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Porcentaje (%)</label>
+                  <input formControlName="beneficiary_percentage" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+
+            <!-- Beneficiary 2 -->
+            <div *ngIf="employeesForm.get('beneficiaries_count')?.value >= 2">
+              <hr>
+              <div class="row mt-2">
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Beneficiario 2</label>
+                  <input formControlName="beneficiary2_name" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Parentesco</label>
+                  <input formControlName="beneficiary2_relationship" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Porcentaje (%)</label>
+                  <input formControlName="beneficiary2_percentage" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
+
+            <!-- Beneficiary 3 -->
+            <div *ngIf="employeesForm.get('beneficiaries_count')?.value >= 3">
+              <hr>
+              <div class="row mt-2">
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Beneficiario 3</label>
+                  <input formControlName="beneficiary3_name" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Parentesco</label>
+                  <input formControlName="beneficiary3_relationship" type="text" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Porcentaje (%)</label>
+                  <input formControlName="beneficiary3_percentage" type="text" class="form-control">
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Documento Adjunto</label>
-            <input type="file" (change)="onRehireFileSelected($event)" class="form-control">
+
+          <div class="section-panel">
+            <h6 class="mb-3">Salud y Emergencia</h6>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Tipo de Sangre</label>
+                <input formControlName="blood_type" type="text" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Peso</label>
+                <input formControlName="weight" type="text" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Estatura</label>
+                <input formControlName="height" type="text" class="form-control">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Alergias</label>
+              <textarea formControlName="allergies" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Contacto Emergencia</label>
+                <input formControlName="emergency_contact_name" type="text" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Parentesco</label>
+                <input formControlName="emergency_contact_relationship" type="text" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Tel. Emergencia</label>
+                <input formControlName="emergency_phone" type="text" class="form-control">
+              </div>
+            </div>
           </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Nombre del Documento</label>
-            <input formControlName="rehire_document_name" type="text" class="form-control" placeholder="Ej. Contrato">
+
+          <div class="section-panel">
+            <h6 class="mb-3">Infonavit</h6>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Número de Crédito</label>
+                <input formControlName="infonavit_credit_number" type="text" class="form-control">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Factor</label>
+                <input formControlName="infonavit_factor" type="text" class="form-control">
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      <!-- Permisos -->
-      <div class="section-panel">
-        <div class="mb-3">
+
+          <div class="section-panel">
+            <h6 class="mb-3">Información Administrativa y Salarial</h6>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Salario ante el IMSS</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input formControlName="imss_salary" type="number" class="form-control">
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Salario Base</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input formControlName="base_salary" type="number" class="form-control">
+                </div>
+              </div>
+
+            </div>
+
+            <label class="form-label fw-bold mt-2">Bonos</label>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" formControlName="bonus_punctuality" id="bonus1Edit">
+                  <label class="form-check-label" for="bonus1Edit">Puntualidad y asistencia</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" formControlName="bonus_productivity" id="bonus2Edit">
+                  <label class="form-check-label" for="bonus2Edit">Productividad</label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" formControlName="bonus_transport" id="bonus3Edit">
+                  <label class="form-check-label" for="bonus3Edit">Transporte</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" formControlName="bonus_permanence" id="bonus4Edit">
+                  <label class="form-check-label" for="bonus4Edit">Permanencia</label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" formControlName="bonus_hiring" id="bonus5Edit">
+                  <label class="form-check-label" for="bonus5Edit">Contratación</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" formControlName="bonus_referral" id="bonus6Edit">
+                  <label class="form-check-label" for="bonus6Edit">Recomendación</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-panel">
+            <h6 class="mb-3">Información de Reingreso</h6>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Fecha de Reingreso</label>
+                <input formControlName="rehire_date" type="date" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Documento Adjunto</label>
+                <input type="file" (change)="onRehireFileSelected($event)" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Nombre del Documento</label>
+                <input formControlName="rehire_document_name" type="text" class="form-control"
+                  placeholder="Ej. Contrato">
+              </div>
+            </div>
+          </div>
+          <!-- Permisos -->
+          <div class="section-panel">
+            <div class="mb-3">
+              <div class="mb-3">
+                <label class="form-label">Rol del Empleado</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                  <select formControlName="role" class="form-select">
+                    <option value="">Seleccione un rol</option>
+                    <option *ngFor="let role of roles" [value]="role.name_role">{{ role.name_role }}</option>
+                  </select>
+                </div>
+                <div *ngIf="employeesForm.get('role')?.invalid && employeesForm.get('role')?.touched"
+                  class="text-danger mt-1">
+                  <small>El rol es requerido</small>
+                </div>
+              </div>
+              <label class="form-label fw-bold">Permisos</label>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pAut1">
+                    <label class="form-check-label">Autorización 1</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pAut2">
+                    <label class="form-check-label">Autorización 2</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pAut3">
+                    <label class="form-check-label">Autorización 3</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pCapSol">
+                    <label class="form-check-label">Capturar Solicitudes</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pComSol">
+                    <label class="form-check-label">Comentar Solicitudes</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pControlSol">
+                    <label class="form-check-label">Control de Solicitudes</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pEdCats">
+                    <label class="form-check-label">Editar Catálogos</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pEdSol">
+                    <label class="form-check-label">Editar Solicitudes</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pEstadisticas">
+                    <label class="form-check-label">Estadísticas</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pHistorial">
+                    <label class="form-check-label">Historial</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pUsuarios">
+                    <label class="form-check-label">Usuarios</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pVerCats">
+                    <label class="form-check-label">Ver Catálogos</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pEliminarDocsRH">
+                    <label class="form-check-label">Eliminar Documentos RH</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pDescripcionesPuestos">
+                    <label class="form-check-label">Descripciones de Puestos</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" formControlName="pPermisosVacaciones">
+                    <label class="form-check-label">Permisos y Vacaciones</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Estatus -->
           <div class="mb-3">
-            <label class="form-label">Rol del Empleado</label>
-            <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
-              <select formControlName="role" class="form-select">
-                <option value="">Seleccione un rol</option>
-                <option *ngFor="let role of roles" [value]="role.name_role">{{ role.name_role }}</option>
-              </select>
-            </div>
-            <div *ngIf="employeesForm.get('role')?.invalid && employeesForm.get('role')?.touched"
-              class="text-danger mt-1">
-              <small>El rol es requerido</small>
+            <label class="form-label">Estatus</label>
+            <div class="form-check form-switch status-switch">
+              <input class="form-check-input" type="checkbox" formControlName="status">
+              <label class="form-check-label">{{ employeesForm.get('status')?.value ? 'Activo' : 'Inactivo' }}</label>
             </div>
           </div>
-          <label class="form-label fw-bold">Permisos</label>
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pAut1">
-                <label class="form-check-label">Autorización 1</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pAut2">
-                <label class="form-check-label">Autorización 2</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pAut3">
-                <label class="form-check-label">Autorización 3</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pCapSol">
-                <label class="form-check-label">Capturar Solicitudes</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pComSol">
-                <label class="form-check-label">Comentar Solicitudes</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pControlSol">
-                <label class="form-check-label">Control de Solicitudes</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pEdCats">
-                <label class="form-check-label">Editar Catálogos</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pEdSol">
-                <label class="form-check-label">Editar Solicitudes</label>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pEstadisticas">
-                <label class="form-check-label">Estadísticas</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pHistorial">
-                <label class="form-check-label">Historial</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pUsuarios">
-                <label class="form-check-label">Usuarios</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pVerCats">
-                <label class="form-check-label">Ver Catálogos</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pEliminarDocsRH">
-                <label class="form-check-label">Eliminar Documentos RH</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pDescripcionesPuestos">
-                <label class="form-check-label">Descripciones de Puestos</label>
-              </div>
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" formControlName="pPermisosVacaciones">
-                <label class="form-check-label">Permisos y Vacaciones</label>
-              </div>
-            </div>
+          <!-- Botón guardar -->
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary px-4">
+              <i class="bi bi-check-circle-fill"></i> Guardar Cambios
+            </button>
           </div>
-        </div>
+        </form>
       </div>
-      <!-- Estatus -->
-      <div class="mb-3">
-        <label class="form-label">Estatus</label>
-        <div class="form-check form-switch status-switch">
-          <input class="form-check-input" type="checkbox" formControlName="status">
-          <label class="form-check-label">{{ employeesForm.get('status')?.value ? 'Activo' : 'Inactivo' }}</label>
-        </div>
-      </div>
-      <!-- Botón guardar -->
-      <div class="text-center mt-4">
-        <button type="submit" class="btn btn-primary px-4">
-          <i class="bi bi-check-circle-fill"></i> Guardar Cambios
-        </button>
-      </div>
-      </form>
     </div>
   </div>
-</div>
 </div>
 
 <!-- Modal para Control de Asistencia -->
