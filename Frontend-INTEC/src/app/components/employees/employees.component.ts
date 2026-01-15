@@ -99,7 +99,7 @@ export class EmployeesComponent implements OnInit {
       city: [''],
       state: [''],
       contract_type: [''], // Added contract_type form control
-      contract_type: [''], // Added contract_type form control
+
 
       birth_place: [''],
       birth_date: [''],
