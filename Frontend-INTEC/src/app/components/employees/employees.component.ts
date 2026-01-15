@@ -386,7 +386,6 @@ export class EmployeesComponent implements OnInit {
       colony: formVal.colony,
       zip_code: formVal.zip_code,
       city: formVal.city,
-      city: formVal.city,
       state: formVal.state,
       contract_type: formVal.contract_type, // Map contract_type (Create) 
       // User request 4: "el domicilio se debe conformar de... Estado" -> address state.
@@ -672,7 +671,6 @@ export class EmployeesComponent implements OnInit {
         interior_number: formVal.interior_number,
         colony: formVal.colony,
         zip_code: formVal.zip_code,
-        city: formVal.city,
         city: formVal.city,
         state: formVal.state,
         contract_type: formVal.contract_type, // Map contract_type (Update)
