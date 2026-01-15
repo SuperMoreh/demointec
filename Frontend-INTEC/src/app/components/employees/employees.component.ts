@@ -99,9 +99,7 @@ export class EmployeesComponent implements OnInit {
       city: [''],
       state: [''],
       contract_type: [''], // Added contract_type form control
-      rehire_date: [''],
-      rehire_document_path: [''],
-      rehire_document_name: [''],
+      contract_type: [''], // Added contract_type form control
 
       birth_place: [''],
       birth_date: [''],
