@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
 import { EmployeesAdapterService } from '../../adapters/employees.adapter';
 import { RoleAdapterService } from '../../adapters/roles.adapter';
 import { Employee } from '../../models/employees';
@@ -1009,6 +1009,8 @@ export class EmployeesComponent implements OnInit {
     return bonuses.join(', ');
   }
 
+
+
   exportToExcel(): void {
     if (!this.employees || this.employees.length === 0) {
       this.toastr.warning('No hay datos para exportar', 'Advertencia');
@@ -1051,20 +1053,41 @@ export class EmployeesComponent implements OnInit {
       'Enfermedades': emp.diseases || '',
       'Alergias': emp.allergies,
       'Contacto Emergencia': emp.emergency_contact_name,
-      'Relación Emergencia': emp.emergency_contact_relationship,
+      'Parentesco Emergencia': emp.emergency_contact_relationship,
       'Tel. Emergencia': emp.emergency_phone,
-      'Hijos': emp.children_count,
-      'Beneficiarios': emp.beneficiaries_count || 0,
-      'Infonavit Crédito': emp.infonavit_credit_number,
-      'Salario IMSS': emp.imss_salary,
-      'Salario Base': emp.base_salary,
-      'Bonos': emp.bonuses,
-      'Estatus': emp.status ? 'Activo' : 'Inactivo'
+      'Sueldo IMSS': emp.imss_salary,
+      'Sueldo Base': emp.base_salary,
+      'Bonos': emp.bonuses
     }));
 
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataToExport);
+
+    // Apply Styles
+    const range = XLSX.utils.decode_range(ws['!ref'] || '');
+
+    // Auto-width for columns (approximate)
+    const wscols = Object.keys(dataToExport[0]).map(key => ({ wch: key.length + 5 }));
+    ws['!cols'] = wscols;
+
+    // Header Style (Blue background, Bold, No gridlines simulation)
+    const headerStyle = {
+      fill: { fgColor: { rgb: "DCE6F1" } }, // Light Blue
+      font: { bold: true, color: { rgb: "000000" } },
+      alignment: { horizontal: "center" }
+    };
+
+    // Apply style to header row
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const address = XLSX.utils.encode_cell({ r: 0, c: C });
+      if (!ws[address]) continue;
+      ws[address].s = headerStyle;
+    }
+
+    // Hide Gridlines
+    ws['!views'] = [{ showGridLines: false }];
+
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Colaboradores');
-    XLSX.writeFile(wb, 'Catálogo_Colaboradores.xlsx');
+    XLSX.utils.book_append_sheet(wb, ws, 'Empleados');
+    XLSX.writeFile(wb, 'Reporte_Empleados.xlsx');
   }
-} 
+}
