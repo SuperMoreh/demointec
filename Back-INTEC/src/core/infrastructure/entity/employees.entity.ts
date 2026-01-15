@@ -226,6 +226,9 @@ export class EmployeeEntity {
   @Column({ name: 'bonuses', type: 'text', nullable: true })
   bonuses!: string;
 
+  @Column({ name: 'contract_type', type: 'varchar', length: 50, nullable: true })
+  contract_type!: string;
+
   @Column({ name: 'rehire_date', type: 'varchar', length: 100, nullable: true })
   rehire_date!: string;
 

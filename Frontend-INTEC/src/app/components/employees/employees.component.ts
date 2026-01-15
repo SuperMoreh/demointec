@@ -44,6 +44,7 @@ export class EmployeesComponent implements OnInit {
 
   childrenCountOptions = ['0', '1', '2', '3', '4', '5 o más'];
   beneficiariesCountOptions = [0, 1, 2, 3];
+  contractTypeOptions = ['COD', 'CTD', 'CTI'];
 
   // Asistencia
   selectedEmployeeForAttendance: Employee | null = null;
@@ -97,6 +98,7 @@ export class EmployeesComponent implements OnInit {
       zip_code: [''],
       city: [''],
       state: [''],
+      contract_type: [''], // Added contract_type form control
 
       birth_place: [''],
       birth_date: [''],
@@ -284,6 +286,7 @@ export class EmployeesComponent implements OnInit {
       zip_code: '',
       city: '',
       state: '',
+      contract_type: '', // Reset contract_type
       birth_place: '',
       birth_date: '',
       nss: '',
@@ -383,7 +386,9 @@ export class EmployeesComponent implements OnInit {
       colony: formVal.colony,
       zip_code: formVal.zip_code,
       city: formVal.city,
-      state: formVal.state, // This will now come from the dropdown if birth_place is used, or address state? Wait, "state" in address context vs "birth_place" might be different. 
+      city: formVal.city,
+      state: formVal.state,
+      contract_type: formVal.contract_type, // Map contract_type (Create) 
       // User request 4: "el domicilio se debe conformar de... Estado" -> address state.
       // User request 5: "lugar de nacimiento que se desplieguen todos los estados".
 
@@ -508,6 +513,7 @@ export class EmployeesComponent implements OnInit {
             zip_code: fullData.zip_code,
             city: fullData.city,
             state: fullData.state,
+            contract_type: fullData.contract_type, // Patch contract_type (Edit)
 
             imss_salary: fullData.imss_salary,
             base_salary: fullData.base_salary,
@@ -667,7 +673,9 @@ export class EmployeesComponent implements OnInit {
         colony: formVal.colony,
         zip_code: formVal.zip_code,
         city: formVal.city,
+        city: formVal.city,
         state: formVal.state,
+        contract_type: formVal.contract_type, // Map contract_type (Update)
 
         birth_place: formVal.birth_place,
         birth_date: formVal.birth_date,

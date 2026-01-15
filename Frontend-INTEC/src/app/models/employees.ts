@@ -11,6 +11,7 @@ export interface Employee {
   position?: string;
   entry_time?: string;
   exit_time?: string;
+  contract_type?: string;
   location?: string;
   gender?: string;
   age?: number;
