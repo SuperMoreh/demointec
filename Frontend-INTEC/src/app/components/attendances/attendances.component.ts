@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
 import { AttendancesAdapterService } from '../../adapters/attendances.adapter';
 import { EmployeesAdapterService } from '../../adapters/employees.adapter';
 import { Attendance } from '../../models/attendances';
@@ -211,6 +211,7 @@ export class AttendancesComponent implements OnInit {
     return date;
   }
 
+
   exportToExcel(): void {
     if (!this.filteredAttendances || this.filteredAttendances.length === 0) {
       this.toastr.warning('No hay datos para exportar', 'Advertencia');
@@ -230,6 +231,31 @@ export class AttendancesComponent implements OnInit {
     }));
 
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataToExport);
+
+    // Apply Styles
+    const range = XLSX.utils.decode_range(ws['!ref'] || '');
+
+    // Auto-width for columns (approximate)
+    const wscols = Object.keys(dataToExport[0]).map(key => ({ wch: key.length + 5 }));
+    ws['!cols'] = wscols;
+
+    // Header Style (Blue background, Bold, No gridlines simulation)
+    const headerStyle = {
+      fill: { fgColor: { rgb: "DCE6F1" } }, // Light Blue
+      font: { bold: true, color: { rgb: "000000" } },
+      alignment: { horizontal: "center" }
+    };
+
+    // Apply style to header row
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const address = XLSX.utils.encode_cell({ r: 0, c: C });
+      if (!ws[address]) continue;
+      ws[address].s = headerStyle;
+    }
+
+    // Hide Gridlines
+    ws['!views'] = [{ showGridLines: false }];
+
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Asistencias');
     XLSX.writeFile(wb, 'Reporte_Asistencias.xlsx');
