@@ -747,7 +747,8 @@ export class EmployeesComponent implements OnInit {
         },
         error: err => {
           console.error('Error al actualizar empleado:', err);
-          this.toastr.error('Error al actualizar el empleado', 'Error');
+          const errorMessage = err?.error?.message || err?.message || 'Error desconocido';
+          this.toastr.error(`Error al actualizar: ${errorMessage}`, 'Error');
         }
       });
     };
