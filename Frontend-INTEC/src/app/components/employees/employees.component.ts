@@ -360,6 +360,13 @@ export class EmployeesComponent implements OnInit {
       return;
     }
     const formVal = this.employeesForm.value;
+
+    // Show loading toast
+    const loadingToast = this.toastr.info('Guardando cambios...', 'Por favor espere', {
+      disableTimeOut: true,
+      tapToDismiss: false
+    });
+
     const employeeData = {
       id_employee: this.generateUUID(),
       name_employee: formVal.name_employee,
@@ -450,6 +457,7 @@ export class EmployeesComponent implements OnInit {
     };
     this.employeesAdapterService.post(employeeData).subscribe({
       next: () => {
+        this.toastr.clear(loadingToast.toastId);
         this.toastr.success('Empleado creado correctamente', 'Éxito');
         this.setCreateMode();
         this.hasConsulted = true;
@@ -457,6 +465,7 @@ export class EmployeesComponent implements OnInit {
         this.closeAddModal();
       },
       error: err => {
+        this.toastr.clear(loadingToast.toastId);
         console.error('Error al guardar empleado', err);
         this.toastr.error('Error al crear el empleado', 'Error');
       }
@@ -647,6 +656,13 @@ export class EmployeesComponent implements OnInit {
     }
     const employeeId = this.selectedEmployee.id_employee;
     const formVal = this.employeesForm.value;
+
+    // Show loading toast
+    const loadingToast = this.toastr.info('Guardando cambios...', 'Por favor espere', {
+      disableTimeOut: true,
+      tapToDismiss: false
+    });
+
     const proceedWithUpdate = (path?: string) => {
       const employeeData: any = {
         name_employee: formVal.name_employee,
@@ -739,6 +755,7 @@ export class EmployeesComponent implements OnInit {
 
       this.employeesAdapterService.put(employeeId, employeeData).subscribe({
         next: () => {
+          this.toastr.clear(loadingToast.toastId);
           this.toastr.success('Empleado actualizado correctamente', 'Éxito');
           this.hasConsulted = true;
           this.loadEmployees();
@@ -746,6 +763,7 @@ export class EmployeesComponent implements OnInit {
           this.setCreateMode();
         },
         error: err => {
+          this.toastr.clear(loadingToast.toastId);
           console.error('Error al actualizar empleado:', err);
           const errorMessage = err?.error?.message || err?.message || 'Error desconocido';
           this.toastr.error(`Error al actualizar: ${errorMessage}`, 'Error');
@@ -759,6 +777,7 @@ export class EmployeesComponent implements OnInit {
           proceedWithUpdate(response.path);
         },
         error: (err) => {
+          this.toastr.clear(loadingToast.toastId);
           console.error('Error uploading file', err);
           this.toastr.error('Error al subir el archivo', 'Error');
         }
