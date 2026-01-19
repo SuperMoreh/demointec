@@ -533,6 +533,7 @@ export class EmployeesComponent implements OnInit {
             city: fullData.city,
             state: fullData.state,
             contract_type: fullData.contract_type, // Patch contract_type (Edit)
+            contract_expiration: fullData.contract_expiration,
 
             imss_salary: fullData.imss_salary,
             base_salary: fullData.base_salary,
@@ -600,6 +601,7 @@ export class EmployeesComponent implements OnInit {
       height: employee.height,
       shirt_size: employee.shirt_size,
       diseases: employee.diseases,
+      contract_expiration: employee.contract_expiration,
       emergency_phone: employee.emergency_phone,
       emergency_contact_name: employee.emergency_contact_name,
       emergency_contact_relationship: employee.emergency_contact_relationship,
