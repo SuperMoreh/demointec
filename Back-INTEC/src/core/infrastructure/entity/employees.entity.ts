@@ -184,6 +184,9 @@ export class EmployeeEntity {
   @Column({ name: 'diseases', type: 'text', nullable: true })
   diseases!: string;
 
+  @Column({ name: 'contract_expiration', type: 'varchar', length: 20, nullable: true })
+  contract_expiration!: string;
+
   @Column({ name: 'emergency_phone', type: 'varchar', length: 50, nullable: true })
   emergency_phone!: string;
 
