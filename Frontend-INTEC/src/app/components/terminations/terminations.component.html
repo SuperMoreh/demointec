@@ -92,8 +92,10 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Motivo de Baja</label>
-                        <input type="text" class="form-control" formControlName="reason"
-                            placeholder="Ej. Renuncia voluntaria">
+                        <select class="form-select" formControlName="reason">
+                            <option value="">Seleccione un motivo</option>
+                            <option *ngFor="let reason of reasonOptions" [value]="reason">{{ reason }}</option>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Fecha de entrega de finiquito</label>

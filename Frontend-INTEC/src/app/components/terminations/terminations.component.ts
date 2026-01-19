@@ -31,6 +31,15 @@ export class TerminationsComponent implements OnInit {
     formModal: any;
     viewModal: any;
 
+    // Dropdown options for termination reason
+    reasonOptions = [
+        'Renuncia voluntaria',
+        'Término de contrato',
+        'Término de proyecto',
+        'Desvinculación',
+        'Abandono de trabajo'
+    ];
+
     constructor(
         private terminationsService: TerminationsAdapterService,
         private employeesService: EmployeesAdapterService,
