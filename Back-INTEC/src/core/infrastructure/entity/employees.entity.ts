@@ -133,6 +133,9 @@ export class EmployeeEntity {
   @Column({ name: 'child5_birth_date', type: 'varchar', length: 100, nullable: true })
   child5_birth_date!: string;
 
+  @Column({ name: 'beneficiaries_count', type: 'int', nullable: true })
+  beneficiaries_count!: number;
+
   @Column({ name: 'beneficiary', type: 'varchar', length: 100, nullable: true })
   beneficiary!: string;
 
@@ -141,6 +144,24 @@ export class EmployeeEntity {
 
   @Column({ name: 'beneficiary_percentage', type: 'varchar', length: 50, nullable: true })
   beneficiary_percentage!: string;
+
+  @Column({ name: 'beneficiary2_name', type: 'varchar', length: 100, nullable: true })
+  beneficiary2_name!: string;
+
+  @Column({ name: 'beneficiary2_relationship', type: 'varchar', length: 100, nullable: true })
+  beneficiary2_relationship!: string;
+
+  @Column({ name: 'beneficiary2_percentage', type: 'varchar', length: 50, nullable: true })
+  beneficiary2_percentage!: string;
+
+  @Column({ name: 'beneficiary3_name', type: 'varchar', length: 100, nullable: true })
+  beneficiary3_name!: string;
+
+  @Column({ name: 'beneficiary3_relationship', type: 'varchar', length: 100, nullable: true })
+  beneficiary3_relationship!: string;
+
+  @Column({ name: 'beneficiary3_percentage', type: 'varchar', length: 50, nullable: true })
+  beneficiary3_percentage!: string;
 
   @Column({ name: 'infonavit_credit_number', type: 'varchar', length: 100, nullable: true })
   infonavit_credit_number!: string;
@@ -156,6 +177,12 @@ export class EmployeeEntity {
 
   @Column({ name: 'height', type: 'varchar', length: 20, nullable: true })
   height!: string;
+
+  @Column({ name: 'shirt_size', type: 'varchar', length: 20, nullable: true })
+  shirt_size!: string;
+
+  @Column({ name: 'diseases', type: 'text', nullable: true })
+  diseases!: string;
 
   @Column({ name: 'emergency_phone', type: 'varchar', length: 50, nullable: true })
   emergency_phone!: string;
