@@ -132,8 +132,15 @@ export class EmployeesController {
       }
 
       res.status(200).json({ message: 'Actualizado correctamente' });
-    } catch (error) {
-      res.status(500).json({ message: 'Error al actualizar al colaborador', error });
+    } catch (error: any) {
+      console.error('Error al actualizar colaborador:', error);
+      const errorMessage = error?.message || 'Error desconocido';
+      const errorDetail = error?.detail || error?.sqlMessage || '';
+      res.status(500).json({
+        message: `Error al actualizar al colaborador: ${errorMessage}`,
+        detail: errorDetail,
+        error: error?.toString()
+      });
     }
   }
 
