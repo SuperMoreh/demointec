@@ -31,6 +31,8 @@ interface RequestRecord {
     endDate: string;
     daysCount: number;
     description: string;
+    reason: string;
+    withPay: boolean;
     documentUrl?: string;
     requestDate: string;
 }
@@ -86,7 +88,9 @@ export class PermissionsVacationsComponent implements OnInit {
             employeeId: ['', Validators.required],
             startDate: ['', Validators.required],
             endDate: ['', Validators.required],
-            description: ['']
+            reason: ['', Validators.required],
+            description: [''],
+            withPay: [false]
         });
     }
 
@@ -260,7 +264,10 @@ export class PermissionsVacationsComponent implements OnInit {
 
     openCreateModal(type: 'Vacaciones' | 'Permiso'): void {
         this.requestType = type;
-        this.requestForm.reset();
+        this.requestForm.reset({
+            withPay: false,
+            reason: type === 'Vacaciones' ? 'Vacaciones' : ''
+        });
         this.requestForm.enable();
         this.selectedFile = null;
         this.editingRequestId = null;
@@ -282,7 +289,9 @@ export class PermissionsVacationsComponent implements OnInit {
             employeeId: employeeId,
             startDate: record.startDate,
             endDate: record.endDate,
-            description: record.description
+            reason: record.reason || '',
+            description: record.description || '',
+            withPay: !!record.withPay
         });
         this.requestForm.enable();
 
@@ -300,7 +309,9 @@ export class PermissionsVacationsComponent implements OnInit {
             employeeId: employeeId,
             startDate: record.startDate,
             endDate: record.endDate,
-            description: record.description
+            reason: record.reason || '',
+            description: record.description || '',
+            withPay: !!record.withPay
         });
         this.requestForm.disable();
 
@@ -355,6 +366,12 @@ export class PermissionsVacationsComponent implements OnInit {
 
     async saveRequest(): Promise<void> {
         if (this.isReadOnly) return; // Prevention
+
+        // If it's Vacations, ensure a default reason to pass validation
+        if (this.requestType === 'Vacaciones' && !this.requestForm.get('reason')?.value) {
+            this.requestForm.patchValue({ reason: 'Vacaciones' });
+        }
+
         if (this.requestForm.invalid) {
             this.toastr.warning('Por favor complete los campos requeridos');
             return;
@@ -417,7 +434,9 @@ export class PermissionsVacationsComponent implements OnInit {
                     startDate: formValues.startDate,
                     endDate: formValues.endDate,
                     daysCount: daysCount,
+                    reason: formValues.reason,
                     description: formValues.description,
+                    withPay: formValues.withPay,
                     // Only update docUrl if new one uploaded, else keep old
                     documentUrl: docPath || savedRequests[index].documentUrl
                 };
@@ -432,7 +451,9 @@ export class PermissionsVacationsComponent implements OnInit {
                 startDate: formValues.startDate,
                 endDate: formValues.endDate,
                 daysCount: daysCount,
+                reason: formValues.reason,
                 description: formValues.description,
+                withPay: formValues.withPay,
                 documentUrl: docPath,
                 requestDate: new Date().toISOString().split('T')[0]
             };

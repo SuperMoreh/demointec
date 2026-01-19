@@ -131,8 +131,24 @@
                                 <input type="date" formControlName="endDate" class="form-control">
                             </div>
                         </div>
+                        <div class="row" *ngIf="requestType === 'Permiso'">
+                            <div class="col-md-12 mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" formControlName="withPay"
+                                        id="withPaySwitch">
+                                    <label class="form-check-label" for="withPaySwitch">Permiso con Goce de
+                                        Sueldo</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3" *ngIf="requestType === 'Permiso'">
+                            <label class="form-label">Motivo</label>
+                            <input type="text" formControlName="reason" class="form-control"
+                                placeholder="Ej. Cita Médica, Trámite Personal...">
+                        </div>
                         <div class="mb-3">
-                            <label class="form-label">Descripción / Motivo</label>
+                            <label class="form-label">{{ requestType === 'Permiso' ? 'Descripción Detallada' :
+                                'Descripción / Motivo' }}</label>
                             <textarea formControlName="description" class="form-control" rows="3"></textarea>
                         </div>
                     </div>
@@ -184,6 +200,7 @@
                                 <th>Hasta</th>
                                 <th>Días</th>
                                 <th>Motivo</th>
+                                <th>Descripción</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -201,6 +218,12 @@
                                 <td>{{ req.startDate }}</td>
                                 <td>{{ req.endDate }}</td>
                                 <td style="font-weight: bold; text-align: center;">{{ req.daysCount }}</td>
+                                <td>
+                                    <div class="fw-bold">{{ req.reason || '-' }}</div>
+                                    <div class="small text-muted" *ngIf="req.type === 'Permiso'">
+                                        {{ req.withPay ? 'Con Goce' : 'Sin Goce' }}
+                                    </div>
+                                </td>
                                 <td>{{ req.description }}</td>
                                 <td>
                                     <div class="action-buttons">
