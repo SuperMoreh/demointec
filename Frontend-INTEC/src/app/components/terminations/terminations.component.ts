@@ -54,8 +54,7 @@ export class TerminationsComponent implements OnInit {
             reason: ['', Validators.required],
             severance_date: [''],
             observation: [''],
-            document_path: [''],
-            document_name: ['']
+            document_path: ['']
         });
     }
 
@@ -128,8 +127,7 @@ export class TerminationsComponent implements OnInit {
             reason: termination.reason,
             severance_date: termination.severance_date,
             observation: termination.observation,
-            document_path: termination.document_path,
-            document_name: termination.document_name
+            document_path: termination.document_path
         });
         this.showModal();
     }
