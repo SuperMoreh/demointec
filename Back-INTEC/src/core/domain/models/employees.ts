@@ -55,6 +55,7 @@ export class Employee {
   private emergency_contact_name: string | undefined;
   private emergency_contact_relationship: string | undefined;
   private allergies: string | undefined;
+  private contract_expiration: string | undefined;
 
 
   public get getId(): number | undefined {
@@ -294,4 +295,6 @@ export class Employee {
   public get getAllergies(): string | undefined { return this.allergies; }
   public set setAllergies(allergies: string | undefined) { this.allergies = allergies; }
 
+  public get getContractExpiration(): string | undefined { return this.contract_expiration; }
+  public set setContractExpiration(contract_expiration: string | undefined) { this.contract_expiration = contract_expiration; }
 }

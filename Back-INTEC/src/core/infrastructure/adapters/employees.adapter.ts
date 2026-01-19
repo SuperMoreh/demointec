@@ -172,7 +172,8 @@ export class EmployeesAdapterRepository implements EmployeesRepository<EmployeeE
           emergency_phone: item.emergency_phone || '',
           emergency_contact_name: item.emergency_contact_name || '',
           emergency_contact_relationship: item.emergency_contact_relationship || '',
-          allergies: item.allergies || ''
+          allergies: item.allergies || '',
+          contract_expiration: item.contract_expiration || ''
         };
 
         operaciones.push(
@@ -284,7 +285,8 @@ export class EmployeesAdapterRepository implements EmployeesRepository<EmployeeE
       emergency_phone: employee.emergency_phone || '',
       emergency_contact_name: employee.emergency_contact_name || '',
       emergency_contact_relationship: employee.emergency_contact_relationship || '',
-      allergies: employee.allergies || ''
+      allergies: employee.allergies || '',
+      contract_expiration: employee.contract_expiration || ''
     });
   }
 
@@ -358,7 +360,8 @@ export class EmployeesAdapterRepository implements EmployeesRepository<EmployeeE
       emergency_phone: employee.emergency_phone || '',
       emergency_contact_name: employee.emergency_contact_name || '',
       emergency_contact_relationship: employee.emergency_contact_relationship || '',
-      allergies: employee.allergies || ''
+      allergies: employee.allergies || '',
+      contract_expiration: employee.contract_expiration || ''
     });
   }
 
