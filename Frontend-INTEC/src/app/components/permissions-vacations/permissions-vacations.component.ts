@@ -200,7 +200,7 @@ export class PermissionsVacationsComponent implements OnInit {
                 let diasPorTomarCurrent = entitlementCurrent - takenCurrent;
 
                 const saldoTotal = diasPorTomarPrevious + diasPorTomarCurrent;
-                const num = (index + 1).toString().padStart(4, '0');
+                const num = emp.employee_code || (index + 1).toString().padStart(4, '0');
 
                 return {
                     id: emp.id_employee,

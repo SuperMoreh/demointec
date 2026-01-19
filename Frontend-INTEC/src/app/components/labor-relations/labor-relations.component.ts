@@ -31,6 +31,9 @@ export class LaborRelationsComponent implements OnInit {
     // Panel 3: Uniforms
     uniformForm: FormGroup;
 
+    // Alertas
+    expiringContracts: any[] = [];
+
     constructor(
         private fb: FormBuilder,
         private employeesService: EmployeesAdapterService,
@@ -45,7 +48,9 @@ export class LaborRelationsComponent implements OnInit {
             event_date: ['', Validators.required],
             event_name: ['', Validators.required],
             observation: [''],
-            document_path: ['']
+            document_path: [''],
+            is_contract: [false],
+            new_expiration_date: ['']
         });
 
         this.uniformForm = this.fb.group({
@@ -73,9 +78,27 @@ export class LaborRelationsComponent implements OnInit {
             next: (data) => {
                 this.employees = data;
                 this.filteredEmployees = [];
+                this.checkExpiringContracts();
             },
             error: (err) => console.error(err)
         });
+    }
+
+    checkExpiringContracts() {
+        const today = new Date();
+        const nextMonth = new Date();
+        nextMonth.setMonth(today.getMonth() + 1);
+
+        this.expiringContracts = this.employees
+            .filter(emp => emp.contract_expiration)
+            .map(emp => {
+                const expiration = new Date(emp.contract_expiration!);
+                const diffTime = expiration.getTime() - today.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return { ...emp, daysLeft: diffDays };
+            })
+            .filter(emp => emp.daysLeft <= 30 && emp.daysLeft >= -5) // Show alerts for next 30 days or recently expired
+            .sort((a, b) => a.daysLeft - b.daysLeft);
     }
 
     filterEmployees(term: string) {
@@ -160,6 +183,22 @@ export class LaborRelationsComponent implements OnInit {
 
         this.laborService.createEvent(formData).subscribe({
             next: () => {
+                // If it's a contract renovation, update the employee record as well
+                if (this.eventForm.get('is_contract')?.value && this.eventForm.get('new_expiration_date')?.value) {
+                    const updatedEmployee = {
+                        ...this.selectedEmployee,
+                        contract_expiration: this.eventForm.get('new_expiration_date')?.value
+                    } as Employee;
+
+                    this.employeesService.put(updatedEmployee.id_employee, updatedEmployee).subscribe({
+                        next: () => {
+                            this.toastr.success('Vencimiento de contrato actualizado en el colaborador');
+                            this.loadEmployees(); // Refresh locally
+                        },
+                        error: (err) => console.error('Error updating employee contract expiration:', err)
+                    });
+                }
+
                 this.toastr.success('Evento agregado');
                 this.eventForm.reset();
                 this.selectedFile = null;
@@ -288,8 +327,18 @@ export class LaborRelationsComponent implements OnInit {
     // Alias for backward compatibility if template uses openAddEventModal
     openAddEventModal() {
         this.eventForm.reset();
+        this.eventForm.get('is_contract')?.setValue(false);
         this.selectedFile = null;
         this.openModal('addEventModal');
+    }
+
+    onContractToggle() {
+        const isContract = this.eventForm.get('is_contract')?.value;
+        if (isContract) {
+            this.eventForm.get('event_name')?.setValue('Vencimiento / Renovación de contrato');
+        } else {
+            this.eventForm.get('event_name')?.setValue('');
+        }
     }
 
     closeModal(modalId: string) {

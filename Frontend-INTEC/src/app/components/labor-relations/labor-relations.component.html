@@ -3,6 +3,30 @@
         <h1 class="page-title">Relaciones Laborales</h1>
     </div>
 
+    <!-- Panel de Alertas de Vencimiento de Contrato -->
+    <div *ngIf="expiringContracts.length > 0" class="alert alert-warning border-start border-4 mb-4 shadow-sm">
+        <h6 class="fw-bold mb-2"><i class="bi bi-exclamation-triangle-fill"></i> Alertas de Vencimiento de Contrato
+            (Próximos 30 días)</h6>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
+            <div *ngFor="let alert of expiringContracts" class="col">
+                <div class="p-2 border rounded bg-white" style="font-size: 0.85rem;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <strong class="text-truncate" style="max-width: 150px;">{{ alert.name_employee }}</strong>
+                        <span class="badge"
+                            [ngClass]="alert.daysLeft < 0 ? 'bg-danger' : (alert.daysLeft <= 7 ? 'bg-warning text-dark' : 'bg-info text-dark')">
+                            {{ alert.daysLeft < 0 ? 'Expiró' : 'Quedan ' + alert.daysLeft + ' días' }} </span>
+                    </div>
+                    <div class="text-muted small mt-1">
+                        {{ alert.contract_expiration | date:'dd/MM/yyyy' }} - {{ alert.position }}
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary w-100 mt-2 py-0" (click)="selectEmployee(alert)">
+                        Atender
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Panel 1: Búsqueda -->
     <div class="filters-section">
         <h5 class="mb-3" style="font-weight: 400; color: #555;">Búsqueda de Colaborador</h5>
@@ -196,6 +220,21 @@
                         <label class="form-label">Nombre del Evento</label>
                         <input type="text" class="form-control" formControlName="event_name"
                             placeholder="Ej: Amonestación, Ascenso...">
+                    </div>
+
+                    <div class="mb-3 p-3 border rounded bg-light">
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="isContract"
+                                formControlName="is_contract" (change)="onContractToggle()">
+                            <label class="form-check-label fw-bold" for="isContract">¿Es renovación de contrato?</label>
+                        </div>
+                        <div *ngIf="eventForm.get('is_contract')?.value" class="mt-2">
+                            <label class="form-label">Nueva Fecha de Vencimiento</label>
+                            <input type="date" class="form-control border-primary"
+                                formControlName="new_expiration_date">
+                            <small class="text-primary"><i class="bi bi-info-circle"></i> Al guardar, se actualizará el
+                                expediente del colaborador.</small>
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Observación</label>

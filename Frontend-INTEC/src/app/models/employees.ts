@@ -60,6 +60,7 @@ export interface Employee {
   height?: string;
   shirt_size?: string;
   diseases?: string;
+  contract_expiration?: string;
   emergency_phone?: string;
   emergency_contact_name?: string;
   emergency_contact_relationship?: string;

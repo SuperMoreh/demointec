@@ -55,6 +55,7 @@
       <table class="users-table">
         <thead>
           <tr>
+            <th>NUM</th>
             <th>Nombre</th>
             <th>Email</th>
             <th>Teléfono</th>
@@ -67,6 +68,7 @@
         </thead>
         <tbody>
           <tr *ngFor="let employee of employees">
+            <td>{{ employee.employee_code || '---' }}</td>
             <td>{{ employee.name_employee }}</td>
             <td>{{ employee.email }}</td>
             <td>{{ employee.phone }}</td>
@@ -230,6 +232,10 @@
                   <option value="">Seleccione...</option>
                   <option *ngFor="let type of contractTypeOptions" [value]="type">{{ type }}</option>
                 </select>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Vencimiento de Contrato</label>
+                <input formControlName="contract_expiration" type="date" class="form-control">
               </div>
             </div>
           </div>
@@ -689,6 +695,7 @@
         <div class="section-panel">
           <h6 class="mb-3">Información Principal</h6>
           <div class="mb-3">
+            <label class="form-label">NUM / ID Empleado</label>
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-card-text"></i></span>
               <input type="text" class="form-control" [value]="selectedEmployee.employee_code" disabled
@@ -746,6 +753,11 @@
             <div class="col-md-4 mb-3">
               <label class="form-label">Tipo de Contrato</label>
               <input type="text" class="form-control" [value]="selectedEmployee.contract_type" disabled>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label text-danger fw-bold">Vencimiento de Contrato</label>
+              <input type="text" class="form-control border-danger"
+                [value]="selectedEmployee.contract_expiration | date:'dd/MM/yyyy'" disabled>
             </div>
           </div>
         </div>
@@ -1238,6 +1250,10 @@
                   <option value="">Seleccione...</option>
                   <option *ngFor="let type of contractTypeOptions" [value]="type">{{ type }}</option>
                 </select>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Vencimiento de Contrato</label>
+                <input formControlName="contract_expiration" type="date" class="form-control">
               </div>
             </div>
           </div>
