@@ -12,6 +12,7 @@ import { JobDescription, JobDescriptionAdapterService } from '../../adapters/job
 import { AttendancesAdapterService } from '../../adapters/attendances.adapter';
 import { Attendance } from '../../models/attendances';
 import { UploadAdapterService } from '../../adapters/upload.adapter';
+import { LaborRelationsAdapterService } from '../../adapters/labor-relations.adapter';
 
 @Component({
   selector: 'app-employees',
@@ -69,7 +70,8 @@ export class EmployeesComponent implements OnInit {
     private jobDescriptionAdapter: JobDescriptionAdapterService,
     private rolesAdapter: RoleAdapterService,
     private attendancesAdapter: AttendancesAdapterService,
-    private uploadService: UploadAdapterService
+    private uploadService: UploadAdapterService,
+    private laborRelationsAdapter: LaborRelationsAdapterService
   ) {
     this.employeesForm = this.fb.group({
       name_employee: ['', Validators.required],
@@ -461,6 +463,12 @@ export class EmployeesComponent implements OnInit {
       next: () => {
         this.toastr.clear(loadingToast.toastId);
         this.toastr.success('Empleado creado correctamente', 'Éxito');
+
+        // Push contract event if date is set
+        if (employeeData.contract_expiration) {
+          this.syncContractToLaborEvents(employeeData.id_employee, employeeData.contract_expiration);
+        }
+
         this.setCreateMode();
         this.hasConsulted = true;
         this.loadEmployees();
@@ -760,6 +768,12 @@ export class EmployeesComponent implements OnInit {
         next: () => {
           this.toastr.clear(loadingToast.toastId);
           this.toastr.success('Empleado actualizado correctamente', 'Éxito');
+
+          // Push contract event if date is set and changed
+          if (employeeData.contract_expiration && employeeData.contract_expiration !== this.selectedEmployee?.contract_expiration) {
+            this.syncContractToLaborEvents(employeeId, employeeData.contract_expiration);
+          }
+
           this.hasConsulted = true;
           this.loadEmployees();
           this.closeEditModal();
@@ -1119,5 +1133,18 @@ export class EmployeesComponent implements OnInit {
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Empleados');
     XLSX.writeFile(wb, 'Reporte_Empleados.xlsx');
+  }
+
+  private syncContractToLaborEvents(employeeId: string, expirationDate: string) {
+    const formData = new FormData();
+    formData.append('id_employee', employeeId);
+    formData.append('event_date', new Date().toISOString().split('T')[0]);
+    formData.append('event_name', 'Vencimiento de contrato actualizado');
+    formData.append('observation', `Nueva fecha de vencimiento establecida para el: ${expirationDate}`);
+
+    this.laborRelationsAdapter.createEvent(formData).subscribe({
+      next: () => console.log('Labor event created for contract expiration update'),
+      error: (err: any) => console.error('Error creating labor event for contract update:', err)
+    });
   }
 }
