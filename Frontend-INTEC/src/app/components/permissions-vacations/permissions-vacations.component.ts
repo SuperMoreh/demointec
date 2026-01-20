@@ -33,6 +33,7 @@ interface RequestRecord {
     description: string;
     reason: string;
     withPay: boolean;
+    vacationYear?: number;
     documentUrl?: string;
     requestDate: string;
 }
@@ -77,6 +78,9 @@ export class PermissionsVacationsComponent implements OnInit {
     isReadOnly: boolean = false;
     currentDocumentUrl: string | null = null;
 
+    // Vacation Years for dropdown
+    availableVacationYears: number[] = [];
+
     constructor(
         private employeesAdapter: EmployeesAdapterService,
         private docService: EmployeeDocumentsAdapterService,
@@ -90,8 +94,13 @@ export class PermissionsVacationsComponent implements OnInit {
             endDate: ['', Validators.required],
             reason: ['', Validators.required],
             description: [''],
-            withPay: [false]
+            withPay: [false],
+            vacationYear: [null]
         });
+
+        // Generate available years (current and 2 previous years)
+        const currentYear = new Date().getFullYear();
+        this.availableVacationYears = [currentYear - 2, currentYear - 1, currentYear];
     }
 
     ngOnInit(): void {
@@ -291,7 +300,8 @@ export class PermissionsVacationsComponent implements OnInit {
             endDate: record.endDate,
             reason: record.reason || '',
             description: record.description || '',
-            withPay: !!record.withPay
+            withPay: !!record.withPay,
+            vacationYear: record.vacationYear || null
         });
         this.requestForm.enable();
 
@@ -311,7 +321,8 @@ export class PermissionsVacationsComponent implements OnInit {
             endDate: record.endDate,
             reason: record.reason || '',
             description: record.description || '',
-            withPay: !!record.withPay
+            withPay: !!record.withPay,
+            vacationYear: record.vacationYear || null
         });
         this.requestForm.disable();
 
@@ -437,6 +448,7 @@ export class PermissionsVacationsComponent implements OnInit {
                     reason: formValues.reason,
                     description: formValues.description,
                     withPay: formValues.withPay,
+                    vacationYear: this.requestType === 'Vacaciones' ? formValues.vacationYear : null,
                     // Only update docUrl if new one uploaded, else keep old
                     documentUrl: docPath || savedRequests[index].documentUrl
                 };
@@ -454,6 +466,7 @@ export class PermissionsVacationsComponent implements OnInit {
                 reason: formValues.reason,
                 description: formValues.description,
                 withPay: formValues.withPay,
+                vacationYear: this.requestType === 'Vacaciones' ? formValues.vacationYear : null,
                 documentUrl: docPath,
                 requestDate: new Date().toISOString().split('T')[0]
             };

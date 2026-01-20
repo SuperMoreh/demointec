@@ -131,6 +131,17 @@
                                 <input type="date" formControlName="endDate" class="form-control">
                             </div>
                         </div>
+                        <div class="row" *ngIf="requestType === 'Vacaciones'">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Año de Vacaciones a Descontar</label>
+                                <select formControlName="vacationYear" class="form-select">
+                                    <option [ngValue]="null">Seleccione el año...</option>
+                                    <option *ngFor="let year of availableVacationYears" [ngValue]="year">{{ year }}
+                                    </option>
+                                </select>
+                                <small class="text-muted">Indica de qué año se tomarán los días de vacaciones</small>
+                            </div>
+                        </div>
                         <div class="row" *ngIf="requestType === 'Permiso'">
                             <div class="col-md-12 mb-3">
                                 <div class="form-check form-switch">
@@ -199,6 +210,7 @@
                                 <th>Desde</th>
                                 <th>Hasta</th>
                                 <th>Días</th>
+                                <th>Año</th>
                                 <th>Motivo</th>
                                 <th>Descripción</th>
                                 <th>Acciones</th>
@@ -218,6 +230,11 @@
                                 <td>{{ req.startDate }}</td>
                                 <td>{{ req.endDate }}</td>
                                 <td style="font-weight: bold; text-align: center;">{{ req.daysCount }}</td>
+                                <td style="text-align: center;">
+                                    <span *ngIf="req.type === 'Vacaciones' && req.vacationYear" class="badge bg-info">{{
+                                        req.vacationYear }}</span>
+                                    <span *ngIf="req.type !== 'Vacaciones' || !req.vacationYear">-</span>
+                                </td>
                                 <td>
                                     <div class="fw-bold">{{ req.reason || '-' }}</div>
                                     <div class="small text-muted" *ngIf="req.type === 'Permiso'">
@@ -243,7 +260,7 @@
                                 </td>
                             </tr>
                             <tr *ngIf="selectedEmployeeHistory.length === 0">
-                                <td colspan="7" class="text-center py-4">No hay registros encontrados.</td>
+                                <td colspan="9" class="text-center py-4">No hay registros encontrados.</td>
                             </tr>
                         </tbody>
                     </table>
