@@ -181,75 +181,9 @@ export class EmployeesController {
   private async syncJobDocuments(employeeId: string, position: string) {
     try {
       console.log(`[syncJobDocuments] START: Employee=${employeeId}, Position='${position}'`);
-      const jobRepo = database.getRepository(JobDescriptionEntity);
-
-      // Try to find the job description. Log what we are searching for.
-      // Note: loosen the status check or log if it fails due to status
-      const job = await jobRepo.findOne({ where: { job_title: position } }); // Removed status check for debugging
-
-      if (!job) {
-        console.warn(`[syncJobDocuments] Job Description NOT FOUND for position: '${position}'`);
-        return;
-      }
-
-      console.log(`[syncJobDocuments] Found Job: ID=${job.id}, Status=${job.status}, Docs=${job.required_documents}`);
-
-      if (!job.status) {
-        console.warn(`[syncJobDocuments] Job found but is INACTIVE (status=${job.status}). Skipping sync.`);
-        // Uncomment return if we strictly want to ignore inactive jobs
-        // return; 
-      }
-
-      if (job && job.required_documents) {
-        let requiredDocs: any[] = [];
-        try {
-          requiredDocs = JSON.parse(job.required_documents);
-        } catch (e) {
-          console.error('[syncJobDocuments] Error parsing required docs JSON', e);
-          return;
-        }
-
-        if (!Array.isArray(requiredDocs)) {
-          console.warn('[syncJobDocuments] required_documents is NOT an array');
-          return;
-        }
-
-        console.log(`[syncJobDocuments] Processing ${requiredDocs.length} documents...`);
-
-        const docRepo = database.getRepository(EmployeeDocumentEntity);
-
-        for (const item of requiredDocs) {
-          const docName = typeof item === 'string' ? item : item.name;
-          const docPath = typeof item === 'string' ? '' : (item.path || '');
-
-          if (!docName) continue;
-
-          console.log(`[syncJobDocuments] Checking doc: '${docName}'`);
-
-          const existingDoc = await docRepo.findOne({
-            where: { id_employee: employeeId, document_type: docName }
-          });
-
-          if (!existingDoc) {
-            const newDoc = new EmployeeDocumentEntity();
-            newDoc.id_employee = employeeId;
-            newDoc.document_type = docName;
-            newDoc.document_path = docPath;
-            newDoc.upload_date = new Date();
-            await docRepo.save(newDoc);
-            console.log(`[syncJobDocuments] CREATED document '${docName}' for employee ${employeeId}`);
-          } else {
-            console.log(`[syncJobDocuments] Document '${docName}' already exists.`);
-            if (existingDoc.document_path === '' && docPath !== '') {
-              existingDoc.document_path = docPath;
-              await docRepo.save(existingDoc);
-              console.log(`[syncJobDocuments] UPDATED document '${docName}' with template path`);
-            }
-          }
-        }
-      } else {
-        console.log('[syncJobDocuments] Job description has NO documents configured.');
-      }
+      // Note: required_documents field was removed in the job description restructure.
+      // This function is now a placeholder for future document sync logic.
+      console.log('[syncJobDocuments] Document sync skipped - restructured job descriptions no longer use required_documents field.');
     } catch (error) {
       console.error('[syncJobDocuments] FATAL ERROR:', error);
     }
