@@ -98,9 +98,9 @@ export class PermissionsVacationsComponent implements OnInit {
             vacationYear: [null]
         });
 
-        // Generate available years (current and 2 previous years)
+        // Generate available years: only current year and previous year
         const currentYear = new Date().getFullYear();
-        this.availableVacationYears = [currentYear - 2, currentYear - 1, currentYear];
+        this.availableVacationYears = [currentYear - 1, currentYear];
     }
 
     ngOnInit(): void {
@@ -190,14 +190,14 @@ export class PermissionsVacationsComponent implements OnInit {
 
                 const empHistory = savedRequests.filter((r: any) => r.employeeId === emp.id_employee);
 
-                // Calculate Taken Days for Previous Year
+                // Calculate Taken Days for Previous Year - using vacationYear field
                 const takenPrevious = empHistory
-                    .filter((r: any) => r.type === 'Vacaciones' && new Date(r.startDate).getFullYear() === previousYear)
+                    .filter((r: any) => r.type === 'Vacaciones' && r.vacationYear === previousYear)
                     .reduce((sum: number, r: any) => sum + (r.daysCount || 0), 0);
 
-                // Calculate Taken Days for Current Year
+                // Calculate Taken Days for Current Year - using vacationYear field
                 const takenCurrent = empHistory
-                    .filter((r: any) => r.type === 'Vacaciones' && new Date(r.startDate).getFullYear() === currentYear)
+                    .filter((r: any) => r.type === 'Vacaciones' && r.vacationYear === currentYear)
                     .reduce((sum: number, r: any) => sum + (r.daysCount || 0), 0);
 
                 let diasPorTomarPrevious = entitlementPrevious - takenPrevious;
