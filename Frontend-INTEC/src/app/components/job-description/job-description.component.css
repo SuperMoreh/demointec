@@ -382,3 +382,22 @@
 .modal {
     z-index: 1050;
 }
+
+/* Section titles with light blue background */
+.section-title {
+    background-color: #d1ecf1 !important;
+    color: #0c5460;
+    font-weight: 600;
+    padding: 0.75rem 1rem !important;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    border-left: 4px solid #54ADEC !important;
+}
+
+/* Table headers with light blue background */
+.table-secondary th,
+.table-secondary td {
+    background-color: #b8e0f0 !important;
+    color: #0c5460;
+    font-weight: 600;
+}
