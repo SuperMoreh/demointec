@@ -14,7 +14,7 @@
         <div class="filters-row">
             <div class="filter-group">
                 <label for="search">Buscar</label>
-                <input type="text" id="search" class="filter-input" placeholder="Puesto, Jefe, Tipo..."
+                <input type="text" id="search" class="filter-input" placeholder="Puesto, Departamento..."
                     [(ngModel)]="searchTerm" (input)="applyFilters()">
             </div>
             <button class="btn-filter" (click)="clearFilters()">
@@ -36,18 +36,16 @@
                 <thead>
                     <tr>
                         <th>Puesto</th>
-                        <th>Jefe Inmediato</th>
-                        <th>Tipo de Empleo</th>
+                        <th>Departamento</th>
+                        <th>Gerente</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr *ngFor="let job of paginatedJobDescriptions">
                         <td><strong>{{ job.job_title }}</strong></td>
-                        <td>{{ job.immediate_boss || 'N/A' }}</td>
-                        <td>
-                            <span class="role-badge">{{ job.employment_type || 'General' }}</span>
-                        </td>
+                        <td>{{ job.department || 'N/A' }}</td>
+                        <td>{{ job.org_manager || 'N/A' }}</td>
                         <td>
                             <div class="action-buttons">
                                 <button class="btn-action btn-view" (click)="viewJob(job)" title="Ver Detalles">
@@ -96,7 +94,7 @@
 <!-- Modal Formulario -->
 <div class="modal-backdrop fade show" *ngIf="isModalOpen"></div>
 <div class="modal fade show d-block" *ngIf="isModalOpen" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title">{{ isViewMode ? 'Detalles de' : (isEditMode ? 'Editar' : 'Nueva') }} Descripción
@@ -106,104 +104,431 @@
             </div>
             <div class="modal-body">
                 <form [formGroup]="jobForm">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Puesto</label>
-                            <input type="text" class="form-control" formControlName="job_title">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Jefe Inmediato</label>
-                            <input type="text" class="form-control" formControlName="immediate_boss">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Subordinados</label>
-                            <input type="text" class="form-control" formControlName="subordinates">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Función Básica</label>
-                            <input type="text" class="form-control" formControlName="basic_function">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Grado de Responsabilidad</label>
-                            <input type="text" class="form-control" formControlName="responsibility_level">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Tipo de Empleo</label>
-                            <input type="text" class="form-control" formControlName="employment_type">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Jornada</label>
-                            <input type="text" class="form-control" formControlName="shift">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Horario Lunes a Viernes</label>
-                            <input type="text" class="form-control" formControlName="schedule_mon_fri">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Horario Fin de Semana</label>
-                            <input type="text" class="form-control" formControlName="schedule_weekend">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Toma de Decisiones</label>
-                            <input type="text" class="form-control" formControlName="decision_making">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Objetivo General</label>
-                            <textarea class="form-control" rows="3" formControlName="general_objective"></textarea>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Funciones</label>
-                            <textarea class="form-control" rows="5" formControlName="functions"
-                                placeholder="Escribe las funciones aquí"></textarea>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Tareas</label>
-                            <textarea class="form-control" rows="5" formControlName="tasks"
-                                placeholder="Escribe las tareas correspondientes aquí"></textarea>
-                        </div>
 
-                        <!-- Documentos Requeridos -->
-                        <div class="col-12">
-                            <label class="form-label fw-bold">Documentos Requeridos</label>
-                            <div class="row g-2 mb-3 align-items-end">
-                                <div class="col-md-5">
-                                    <label class="small text-muted mb-1">Nombre del Documento</label>
-                                    <input type="text" class="form-control" placeholder="Ej: Manual de Operaciones"
-                                        [(ngModel)]="newDocumentName" [ngModelOptions]="{standalone: true}">
+                    <!-- I. Información General del Puesto -->
+                    <div class="section-panel mb-4">
+                        <h6 class="section-title bg-light p-2 border">I.- Información general del puesto</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Nombre de puesto:</label>
+                                <input type="text" class="form-control" formControlName="job_title">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Departamento:</label>
+                                <input type="text" class="form-control" formControlName="department">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- II. Razón de Ser -->
+                    <div class="section-panel mb-4">
+                        <h6 class="section-title bg-light p-2 border">II.- Razón de ser</h6>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Objetivo:</label>
+                                <textarea class="form-control" rows="3" formControlName="objective"
+                                    placeholder="Describe el objetivo principal del puesto"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- III. Funciones Claves -->
+                    <div class="section-panel mb-4">
+                        <h6 class="section-title bg-light p-2 border">III.- Funciones claves</h6>
+
+                        <!-- Matriz de Actividades -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Matriz de Actividades</label>
+                            <table class="table table-bordered table-sm">
+                                <thead class="table-secondary">
+                                    <tr>
+                                        <th style="width: 5%">#</th>
+                                        <th style="width: 40%">Descripción</th>
+                                        <th style="width: 8%" class="text-center">Ejecuta</th>
+                                        <th style="width: 8%" class="text-center">Supervisa</th>
+                                        <th style="width: 8%" class="text-center">Autoriza</th>
+                                        <th style="width: 20%">Frecuencia</th>
+                                        <th style="width: 6%" *ngIf="!isViewMode"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let act of activities; let i = index">
+                                        <td>{{ i + 1 }}</td>
+                                        <td>{{ act.description }}</td>
+                                        <td class="text-center">{{ act.ejecuta ? 'X' : '' }}</td>
+                                        <td class="text-center">{{ act.supervisa ? 'X' : '' }}</td>
+                                        <td class="text-center">{{ act.autoriza ? 'X' : '' }}</td>
+                                        <td>{{ act.frecuencia }}</td>
+                                        <td *ngIf="!isViewMode">
+                                            <button type="button" class="btn btn-sm btn-danger"
+                                                (click)="removeActivity(i)">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf="activities.length === 0">
+                                        <td [attr.colspan]="isViewMode ? 6 : 7" class="text-muted text-center">No hay
+                                            actividades registradas</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- Agregar Actividad -->
+                            <div class="row g-2 align-items-end" *ngIf="!isViewMode">
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control form-control-sm"
+                                        placeholder="Descripción de actividad" [(ngModel)]="newActivity.description"
+                                        [ngModelOptions]="{standalone: true}">
                                 </div>
-                                <div class="col-md-5">
-                                    <label class="small text-muted mb-1">Archivo de Plantilla (Opcional)</label>
-                                    <input type="file" class="form-control" (change)="onFileSelected($event)"
-                                        #fileInput>
+                                <div class="col-md-1">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox"
+                                            [(ngModel)]="newActivity.ejecuta" [ngModelOptions]="{standalone: true}">
+                                        <label class="form-check-label small">Ejecuta</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox"
+                                            [(ngModel)]="newActivity.supervisa" [ngModelOptions]="{standalone: true}">
+                                        <label class="form-check-label small">Supervisa</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox"
+                                            [(ngModel)]="newActivity.autoriza" [ngModelOptions]="{standalone: true}">
+                                        <label class="form-check-label small">Autoriza</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select form-select-sm" [(ngModel)]="newActivity.frecuencia"
+                                        [ngModelOptions]="{standalone: true}">
+                                        <option value="">Frecuencia...</option>
+                                        <option *ngFor="let f of frecuenciaOptions" [value]="f">{{ f }}</option>
+                                    </select>
                                 </div>
                                 <div class="col-md-2">
-                                    <button class="btn btn-success w-100" type="button" (click)="addDocument()"
-                                        [disabled]="isViewMode">
-                                        <i class="bi bi-plus-lg"></i> Añadir
+                                    <button type="button" class="btn btn-success btn-sm w-100" (click)="addActivity()">
+                                        <i class="bi bi-plus-lg"></i> Agregar
                                     </button>
                                 </div>
                             </div>
+                        </div>
 
-                            <ul class="list-group">
-                                <li class="list-group-item d-flex justify-content-between align-items-center"
-                                    *ngFor="let doc of documents; let i = index">
-                                    <div>
-                                        <strong>{{ doc.name }}</strong>
-                                        <span *ngIf="doc.path" class="badge bg-success ms-2">
-                                            <i class="bi bi-file-earmark-check"></i> Archivo adjunto
-                                        </span>
+                        <!-- Matriz de Responsabilidades -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Matriz de Responsabilidades</label>
+                            <table class="table table-bordered table-sm">
+                                <thead class="table-secondary">
+                                    <tr>
+                                        <th style="width: 5%">#</th>
+                                        <th style="width: 45%">Descripción</th>
+                                        <th style="width: 10%" class="text-center">Individual</th>
+                                        <th style="width: 10%" class="text-center">Compartida</th>
+                                        <th style="width: 24%">Puestos y áreas involucradas</th>
+                                        <th style="width: 6%" *ngIf="!isViewMode"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let resp of responsibilities; let i = index">
+                                        <td>{{ i + 1 }}</td>
+                                        <td>{{ resp.description }}</td>
+                                        <td class="text-center">{{ resp.individual ? 'X' : '' }}</td>
+                                        <td class="text-center">{{ resp.compartida ? 'X' : '' }}</td>
+                                        <td>{{ resp.puestos_involucrados }}</td>
+                                        <td *ngIf="!isViewMode">
+                                            <button type="button" class="btn btn-sm btn-danger"
+                                                (click)="removeResponsibility(i)">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf="responsibilities.length === 0">
+                                        <td [attr.colspan]="isViewMode ? 5 : 6" class="text-muted text-center">No hay
+                                            responsabilidades registradas</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- Agregar Responsabilidad -->
+                            <div class="row g-2 align-items-end" *ngIf="!isViewMode">
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control form-control-sm"
+                                        placeholder="Descripción de responsabilidad"
+                                        [(ngModel)]="newResponsibility.description"
+                                        [ngModelOptions]="{standalone: true}">
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox"
+                                            [(ngModel)]="newResponsibility.individual"
+                                            [ngModelOptions]="{standalone: true}">
+                                        <label class="form-check-label small">Individual</label>
                                     </div>
-                                    <button class="btn btn-sm btn-danger" (click)="removeDocument(i)"
-                                        *ngIf="!isViewMode">
-                                        <i class="bi bi-trash"></i>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox"
+                                            [(ngModel)]="newResponsibility.compartida"
+                                            [ngModelOptions]="{standalone: true}">
+                                        <label class="form-check-label small">Compartida</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control form-control-sm"
+                                        placeholder="Puestos involucrados"
+                                        [(ngModel)]="newResponsibility.puestos_involucrados"
+                                        [ngModelOptions]="{standalone: true}">
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-success btn-sm w-100"
+                                        (click)="addResponsibility()">
+                                        <i class="bi bi-plus-lg"></i> Agregar
                                     </button>
-                                </li>
-                                <li class="list-group-item text-muted" *ngIf="documents.length === 0">
-                                    No hay documentos requeridos asignados.
-                                </li>
-                            </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- IV. Relaciones Estratégicas -->
+                    <div class="section-panel mb-4">
+                        <h6 class="section-title bg-light p-2 border">IV.- Relaciones estratégicas</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Internas</label>
+                                <ul class="list-group mb-2">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center"
+                                        *ngFor="let rel of internalRelations; let i = index">
+                                        {{ rel }}
+                                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                            (click)="removeInternalRelation(i)" *ngIf="!isViewMode">
+                                            <i class="bi bi-x"></i>
+                                        </button>
+                                    </li>
+                                    <li class="list-group-item text-muted" *ngIf="internalRelations.length === 0">Sin
+                                        relaciones internas</li>
+                                </ul>
+                                <div class="input-group input-group-sm" *ngIf="!isViewMode">
+                                    <input type="text" class="form-control" placeholder="Agregar relación interna"
+                                        [(ngModel)]="newInternalRelation" [ngModelOptions]="{standalone: true}">
+                                    <button class="btn btn-success" type="button" (click)="addInternalRelation()">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Externas</label>
+                                <ul class="list-group mb-2">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center"
+                                        *ngFor="let rel of externalRelations; let i = index">
+                                        {{ rel }}
+                                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                            (click)="removeExternalRelation(i)" *ngIf="!isViewMode">
+                                            <i class="bi bi-x"></i>
+                                        </button>
+                                    </li>
+                                    <li class="list-group-item text-muted" *ngIf="externalRelations.length === 0">Sin
+                                        relaciones externas</li>
+                                </ul>
+                                <div class="input-group input-group-sm" *ngIf="!isViewMode">
+                                    <input type="text" class="form-control" placeholder="Agregar relación externa"
+                                        [(ngModel)]="newExternalRelation" [ngModelOptions]="{standalone: true}">
+                                    <button class="btn btn-success" type="button" (click)="addExternalRelation()">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- V. Estructura Organizacional -->
+                    <div class="section-panel mb-4">
+                        <h6 class="section-title bg-light p-2 border">Estructura Organizacional</h6>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Gerente:</label>
+                                <input type="text" class="form-control" formControlName="org_manager">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Supervisor:</label>
+                                <input type="text" class="form-control" formControlName="org_supervisor">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Puesto Actual:</label>
+                                <input type="text" class="form-control" [value]="jobForm.get('job_title')?.value"
+                                    disabled>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VI. Características Generales del Perfil -->
+                    <div class="section-panel mb-4">
+                        <h6 class="section-title bg-light p-2 border">V.- Características generales del perfil</h6>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Sexo:</label>
+                                <select class="form-select" formControlName="profile_gender">
+                                    <option value="">Seleccione...</option>
+                                    <option *ngFor="let g of genderOptions" [value]="g">{{ g }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Edad:</label>
+                                <input type="text" class="form-control" formControlName="profile_age"
+                                    placeholder="Ej: 25 a 49 años">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Estado civil:</label>
+                                <input type="text" class="form-control" formControlName="profile_marital_status"
+                                    placeholder="Ej: Indistinto">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Horario:</label>
+                                <input type="text" class="form-control" formControlName="profile_schedule"
+                                    placeholder="Ej: Lunes a viernes de 9am a 6pm">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Disponibilidad para viajar:</label>
+                                <select class="form-select" formControlName="profile_travel_availability">
+                                    <option value="">Seleccione...</option>
+                                    <option *ngFor="let t of travelOptions" [value]="t">{{ t }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Idiomas:</label>
+                                <input type="text" class="form-control" formControlName="profile_languages"
+                                    placeholder="Ej: No es requisito">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Requerimientos extras:</label>
+                                <input type="text" class="form-control" formControlName="profile_extra_requirements"
+                                    placeholder="Ej: Disponibilidad de horario">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VII. Conocimientos y Habilidades -->
+                    <div class="section-panel mb-4">
+                        <h6 class="section-title bg-light p-2 border">VI.- Conocimientos y habilidades</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Escolaridad:</label>
+                                <input type="text" class="form-control" formControlName="education"
+                                    placeholder="Ej: Técnico electricista, Ingeniería o a fin">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Especialidad (Requisito):</label>
+                                <input type="text" class="form-control" formControlName="specialty"
+                                    placeholder="Ej: Electricista">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Experiencia:</label>
+                                <input type="text" class="form-control" formControlName="experience"
+                                    placeholder="Ej: Mínima de 2 años">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">*Software:</label>
+                                <input type="text" class="form-control" formControlName="software"
+                                    placeholder="Ej: No se requiere">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Conocimientos técnicos:</label>
+                                <textarea class="form-control" rows="2" formControlName="technical_knowledge"
+                                    placeholder="Ej: Instalación eléctrica tipo residencial y comercial, lectura de planos"></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Equipos y maquinaria:</label>
+                                <textarea class="form-control" rows="2" formControlName="equipment"
+                                    placeholder="Ej: pistola, taladro"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VIII. Para uso de expediente y Depto. De Personal -->
+                    <div class="section-panel mb-4">
+                        <h6 class="section-title bg-light p-2 border">Para uso de expediente y Depto. De Personal</h6>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Fecha:</label>
+                                <input type="date" class="form-control" formControlName="created_date">
+                            </div>
+                        </div>
+                        <div class="row g-3 mt-2">
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Autorización</label>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Elabora:</label>
+                                <input type="text" class="form-control" formControlName="created_by">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Revisa:</label>
+                                <input type="text" class="form-control" formControlName="reviewed_by">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Autoriza:</label>
+                                <input type="text" class="form-control" formControlName="authorized_by">
+                            </div>
+                        </div>
+
+                        <!-- Control de Cambios -->
+                        <div class="mt-4">
+                            <label class="form-label fw-bold">Control de cambios</label>
+                            <table class="table table-bordered table-sm">
+                                <thead class="table-secondary">
+                                    <tr>
+                                        <th style="width: 5%">#</th>
+                                        <th style="width: 45%">Descripción</th>
+                                        <th style="width: 20%">Fecha</th>
+                                        <th style="width: 25%">Autor</th>
+                                        <th style="width: 5%" *ngIf="!isViewMode"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let log of changeLog; let i = index">
+                                        <td>{{ i + 1 }}</td>
+                                        <td>{{ log.description }}</td>
+                                        <td>{{ log.date }}</td>
+                                        <td>{{ log.author }}</td>
+                                        <td *ngIf="!isViewMode">
+                                            <button type="button" class="btn btn-sm btn-danger"
+                                                (click)="removeChangeLogEntry(i)">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf="changeLog.length === 0">
+                                        <td [attr.colspan]="isViewMode ? 4 : 5" class="text-muted text-center">Sin
+                                            cambios registrados</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="row g-2 align-items-end" *ngIf="!isViewMode">
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control form-control-sm"
+                                        placeholder="Descripción del cambio" [(ngModel)]="newChangeLog.description"
+                                        [ngModelOptions]="{standalone: true}">
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="date" class="form-control form-control-sm"
+                                        [(ngModel)]="newChangeLog.date" [ngModelOptions]="{standalone: true}">
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control form-control-sm" placeholder="Autor"
+                                        [(ngModel)]="newChangeLog.author" [ngModelOptions]="{standalone: true}">
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-success btn-sm w-100"
+                                        (click)="addChangeLogEntry()">
+                                        <i class="bi bi-plus-lg"></i> Agregar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </form>
             </div>
             <div class="modal-footer">

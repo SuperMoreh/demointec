@@ -5,47 +5,94 @@ export class JobDescriptionEntity {
     @PrimaryGeneratedColumn()
     id!: number;
 
+    // I. Información General del Puesto
     @Column({ type: 'varchar', length: 255 })
     job_title!: string;
 
     @Column({ type: 'varchar', length: 255, nullable: true })
-    immediate_boss!: string;
+    department!: string;
+
+    // II. Razón de Ser
+    @Column({ type: 'text', nullable: true })
+    objective!: string;
+
+    // III. Funciones Claves - Matrices (stored as JSON)
+    @Column({ type: 'text', nullable: true })
+    activities_matrix!: string;
 
     @Column({ type: 'text', nullable: true })
-    subordinates!: string;
+    responsibilities_matrix!: string;
+
+    // IV. Relaciones Estratégicas
+    @Column({ type: 'text', nullable: true })
+    internal_relations!: string;
 
     @Column({ type: 'text', nullable: true })
-    basic_function!: string;
+    external_relations!: string;
 
-    @Column({ type: 'varchar', length: 100, nullable: true })
-    responsibility_level!: string;
-
-    @Column({ type: 'varchar', length: 100, nullable: true })
-    employment_type!: string;
-
-    @Column({ type: 'varchar', length: 100, nullable: true })
-    shift!: string;
+    // V. Estructura Organizacional
+    @Column({ type: 'varchar', length: 255, nullable: true })
+    org_manager!: string;
 
     @Column({ type: 'varchar', length: 255, nullable: true })
-    schedule_mon_fri!: string;
+    org_supervisor!: string;
+
+    // VI. Características Generales del Perfil
+    @Column({ type: 'varchar', length: 100, nullable: true })
+    profile_gender!: string;
+
+    @Column({ type: 'varchar', length: 100, nullable: true })
+    profile_age!: string;
+
+    @Column({ type: 'varchar', length: 100, nullable: true })
+    profile_marital_status!: string;
 
     @Column({ type: 'varchar', length: 255, nullable: true })
-    schedule_weekend!: string;
+    profile_schedule!: string;
+
+    @Column({ type: 'varchar', length: 100, nullable: true })
+    profile_travel_availability!: string;
+
+    @Column({ type: 'varchar', length: 255, nullable: true })
+    profile_languages!: string;
 
     @Column({ type: 'text', nullable: true })
-    decision_making!: string;
+    profile_extra_requirements!: string;
+
+    // VII. Conocimientos y Habilidades
+    @Column({ type: 'varchar', length: 255, nullable: true })
+    education!: string;
+
+    @Column({ type: 'varchar', length: 255, nullable: true })
+    specialty!: string;
+
+    @Column({ type: 'varchar', length: 255, nullable: true })
+    experience!: string;
 
     @Column({ type: 'text', nullable: true })
-    general_objective!: string;
+    technical_knowledge!: string;
+
+    @Column({ type: 'varchar', length: 255, nullable: true })
+    software!: string;
 
     @Column({ type: 'text', nullable: true })
-    functions!: string; // Stored as JSON string or plain text if simple
+    equipment!: string;
+
+    // VIII. Autorización y Control
+    @Column({ type: 'varchar', length: 50, nullable: true })
+    created_date!: string;
+
+    @Column({ type: 'varchar', length: 255, nullable: true })
+    created_by!: string;
+
+    @Column({ type: 'varchar', length: 255, nullable: true })
+    reviewed_by!: string;
+
+    @Column({ type: 'varchar', length: 255, nullable: true })
+    authorized_by!: string;
 
     @Column({ type: 'text', nullable: true })
-    tasks!: string; // Stored as JSON string or plain text if simple
-
-    @Column({ type: 'text', nullable: true })
-    required_documents!: string; // Stored as JSON string of document names
+    change_log!: string;
 
     @Column({ type: 'boolean', default: true })
     status!: boolean;

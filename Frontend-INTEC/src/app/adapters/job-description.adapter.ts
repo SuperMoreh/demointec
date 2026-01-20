@@ -3,22 +3,65 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
+// Interfaces para las matrices
+export interface Activity {
+    description: string;
+    ejecuta: boolean;
+    supervisa: boolean;
+    autoriza: boolean;
+    frecuencia: string;
+}
+
+export interface Responsibility {
+    description: string;
+    individual: boolean;
+    compartida: boolean;
+    puestos_involucrados: string;
+}
+
+export interface ChangeLogEntry {
+    description: string;
+    date: string;
+    author: string;
+}
+
 export interface JobDescription {
     id?: number;
+    // I. Información General
     job_title: string;
-    immediate_boss?: string;
-    subordinates?: string;
-    basic_function?: string;
-    responsibility_level?: string;
-    employment_type?: string;
-    shift?: string;
-    schedule_mon_fri?: string;
-    schedule_weekend?: string;
-    decision_making?: string;
-    general_objective?: string;
-    functions?: string;
-    tasks?: string;
-    required_documents?: string;
+    department?: string;
+    // II. Razón de Ser
+    objective?: string;
+    // III. Funciones Claves (JSON stringified arrays)
+    activities_matrix?: string;
+    responsibilities_matrix?: string;
+    // IV. Relaciones Estratégicas
+    internal_relations?: string;
+    external_relations?: string;
+    // V. Estructura Organizacional
+    org_manager?: string;
+    org_supervisor?: string;
+    // VI. Características del Perfil
+    profile_gender?: string;
+    profile_age?: string;
+    profile_marital_status?: string;
+    profile_schedule?: string;
+    profile_travel_availability?: string;
+    profile_languages?: string;
+    profile_extra_requirements?: string;
+    // VII. Conocimientos y Habilidades
+    education?: string;
+    specialty?: string;
+    experience?: string;
+    technical_knowledge?: string;
+    software?: string;
+    equipment?: string;
+    // VIII. Autorización y Control
+    created_date?: string;
+    created_by?: string;
+    reviewed_by?: string;
+    authorized_by?: string;
+    change_log?: string;
     status?: boolean;
 }
 
