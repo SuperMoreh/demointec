@@ -154,8 +154,14 @@
                         </div>
                         <div class="mb-3" *ngIf="requestType === 'Permiso'">
                             <label class="form-label">Motivo</label>
-                            <input type="text" formControlName="reason" class="form-control"
-                                placeholder="Ej. Cita Médica, Trámite Personal...">
+                            <select formControlName="reason" class="form-select">
+                                <option value="">Seleccione un motivo...</option>
+                                <option value="Defunción">Defunción</option>
+                                <option value="Paternidad">Paternidad</option>
+                                <option value="Matrimonio">Matrimonio</option>
+                                <option value="Adopción">Adopción</option>
+                                <option value="Otros">Otros</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">{{ requestType === 'Permiso' ? 'Descripción Detallada' :
