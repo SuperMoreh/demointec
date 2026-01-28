@@ -192,6 +192,12 @@ export class EmployeesController {
       const day = String(targetDate.getDate()).padStart(2, '0');
       const formattedDate = `${year}-${month}-${day}`;
 
+      const formattedDate = `${year}-${month}-${day}`;
+
+      console.log('--- Expiring Contracts Debug ---');
+      console.log('Server Time:', today.toISOString());
+      console.log('Target Date (8 days from now):', formattedDate);
+
       console.log('Checking for contracts expiring on:', formattedDate);
 
       const repository = database.getRepository(EmployeeEntity);

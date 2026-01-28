@@ -39,8 +39,15 @@ export class NavbarMainComponent implements OnInit {
           this.userImage = userObj.photo || null;
 
           // Check for expiring contracts permission
+          console.log('[Navbar] User loaded:', userObj);
+          console.log('[Navbar] Email:', userObj.email);
+          console.log('[Navbar] Permission pAlertaContratos:', userObj.pAlertaContratos);
+
           if (userObj.pAlertaContratos === '1') {
+            console.log('[Navbar] Permission granted. Checking contracts...');
             this.checkExpiringContracts();
+          } else {
+            console.log('[Navbar] Permission denied or not found.');
           }
         } catch (e) {
           console.error('Error al parsear usuario:', e);
@@ -50,9 +57,12 @@ export class NavbarMainComponent implements OnInit {
   }
 
   checkExpiringContracts(): void {
+    console.log('[Navbar] Calling getExpiringContracts service...');
     this.employeesAdapter.getExpiringContracts().subscribe({
       next: (employees) => {
+        console.log('[Navbar] API Response:', employees);
         if (employees && employees.length > 0) {
+          console.log('[Navbar] Found employees:', employees.length);
           const count = employees.length;
           // Format list: Name - YYYY-MM-DD
           const list = employees
@@ -72,12 +82,14 @@ export class NavbarMainComponent implements OnInit {
               closeButton: true,
               enableHtml: true,
               tapToDismiss: false,
-              toastClass: 'ngx-toastr toast-warning width-auto' // Custom class for wider toast if needed
+              toastClass: 'ngx-toastr toast-warning width-auto'
             }
           );
+        } else {
+          console.log('[Navbar] No employees found with expiring contracts.');
         }
       },
-      error: (err) => console.error('Error checking expiring contracts', err)
+      error: (err) => console.error('[Navbar] Error checking expiring contracts', err)
     });
   }
 
