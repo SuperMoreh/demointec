@@ -16,6 +16,7 @@ export class Employee {
   private pUsuarios: string | undefined;
   private pVerCats: string | undefined;
   private pPermisosVacaciones: string | undefined;
+  private pAlertaContratos: string | undefined;
   private status: boolean | undefined;
 
   private admission_date: string | undefined;
@@ -175,6 +176,13 @@ export class Employee {
   }
   public set setpPermisosVacaciones(pPermisosVacaciones: string | undefined) {
     this.pPermisosVacaciones = pPermisosVacaciones;
+  }
+
+  public get getpAlertaContratos(): string | undefined {
+    return this.pAlertaContratos;
+  }
+  public set setpAlertaContratos(pAlertaContratos: string | undefined) {
+    this.pAlertaContratos = pAlertaContratos;
   }
 
   public get getStatus(): boolean | undefined {
