@@ -70,7 +70,7 @@ export class NavbarMainComponent implements OnInit {
             .join('');
 
           const message = `
-            <strong>Hay ${count} contratos por vencer en 8 días:</strong>
+            <strong>Hay ${count} contratos por vencer en los próximos 8 días:</strong>
             <ul style="padding-left: 20px; margin-top: 5px; margin-bottom: 0;">${list}</ul>
           `;
 

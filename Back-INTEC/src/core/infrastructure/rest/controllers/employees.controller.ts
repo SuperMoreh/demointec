@@ -1,4 +1,5 @@
 import { config } from 'dotenv';
+import { Between } from 'typeorm';
 import { Request, Response } from "express";
 import database from '../../../../config/db';
 import { db } from '../../../../firebase/firebase.config';
@@ -181,30 +182,28 @@ export class EmployeesController {
   async getExpiringContracts(req: Request, res: Response): Promise<void> {
     try {
       const today = new Date();
+      // Format today
+      const yearToday = today.getFullYear();
+      const monthToday = String(today.getMonth() + 1).padStart(2, '0');
+      const dayToday = String(today.getDate()).padStart(2, '0');
+      const formattedToday = `${yearToday}-${monthToday}-${dayToday}`;
+
       // Calculate date 8 days from now
       const targetDate = new Date(today);
       targetDate.setDate(today.getDate() + 8);
-
-      // Format to match database format (assuming YYYY-MM-DD based on existing code)
-      // Note: Existing code uses YYYY-MM-DD string format
-      const year = targetDate.getFullYear();
-      const month = String(targetDate.getMonth() + 1).padStart(2, '0');
-      const day = String(targetDate.getDate()).padStart(2, '0');
-      const formattedDate = `${year}-${month}-${day}`;
-
-      const formattedDate = `${year}-${month}-${day}`;
+      const yearTarget = targetDate.getFullYear();
+      const monthTarget = String(targetDate.getMonth() + 1).padStart(2, '0');
+      const dayTarget = String(targetDate.getDate()).padStart(2, '0');
+      const formattedTarget = `${yearTarget}-${monthTarget}-${dayTarget}`;
 
       console.log('--- Expiring Contracts Debug ---');
-      console.log('Server Time:', today.toISOString());
-      console.log('Target Date (8 days from now):', formattedDate);
-
-      console.log('Checking for contracts expiring on:', formattedDate);
+      console.log('Checking range:', formattedToday, 'to', formattedTarget);
 
       const repository = database.getRepository(EmployeeEntity);
 
       const employees = await repository.find({
         where: {
-          contract_expiration: formattedDate,
+          contract_expiration: Between(formattedToday, formattedTarget),
           status: true
         }
       });
