@@ -54,14 +54,25 @@ export class NavbarMainComponent implements OnInit {
       next: (employees) => {
         if (employees && employees.length > 0) {
           const count = employees.length;
-          const names = employees.map(e => e.name_employee).join(', ');
+          // Format list: Name - YYYY-MM-DD
+          const list = employees
+            .map(e => `<li>${e.name_employee} (${e.contract_expiration})</li>`)
+            .join('');
+
+          const message = `
+            <strong>Hay ${count} contratos por vencer en 8 días:</strong>
+            <ul style="padding-left: 20px; margin-top: 5px; margin-bottom: 0;">${list}</ul>
+          `;
+
           this.toastr.warning(
-            `Hay ${count} contratos que vencen en 8 días: ${names}`,
-            'Alerta de Vencimiento de Contrato',
+            message,
+            'Alerta de Contratos',
             {
               disableTimeOut: true,
               closeButton: true,
-              progressBar: true
+              enableHtml: true,
+              tapToDismiss: false,
+              toastClass: 'ngx-toastr toast-warning width-auto' // Custom class for wider toast if needed
             }
           );
         }
