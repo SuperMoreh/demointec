@@ -22,7 +22,6 @@ export class NavbarMainComponent implements OnInit {
   isSubmenuOpen: { [key: string]: boolean } = {};
   isSidebarCollapsed: boolean = false;
 
-  isSidebarCollapsed: boolean = false;
 
   constructor(
     private renderer: Renderer2,
