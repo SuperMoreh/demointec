@@ -80,6 +80,7 @@ export interface Employee {
   pEliminarDocsRH?: string;
   pDescripcionesPuestos?: string;
   pPermisosVacaciones?: string;
+  pAlertaContratos?: string;
   status?: boolean;
   imss_salary?: number;
   base_salary?: number;

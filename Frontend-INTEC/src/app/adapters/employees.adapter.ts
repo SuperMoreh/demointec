@@ -40,4 +40,8 @@ export class EmployeesAdapterService {
   syncToFirebase(): Observable<any> {
     return this.http.post(this.myAppUrl + 'api/sincronizar-colaboradores', {});
   }
+
+  getExpiringContracts(): Observable<Employee[]> {
+    return this.http.get<Employee[]>(this.myAppUrl + 'api/contracts-expiring');
+  }
 } 

@@ -178,6 +178,38 @@ export class EmployeesController {
   }
 
 
+  async getExpiringContracts(req: Request, res: Response): Promise<void> {
+    try {
+      const today = new Date();
+      // Calculate date 8 days from now
+      const targetDate = new Date(today);
+      targetDate.setDate(today.getDate() + 8);
+
+      // Format to match database format (assuming YYYY-MM-DD based on existing code)
+      // Note: Existing code uses YYYY-MM-DD string format
+      const year = targetDate.getFullYear();
+      const month = String(targetDate.getMonth() + 1).padStart(2, '0');
+      const day = String(targetDate.getDate()).padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}`;
+
+      console.log('Checking for contracts expiring on:', formattedDate);
+
+      const repository = database.getRepository(EmployeeEntity);
+
+      const employees = await repository.find({
+        where: {
+          contract_expiration: formattedDate,
+          status: true
+        }
+      });
+
+      res.status(200).json(employees);
+    } catch (error) {
+      console.error('Error fetching expiring contracts:', error);
+      res.status(500).json({ message: 'Error seeking expiring contracts', error });
+    }
+  }
+
   private async syncJobDocuments(employeeId: string, position: string) {
     try {
       console.log(`[syncJobDocuments] START: Employee=${employeeId}, Position='${position}'`);

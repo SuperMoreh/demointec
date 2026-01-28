@@ -38,6 +38,7 @@ export class LoginController {
 
         if (employee) {
           responseUser.pPermisosVacaciones = employee.pPermisosVacaciones;
+          responseUser.pAlertaContratos = employee.pAlertaContratos;
         }
       } catch (err) {
         console.error('Error fetching linked employee for permissions', err);

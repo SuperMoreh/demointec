@@ -133,6 +133,7 @@ export class EmployeesAdapterRepository implements EmployeesRepository<EmployeeE
 
           pDescripcionesPuestos: item.pDescripcionesPuestos || '0',
           pPermisosVacaciones: item.pPermisosVacaciones || '0',
+          pAlertaContratos: item.pAlertaContratos || '0',
           phone: item.telefono || '',
           role: item.rol || '',
           // New fields
@@ -248,6 +249,7 @@ export class EmployeesAdapterRepository implements EmployeesRepository<EmployeeE
 
       pDescripcionesPuestos: employee.pDescripcionesPuestos || '0',
       pPermisosVacaciones: employee.pPermisosVacaciones || '0',
+      pAlertaContratos: employee.pAlertaContratos || '0',
       // New fields
       admission_date: employee.admission_date || '',
       position: employee.position || '',
@@ -323,6 +325,7 @@ export class EmployeesAdapterRepository implements EmployeesRepository<EmployeeE
 
       pDescripcionesPuestos: employee.pDescripcionesPuestos || '0',
       pPermisosVacaciones: employee.pPermisosVacaciones || '0',
+      pAlertaContratos: employee.pAlertaContratos || '0',
       // New fields
       admission_date: employee.admission_date || '',
       position: employee.position || '',

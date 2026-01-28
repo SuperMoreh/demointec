@@ -244,6 +244,9 @@ export class EmployeeEntity {
   @Column({ name: 'pPermisosVacaciones', type: 'varchar', length: 10, default: '0' })
   pPermisosVacaciones!: string;
 
+  @Column({ name: 'pAlertaContratos', type: 'varchar', length: 10, default: '0' })
+  pAlertaContratos!: string;
+
   @Column({ name: 'status', type: 'boolean', default: true })
   status!: boolean;
 
