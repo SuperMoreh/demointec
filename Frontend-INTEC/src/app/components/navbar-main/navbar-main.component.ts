@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID, Inject } from '@angular/core';
 import { EmployeesAdapterService } from '../../adapters/employees.adapter';
@@ -27,7 +27,8 @@ export class NavbarMainComponent implements OnInit {
     private renderer: Renderer2,
     @Inject(PLATFORM_ID) private platformId: Object,
     private employeesAdapter: EmployeesAdapterService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private router: Router
   ) { }
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
@@ -152,6 +153,13 @@ export class NavbarMainComponent implements OnInit {
         el.style.display = 'inline';
       });
     }
+  }
+
+  logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    this.toastr.info('Has cerrado sesión correctamente');
+    this.router.navigate(['/login']);
   }
 
 }

@@ -116,7 +116,7 @@
           </ng-template>
           <span class="user-name">{{ userName }}</span>
         </div>
-        <button class="login-button" routerLink="/login">
+        <button class="login-button" (click)="logout()">
           <i class="bi bi-box-arrow-right"></i>
         </button>
       </div>
