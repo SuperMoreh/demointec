@@ -33,7 +33,7 @@ export const AppDataSource = new DataSource({
   ssl: {
     rejectUnauthorized: false
   },
-  synchronize: true,
+  synchronize: false,
   logging: false,
   entities: [UserEntity, RoleEntity, AttendanceEntity, ToolsEntity, MaterialEntity, ProjectEntity,
     CategoriesEntity, SubcategoriesEntity, EmployeeEntity, RequestDetailsEntity, RequestHeadersEntity, RequestsAdditionalEntity,

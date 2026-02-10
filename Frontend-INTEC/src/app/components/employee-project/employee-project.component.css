@@ -1,0 +1,382 @@
+.content-container {
+    padding: 1rem;
+    background-color: #eff2f7;
+
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    background-color: #eff2f7;
+}
+
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: #333;
+    margin: 0;
+}
+
+.breadcrumb {
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+}
+
+.btn-primary {
+    background-color: #F58525;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    color: white;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #ecaa2f;
+}
+
+/* Filtros y búsqueda */
+.filters-section {
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-top: 1px solid #eee;
+    background-color: #f8f9fa;
+}
+
+.filters-row {
+    display: flex;
+    gap: 1rem;
+    align-items: end;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-group label {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.filter-input {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.btn-filter {
+    background-color: #54ADEC;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    height: fit-content;
+}
+
+.btn-filter:hover {
+    background-color: #4299d1;
+}
+
+.btn-filter1 {
+    background-color: #1ba508;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    height: fit-content;
+}
+
+.btn-filter1:hover {
+    background-color: #34f53d;
+}
+
+.btn-consult {
+    background-color: #2a7ae4;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    height: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: background-color 0.3s;
+}
+
+.btn-consult:hover {
+    background-color: #1d5fb1;
+}
+
+.btn-consult:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Tabla */
+.table-container {
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #eee;
+    background-color: #f8f9fa;
+}
+
+.table-info {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.table-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+}
+
+.users-table th {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 400;
+    color: #555;
+    border-bottom: 2px solid #eee;
+}
+
+.users-table td {
+    padding: 0.5rem;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.users-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Estados y badges */
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+
+}
+
+.status-active {
+    background-color: #d4edda;
+    color: #155724;
+    font-style: bold;
+}
+
+.status-inactive {
+    background-color: #f8d7da;
+    color: #721c24;
+    font-style: bold;
+}
+
+/* Botones de acción */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-action {
+    padding: 0.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    transition: background-color 0.3s;
+}
+
+.btn-edit {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.btn-edit:hover {
+    background-color: #ffeaa7;
+}
+
+.btn-delete {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.btn-delete:hover {
+    background-color: #f5c6cb;
+}
+
+.btn-assign {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.btn-assign:hover {
+    background-color: #c3e6cb;
+}
+
+/* Paginación */
+.pagination-container {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #eee;
+    background-color: #f8f9fa;
+}
+
+.pagination {
+    display: flex;
+    gap: 0.25rem;
+    margin-left: auto;
+}
+
+.pagination button {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ddd;
+    background-color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.pagination button:hover {
+    background-color: #f8f9fa;
+}
+
+.pagination button.active {
+    background-color: #2a1cf8;
+    color: white;
+    border-color: #2a1cf8;
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.placeholder-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1rem;
+    color: #666;
+    text-align: center;
+}
+
+.loading-icon {
+    animation: spin 1.5s linear infinite;
+}
+
+.consult-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 2rem;
+    background-color: #f0f4ff;
+    border: 1px dashed #2a7ae4;
+    border-radius: 8px;
+    color: #2a7ae4;
+    font-size: 1rem;
+}
+
+.consult-placeholder i {
+    font-size: 1.5rem;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.modal-header{
+background-color: #58b5f3;
+color: white;
+height: 5px;
+font-size: 10px;
+border-radius: 6px;
+border: none;
+}
+
+.modal-title{
+color: white;
+font-size: 17px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .content-container {
+        padding: 1rem;
+    }
+
+    .page-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .filters-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-group {
+        width: 100%;
+    }
+}

@@ -83,7 +83,7 @@ export class AttendaceAdapterRepository implements AttendanceRepository<Attendan
             const entity = repository.create({
               id_attendance: id,
               name_user: item.nombre || '',
-              date: item.fecha ? new Date(item.fecha) : new Date(),
+              date: item.fecha || new Date().toISOString().split('T')[0],
               hour: item.hora || '',
               latitude: item.latitud || 0,
               length: item.longitud || 0,

@@ -401,3 +401,160 @@
     color: #2e7d32;
     font-weight: 600;
 }
+
+/* ===================== Organigrama ===================== */
+.org-chart-toggle {
+    border-top: 1px solid #e0e0e0;
+    padding-top: 0.75rem;
+}
+
+.org-chart-container {
+    margin-top: 1rem;
+    background: linear-gradient(180deg, #f8f6fb 0%, #eef0f7 100%);
+    border: 1px solid #d5cfe6;
+    border-radius: 10px;
+    overflow: hidden;
+    animation: orgFadeIn 0.3s ease-out;
+}
+
+@keyframes orgFadeIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Titulo con barra de color */
+.org-chart-title {
+    text-align: center;
+    padding: 0.65rem 1rem;
+    background-color: #5a4a7a;
+    border-bottom: 3px solid #F58525;
+}
+
+.org-chart-title span {
+    font-style: italic;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+.org-chart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 1rem 2rem;
+}
+
+.org-level {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Nodo base */
+.org-node {
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    line-height: 1.35;
+    word-wrap: break-word;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.org-node:hover {
+    transform: translateY(-2px);
+}
+
+/* Nivel 1 — Gerente: rectángulo con doble borde */
+.org-node-top {
+    background-color: #5a4a7a;
+    color: #fff;
+    border: 2px solid #5a4a7a;
+    outline: 2px solid #5a4a7a;
+    outline-offset: 3px;
+    padding: 0.7rem 1.8rem;
+    min-width: 220px;
+    max-width: 280px;
+    border-radius: 4px;
+    box-shadow: 0 3px 10px rgba(90, 74, 122, 0.35);
+}
+
+/* Nivel 2 — Supervisor: rectángulo simple */
+.org-node-mid {
+    background-color: #fff;
+    color: #5a4a7a;
+    border: 2px solid #9b8ab8;
+    padding: 0.7rem 1.5rem;
+    min-width: 180px;
+    max-width: 250px;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(155, 138, 184, 0.25);
+}
+
+/* Nivel 3 — Puesto actual: forma de rombo (hexágono horizontal) con SVG */
+.org-node-diamond {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 280px;
+    min-height: 90px;
+    padding: 0.3rem 0;
+    transition: transform 0.2s ease;
+}
+
+.org-node-diamond:hover {
+    transform: translateY(-2px);
+}
+
+.org-diamond-border {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    filter: drop-shadow(0 3px 8px rgba(245, 133, 37, 0.3));
+}
+
+.org-diamond-text {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    line-height: 1.45;
+    color: #fff;
+    padding: 0.4rem 3rem;
+    word-wrap: break-word;
+    max-width: 240px;
+}
+
+/* Línea vertical de conexión */
+.org-connector {
+    display: flex;
+    justify-content: center;
+    height: 30px;
+}
+
+.org-line {
+    width: 2px;
+    height: 100%;
+    background-color: #9b8ab8;
+    position: relative;
+}
+
+.org-line::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #9b8ab8;
+}

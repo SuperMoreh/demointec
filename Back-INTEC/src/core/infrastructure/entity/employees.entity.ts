@@ -271,5 +271,8 @@ export class EmployeeEntity {
   @Column({ name: 'rehire_document_name', type: 'varchar', length: 255, nullable: true })
   rehire_document_name!: string;
 
+  @Column({ name: 'project', type: 'varchar', length: 255, nullable: true })
+  project!: string;
+
 }
 

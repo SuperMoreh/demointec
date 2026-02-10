@@ -1,0 +1,200 @@
+<div class="content-container">
+  <!-- Header de la página -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Asignar Obras</h1>
+    </div>
+  </div>
+
+  <!-- Filtros y búsqueda -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <div class="filter-group">
+        <label for="search">Buscar</label>
+        <input type="text" id="search" class="filter-input" placeholder="Nombre, correo, obra..." [(ngModel)]="searchTerm" (input)="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <select id="status" class="filter-input" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+          <option value="">Todos los estados</option>
+          <option value="true">Activo</option>
+          <option value="false">Inactivo</option>
+        </select>
+      </div>
+      <button class="btn-consult" (click)="consultEmployeeProjects()" [disabled]="isLoading">
+        <i class="bi bi-search"></i>
+        Consultar
+      </button>
+      <button class="btn-filter" (click)="clearFilters()">
+        <i class="bi bi-list-ul"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabla de asignaciones -->
+  <div class="table-container" *ngIf="hasConsulted && !isLoading && filteredEmployeeProjects.length > 0">
+    <div class="table-header">
+      <div class="table-info">
+        Mostrando {{ employeeProjects.length }} de {{ allEmployeeProjects.length }} colaboradores
+        <span *ngIf="hasActiveFilters()" class="text-muted">(filtrados)</span>
+      </div>
+      <div class="table-actions">
+        <button class="btn-filter1" (click)="exportEmployeeProjects()">
+          <i class="bi bi-download"></i>
+          Exportar
+        </button>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Obra</th>
+            <th>Estatus</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of employeeProjects">
+            <td>{{ item.name_employee }}</td>
+            <td>{{ item.email }}</td>
+            <td>{{ item.project || '' }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="item.status ? 'status-active' : 'status-inactive'">
+                {{ item.status ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn-action btn-assign" (click)="handleAssignClick(item)" title="Asignar Obra">
+                  <i class="bi bi-building-add"></i>
+                </button>
+                <button class="btn-action btn-edit" (click)="handleEditClick(item)" title="Editar">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn-action btn-delete" (click)="deleteEmployeeProject(item)" title="Eliminar">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Paginación -->
+    <div class="pagination-container" *ngIf="totalPages > 1">
+      <div class="pagination">
+        <button [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button *ngFor="let page of pages" [class.active]="page === currentPage" (click)="setPage(page)">
+          {{ page }}
+        </button>
+        <button [disabled]="currentPage === totalPages" (click)="setPage(currentPage + 1)">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="table-container placeholder-container" *ngIf="hasConsulted && !isLoading && filteredEmployeeProjects.length === 0">
+    <div class="table-placeholder">
+      <i class="bi bi-inbox"></i>
+      No se encontraron colaboradores con los filtros aplicados.
+    </div>
+  </div>
+  <div class="table-container placeholder-container" *ngIf="hasConsulted && isLoading">
+    <div class="table-placeholder">
+      <i class="bi bi-arrow-repeat loading-icon"></i>
+      Cargando colaboradores...
+    </div>
+  </div>
+  <div class="consult-placeholder" *ngIf="!hasConsulted">
+    <i class="bi bi-info-circle"></i>
+    Consulte para ver la información de asignaciones de obras.
+  </div>
+</div>
+
+<!-- Modal para Editar Obra -->
+<div class="modal fade" id="editarObraModal" tabindex="-1" aria-labelledby="editarObraModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="editarObraModalLabel">Editar Obra</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedEmployeeProject">
+        <form [formGroup]="employeeProjectForm" (ngSubmit)="updateEmployeeProject()">
+          <!-- Colaborador (solo lectura) -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-person"></i></span>
+              <input type="text" class="form-control" [value]="selectedEmployeeProject.name_employee" disabled>
+            </div>
+          </div>
+          <!-- Obra -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-building"></i></span>
+              <select formControlName="project" class="form-select">
+                <option value="">Seleccione obra...</option>
+                <option *ngFor="let proj of projects" [value]="proj.name_project">{{ proj.name_project }}</option>
+              </select>
+            </div>
+            <div *ngIf="employeeProjectForm.get('project')?.invalid && employeeProjectForm.get('project')?.touched" class="text-danger mt-1">
+              <small>La obra es requerida</small>
+            </div>
+          </div>
+          <!-- Botón guardar -->
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary px-4">
+              <i class="bi bi-check-circle-fill"></i> Guardar Cambios
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Asignar Obra -->
+<div class="modal fade" id="asignarObraModal" tabindex="-1" aria-labelledby="asignarObraModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="asignarObraModalLabel">Asignar Obra</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedEmployeeProject">
+        <form [formGroup]="assignProjectForm" (ngSubmit)="assignProject()">
+          <!-- Colaborador (solo lectura) -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-person"></i></span>
+              <input type="text" class="form-control" [value]="selectedEmployeeProject.name_employee" disabled>
+            </div>
+          </div>
+          <!-- Obra -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-building"></i></span>
+              <select formControlName="project" class="form-select">
+                <option value="">Seleccione obra...</option>
+                <option *ngFor="let proj of projects" [value]="proj.name_project">{{ proj.name_project }}</option>
+              </select>
+            </div>
+            <div *ngIf="assignProjectForm.get('project')?.invalid && assignProjectForm.get('project')?.touched" class="text-danger mt-1">
+              <small>La obra es requerida</small>
+            </div>
+          </div>
+          <!-- Botón guardar -->
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-success px-4" [disabled]="assignProjectForm.invalid">
+              <i class="bi bi-check-circle-fill"></i> Asignar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

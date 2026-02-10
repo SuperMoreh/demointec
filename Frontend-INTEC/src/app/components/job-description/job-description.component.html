@@ -340,6 +340,51 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Organigrama Visual -->
+                        <div class="org-chart-toggle mt-3">
+                            <button type="button" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-2"
+                                (click)="toggleOrgChart()">
+                                <i class="bi" [ngClass]="showOrgChart ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                                {{ showOrgChart ? 'Ocultar' : 'Ver' }} Organigrama
+                            </button>
+                        </div>
+
+                        <div class="org-chart-container" *ngIf="showOrgChart">
+                            <div class="org-chart-title">
+                                <span>ESTRUCTURA ORGANIZACIONAL</span>
+                            </div>
+                            <div class="org-chart">
+                                <!-- Nivel 1: Gerente -->
+                                <div class="org-level">
+                                    <div class="org-node org-node-top">
+                                        <span>{{ jobForm.get('org_manager')?.value || 'GERENTE DE OPERACIONES' }}</span>
+                                    </div>
+                                </div>
+                                <div class="org-connector">
+                                    <div class="org-line"></div>
+                                </div>
+                                <!-- Nivel 2: Supervisor -->
+                                <div class="org-level">
+                                    <div class="org-node org-node-mid">
+                                        <span>{{ jobForm.get('org_supervisor')?.value || 'INGENIERO RESIDENTE' }}</span>
+                                    </div>
+                                </div>
+                                <div class="org-connector">
+                                    <div class="org-line"></div>
+                                </div>
+                                <!-- Nivel 3: Puesto Actual (Rombo) -->
+                                <div class="org-level">
+                                    <div class="org-node-diamond">
+                                        <svg class="org-diamond-border" viewBox="0 0 300 80" preserveAspectRatio="none">
+                                            <polygon points="40,0 260,0 300,40 260,80 40,80 0,40"
+                                                fill="#F58525" stroke="#d9741e" stroke-width="2"/>
+                                        </svg>
+                                        <span class="org-diamond-text">{{ jobForm.get('job_title')?.value || 'PUESTO ACTUAL' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- V. Estructura Organizacional -->

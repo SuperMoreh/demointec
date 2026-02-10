@@ -30,6 +30,7 @@ export class JobDescriptionComponent implements OnInit {
 
     hasPermission: boolean = false;
     isViewMode: boolean = false;
+    showOrgChart: boolean = false;
 
     // Dynamic arrays for matrices
     activities: Activity[] = [];
@@ -185,6 +186,10 @@ export class JobDescriptionComponent implements OnInit {
 
     removeExternalRelation(index: number) {
         this.externalRelations.splice(index, 1);
+    }
+
+    toggleOrgChart() {
+        this.showOrgChart = !this.showOrgChart;
     }
 
     // Change Log Methods

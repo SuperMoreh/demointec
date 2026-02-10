@@ -15,6 +15,8 @@ import { LaborRelationsComponent } from './components/labor-relations/labor-rela
 import { DocumentRepositoryComponent } from './components/document-repository/document-repository.component';
 import { JobDescriptionComponent } from './components/job-description/job-description.component';
 import { TerminationsComponent } from './components/terminations/terminations.component';
+import { PrenominaComponent } from './components/prenomina/prenomina.component';
+import { EmployeeProjectComponent } from './components/employee-project/employee-project.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -37,6 +39,8 @@ export const routes: Routes = [
       { path: 'repositorio-documental', component: DocumentRepositoryComponent },
       { path: 'descripciones-puestos', component: JobDescriptionComponent },
       { path: 'control-bajas', component: TerminationsComponent },
+      { path: 'prenomina', component: PrenominaComponent },
+      { path: 'asignar-obras', component: EmployeeProjectComponent },
       { path: 'permisos-vacaciones', loadComponent: () => import('./components/permissions-vacations/permissions-vacations.component').then(m => m.PermissionsVacationsComponent) },
     ]
   },
