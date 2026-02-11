@@ -67,7 +67,7 @@
             </td>
             <td>
               <div class="action-buttons">
-                <button class="btn-action btn-assign" (click)="handleAssignClick(item)" title="Asignar Obra">
+                <button class="btn-action btn-assign" (click)="handleAssignClick(item)" title="Asignar Obra" [disabled]="item.project">
                   <i class="bi bi-building-add"></i>
                 </button>
                 <button class="btn-action btn-edit" (click)="handleEditClick(item)" title="Editar">
@@ -187,10 +187,81 @@
               <small>La obra es requerida</small>
             </div>
           </div>
-          <!-- Botón guardar -->
-          <div class="text-center mt-4">
+          <!-- Botones -->
+          <div class="text-center mt-4 d-flex justify-content-center gap-2">
+            <button type="button" class="btn btn-primary px-4" (click)="openAddProjectModal()">
+              <i class="bi bi-plus-circle"></i> Agregar Obra
+            </button>
             <button type="submit" class="btn btn-success px-4" [disabled]="assignProjectForm.invalid">
               <i class="bi bi-check-circle-fill"></i> Asignar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Agregar Obra -->
+<div class="modal fade" id="agregarObraModal" tabindex="-1" aria-labelledby="agregarObraModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="agregarObraModalLabel">Agregar Obra</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="addProjectForm" (ngSubmit)="createProject()">
+          <!-- Nombre -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-building"></i></span>
+              <input formControlName="name_project" type="text" class="form-control" placeholder="Ingresa nombre de la obra">
+            </div>
+            <div *ngIf="addProjectForm.get('name_project')?.invalid && addProjectForm.get('name_project')?.touched" class="text-danger mt-1">
+              <small>El nombre es requerido</small>
+            </div>
+          </div>
+          <!-- Tipo de Ubicación -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+              <select formControlName="locationType" class="form-select">
+                <option value="">Seleccione tipo de ubicación...</option>
+                <option *ngFor="let loc of locationOptions" [value]="loc">{{ loc }}</option>
+              </select>
+            </div>
+            <div *ngIf="addProjectForm.get('locationType')?.invalid && addProjectForm.get('locationType')?.touched" class="text-danger mt-1">
+              <small>El tipo de ubicación es requerido</small>
+            </div>
+          </div>
+          <!-- Localidad -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-geo"></i></span>
+              <input formControlName="locality" type="text" class="form-control" placeholder="Localidad">
+            </div>
+            <div *ngIf="addProjectForm.get('locality')?.invalid && addProjectForm.get('locality')?.touched" class="text-danger mt-1">
+              <small>La localidad es requerida</small>
+            </div>
+          </div>
+          <!-- Oficial -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+              <select formControlName="official" class="form-select">
+                <option value="">Seleccione oficial...</option>
+                <option *ngFor="let emp of employees" [value]="emp.name_employee">{{ emp.name_employee }}</option>
+              </select>
+            </div>
+            <div *ngIf="addProjectForm.get('official')?.invalid && addProjectForm.get('official')?.touched" class="text-danger mt-1">
+              <small>El oficial es requerido</small>
+            </div>
+          </div>
+          <!-- Botón guardar -->
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-success px-4" [disabled]="addProjectForm.invalid">
+              <i class="bi bi-check-circle-fill"></i> Guardar
             </button>
           </div>
         </form>
