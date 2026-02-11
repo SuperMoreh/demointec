@@ -1,0 +1,151 @@
+<div class="content-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Comisiones Mixtas</h1>
+    </div>
+  </div>
+
+  <!-- Buscador de empleado -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <div class="filter-group search-wrapper">
+        <label for="searchEmployee">Buscar Colaborador</label>
+        <div class="search-input-container">
+          <input type="text" id="searchEmployee" class="filter-input" placeholder="Escriba el nombre del colaborador..."
+            [(ngModel)]="searchTerm" (input)="onSearchInput()" autocomplete="off">
+          <button *ngIf="selectedEmployee" type="button" class="btn-clear-input" (click)="clearSelection()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+        <!-- Dropdown de resultados -->
+        <div class="search-dropdown" *ngIf="showDropdown">
+          <div class="dropdown-item" *ngFor="let emp of filteredEmployees" (click)="selectEmployee(emp)">
+            <i class="bi bi-person"></i>
+            <span>{{ emp.name_employee }}</span>
+            <small *ngIf="emp.position">{{ emp.position }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="selected-employee-info" *ngIf="selectedEmployee">
+      <i class="bi bi-person-check"></i>
+      <strong>{{ selectedEmployee.name_employee }}</strong>
+      <span *ngIf="selectedEmployee.position" class="employee-position">| {{ selectedEmployee.position }}</span>
+      <span *ngIf="selectedEmployee.employee_code" class="employee-code">| {{ selectedEmployee.employee_code }}</span>
+    </div>
+  </div>
+
+  <!-- Carpetas tipo acordeón -->
+  <div class="table-container" *ngIf="selectedEmployee">
+    <div class="table-header">
+      <div class="table-info">Carpetas de Comisiones Mixtas</div>
+    </div>
+
+    <div class="folders-list">
+      <div class="folder-item" *ngFor="let section of sections">
+        <!-- Fila de carpeta -->
+        <div class="folder-header" (click)="toggleSection(section)" [class.expanded]="section.expanded">
+          <div class="folder-title">
+            <i class="bi bi-chevron-down folder-arrow" [class.rotated]="!section.expanded"></i>
+            <i class="bi bi-folder2" *ngIf="!section.expanded"></i>
+            <i class="bi bi-folder2-open" *ngIf="section.expanded"></i>
+            <span class="section-abbreviation">{{ section.abbreviation }}</span>
+            <span class="folder-label">{{ section.label }}</span>
+          </div>
+          <div class="folder-actions" (click)="$event.stopPropagation()">
+            <button class="btn-action btn-upload-action" (click)="openUploadModal(section)">
+              <i class="bi bi-cloud-arrow-up"></i>
+              Subir
+            </button>
+          </div>
+        </div>
+
+        <!-- Contenido expandible -->
+        <div class="folder-content" *ngIf="section.expanded">
+          <!-- Loading -->
+          <div class="folder-loading" *ngIf="section.isLoading">
+            <i class="bi bi-arrow-repeat loading-icon"></i>
+            Cargando documentos...
+          </div>
+
+          <!-- Documentos -->
+          <div *ngIf="!section.isLoading && section.loaded">
+            <div class="document-item" *ngFor="let doc of section.documents">
+              <div class="document-info">
+                <i class="bi bi-file-earmark-text"></i>
+                <div>
+                  <span class="document-name">{{ doc.name_document || 'Sin nombre' }}</span>
+                  <small class="document-date" *ngIf="doc.upload_date">Subido: {{ doc.upload_date }}</small>
+                </div>
+              </div>
+              <div class="document-actions">
+                <button class="btn-doc btn-doc-view" (click)="viewDocument(doc)" title="Ver">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn-doc btn-doc-download" (click)="downloadDocument(doc)" title="Descargar">
+                  <i class="bi bi-download"></i>
+                </button>
+                <button class="btn-doc btn-doc-delete" (click)="deleteDocument(doc, section)" title="Eliminar">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Sin documentos -->
+            <div class="no-documents" *ngIf="section.documents.length === 0">
+              <i class="bi bi-folder2-open"></i>
+              <span>No hay documentos en esta carpeta.</span>
+              <span class="no-docs-hint">Sube uno con el botón <i class="bi bi-cloud-arrow-up"></i> <strong>Subir</strong></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Placeholder sin selección -->
+  <div class="table-container placeholder-container" *ngIf="!selectedEmployee">
+    <div class="table-placeholder">
+      <i class="bi bi-search"></i>
+      Busque y seleccione un colaborador para ver sus carpetas de comisiones mixtas.
+    </div>
+  </div>
+</div>
+
+<!-- Mini modal para subir archivo -->
+<div class="modal-overlay" *ngIf="showUploadModal" (click)="closeUploadModal()">
+  <div class="modal-upload" (click)="$event.stopPropagation()">
+    <div class="modal-upload-header">
+      <h3 class="modal-upload-title">
+        <i class="bi bi-cloud-arrow-up"></i>
+        Subir documento
+      </h3>
+      <button class="modal-close" (click)="closeUploadModal()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="modal-upload-body">
+      <div class="upload-info">
+        <span class="upload-info-label">Carpeta:</span>
+        <span class="section-abbreviation">{{ uploadSection?.abbreviation }}</span>
+        {{ uploadSection?.label }}
+      </div>
+      <div class="upload-info">
+        <span class="upload-info-label">Colaborador:</span>
+        {{ selectedEmployee?.name_employee }}
+      </div>
+      <div class="upload-field">
+        <label class="upload-label">Seleccionar archivo</label>
+        <input type="file" class="upload-input" (change)="onFileSelected($event)">
+      </div>
+    </div>
+    <div class="modal-upload-footer">
+      <button class="btn-cancel" (click)="closeUploadModal()">Cancelar</button>
+      <button class="btn-upload" (click)="uploadDocument()" [disabled]="!selectedFile || isUploading">
+        <i class="bi bi-cloud-arrow-up"></i>
+        {{ isUploading ? 'Subiendo...' : 'Subir' }}
+      </button>
+    </div>
+  </div>
+</div>

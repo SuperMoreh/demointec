@@ -24,6 +24,7 @@ import uploadRouter from './core/infrastructure/rest/routes/upload.route';
 import terminationRouter from './core/infrastructure/rest/routes/terminations.route';
 import employeeProjectRouter from './core/infrastructure/rest/routes/employee-project.route';
 import prenominaRouter from './core/infrastructure/rest/routes/prenomina.route';
+import committeeDocumentsRouter from './core/infrastructure/rest/routes/committee-documents.route';
 
 import { RoleEntity } from './core/infrastructure/entity/roles.entity';
 import { UserEntity } from './core/infrastructure/entity/users.entity';
@@ -62,6 +63,7 @@ app.use('/api', uploadRouter);
 app.use('/api', terminationRouter);
 app.use('/api', employeeProjectRouter);
 app.use('/api', prenominaRouter);
+app.use('/api', committeeDocumentsRouter);
 
 // Serve Frontend Static Files
 app.use(express.static(path.join(__dirname, '../public')));
