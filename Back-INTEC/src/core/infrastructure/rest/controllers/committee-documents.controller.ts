@@ -47,8 +47,7 @@ export class CommitteeDocumentsController {
 
     async getDocuments(req: Request, res: Response): Promise<void> {
         try {
-            const { employeeId } = req.params;
-            const documents = await this.adapter.getDocumentsByEmployee(employeeId);
+            const documents = await this.adapter.getAllDocuments();
             res.status(200).json(documents);
         } catch (error) {
             res.status(500).json({ message: "Error al obtener documentos de comisiones", error });
@@ -69,8 +68,8 @@ export class CommitteeDocumentsController {
         try {
             const body = req.body;
 
-            if (!body.id_employee || !body.document_type) {
-                res.status(400).json({ message: "Faltan datos requeridos (id_employee, document_type)" });
+            if (!body.document_type) {
+                res.status(400).json({ message: "Faltan datos requeridos (document_type)" });
                 return;
             }
 

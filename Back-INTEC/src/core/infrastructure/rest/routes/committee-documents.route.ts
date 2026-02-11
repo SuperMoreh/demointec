@@ -20,7 +20,7 @@ const uploadMiddleware = (req: Request, res: Response, next: NextFunction) => {
     });
 };
 
-committeeDocumentsRouter.get('/comisiones-documentos/:employeeId', (req, res) => controller.getDocuments(req, res));
+committeeDocumentsRouter.get('/comisiones-documentos', (req, res) => controller.getDocuments(req, res));
 committeeDocumentsRouter.get('/comisiones-documentos/tipo/:documentType', (req, res) => controller.getDocumentsByType(req, res));
 committeeDocumentsRouter.post('/comisiones-documentos', uploadMiddleware, (req, res) => controller.uploadDocument(req, res));
 committeeDocumentsRouter.delete('/comisiones-documentos/:id', (req, res) => controller.deleteDocument(req, res));

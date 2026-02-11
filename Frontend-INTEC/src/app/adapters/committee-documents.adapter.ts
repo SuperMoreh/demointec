@@ -16,10 +16,6 @@ export class CommitteeDocumentsAdapterService {
     this.myAppUrl = environment.endpoint;
   }
 
-  getDocumentsByEmployee(employeeId: string): Observable<CommitteeDocument[]> {
-    return this.http.get<CommitteeDocument[]>(`${this.myAppUrl}${this.myApiUrl}${employeeId}`);
-  }
-
   getDocumentsByType(documentType: string): Observable<CommitteeDocument[]> {
     return this.http.get<CommitteeDocument[]>(`${this.myAppUrl}${this.myApiUrl}tipo/${documentType}`);
   }

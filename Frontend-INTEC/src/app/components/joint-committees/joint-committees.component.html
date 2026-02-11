@@ -6,38 +6,25 @@
     </div>
   </div>
 
-  <!-- Buscador de empleado -->
+  <!-- Buscador de documentos -->
   <div class="filters-section">
     <div class="filters-row">
       <div class="filter-group search-wrapper">
-        <label for="searchEmployee">Buscar Colaborador</label>
+        <label for="searchDocument">Buscar Documento</label>
         <div class="search-input-container">
-          <input type="text" id="searchEmployee" class="filter-input" placeholder="Escriba el nombre del colaborador..."
+          <i class="bi bi-search search-icon"></i>
+          <input type="text" id="searchDocument" class="filter-input" placeholder="Escriba el nombre del documento..."
             [(ngModel)]="searchTerm" (input)="onSearchInput()" autocomplete="off">
-          <button *ngIf="selectedEmployee" type="button" class="btn-clear-input" (click)="clearSelection()">
+          <button *ngIf="searchTerm" type="button" class="btn-clear-input" (click)="searchTerm = ''; onSearchInput()">
             <i class="bi bi-x-lg"></i>
           </button>
         </div>
-        <!-- Dropdown de resultados -->
-        <div class="search-dropdown" *ngIf="showDropdown">
-          <div class="dropdown-item" *ngFor="let emp of filteredEmployees" (click)="selectEmployee(emp)">
-            <i class="bi bi-person"></i>
-            <span>{{ emp.name_employee }}</span>
-            <small *ngIf="emp.position">{{ emp.position }}</small>
-          </div>
-        </div>
       </div>
-    </div>
-    <div class="selected-employee-info" *ngIf="selectedEmployee">
-      <i class="bi bi-person-check"></i>
-      <strong>{{ selectedEmployee.name_employee }}</strong>
-      <span *ngIf="selectedEmployee.position" class="employee-position">| {{ selectedEmployee.position }}</span>
-      <span *ngIf="selectedEmployee.employee_code" class="employee-code">| {{ selectedEmployee.employee_code }}</span>
     </div>
   </div>
 
   <!-- Carpetas tipo acordeón -->
-  <div class="table-container" *ngIf="selectedEmployee">
+  <div class="table-container">
     <div class="table-header">
       <div class="table-info">Carpetas de Comisiones Mixtas</div>
     </div>
@@ -71,7 +58,7 @@
 
           <!-- Documentos -->
           <div *ngIf="!section.isLoading && section.loaded">
-            <div class="document-item" *ngFor="let doc of section.documents">
+            <div class="document-item" *ngFor="let doc of section.filteredDocuments">
               <div class="document-info">
                 <i class="bi bi-file-earmark-text"></i>
                 <div>
@@ -93,7 +80,12 @@
             </div>
 
             <!-- Sin documentos -->
-            <div class="no-documents" *ngIf="section.documents.length === 0">
+            <div class="no-documents" *ngIf="section.filteredDocuments.length === 0 && searchTerm.length > 0">
+              <i class="bi bi-search"></i>
+              <span>No se encontraron documentos que coincidan con la búsqueda.</span>
+            </div>
+
+            <div class="no-documents" *ngIf="section.filteredDocuments.length === 0 && searchTerm.length === 0">
               <i class="bi bi-folder2-open"></i>
               <span>No hay documentos en esta carpeta.</span>
               <span class="no-docs-hint">Sube uno con el botón <i class="bi bi-cloud-arrow-up"></i> <strong>Subir</strong></span>
@@ -101,14 +93,6 @@
           </div>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- Placeholder sin selección -->
-  <div class="table-container placeholder-container" *ngIf="!selectedEmployee">
-    <div class="table-placeholder">
-      <i class="bi bi-search"></i>
-      Busque y seleccione un colaborador para ver sus carpetas de comisiones mixtas.
     </div>
   </div>
 </div>
@@ -130,10 +114,6 @@
         <span class="upload-info-label">Carpeta:</span>
         <span class="section-abbreviation">{{ uploadSection?.abbreviation }}</span>
         {{ uploadSection?.label }}
-      </div>
-      <div class="upload-info">
-        <span class="upload-info-label">Colaborador:</span>
-        {{ selectedEmployee?.name_employee }}
       </div>
       <div class="upload-field">
         <label class="upload-label">Seleccionar archivo</label>

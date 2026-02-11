@@ -3,11 +3,9 @@ import { CommitteeDocumentEntity } from "../entity/committee-documents.entity";
 import { storage } from "../../../firebase/firebase.config";
 
 export class CommitteeDocumentsAdapter {
-    async getDocumentsByEmployee(employeeId: string): Promise<CommitteeDocumentEntity[]> {
+    async getAllDocuments(): Promise<CommitteeDocumentEntity[]> {
         const repository = AppDataSource.getRepository(CommitteeDocumentEntity);
-        return await repository.find({
-            where: { id_employee: employeeId }
-        });
+        return await repository.find();
     }
 
     async getDocumentsByType(documentType: string): Promise<CommitteeDocumentEntity[]> {

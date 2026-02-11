@@ -69,7 +69,16 @@
 
 .search-input-container .filter-input {
   width: 100%;
+  padding-left: 2.2rem;
   padding-right: 2.5rem;
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.65rem;
+  color: #999;
+  font-size: 0.85rem;
+  pointer-events: none;
 }
 
 .btn-clear-input {
@@ -87,72 +96,6 @@
   color: #333;
 }
 
-.search-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background-color: white;
-  border: 1px solid #ddd;
-  border-top: none;
-  border-radius: 0 0 4px 4px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  z-index: 100;
-  max-height: 250px;
-  overflow-y: auto;
-}
-
-.dropdown-item {
-  padding: 0.6rem 0.75rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  border-bottom: 1px solid #f0f0f0;
-  transition: background-color 0.2s;
-}
-
-.dropdown-item:last-child {
-  border-bottom: none;
-}
-
-.dropdown-item:hover {
-  background-color: #e9f3ff;
-}
-
-.dropdown-item i {
-  color: #888;
-}
-
-.dropdown-item small {
-  margin-left: auto;
-  color: #999;
-  font-size: 0.75rem;
-}
-
-/* Info del empleado seleccionado */
-.selected-employee-info {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  padding: 0.75rem 1rem;
-  background-color: #e8f5e9;
-  border-radius: 6px;
-  border-left: 4px solid #4caf50;
-  font-size: 0.9rem;
-  color: #2e7d32;
-}
-
-.selected-employee-info i {
-  font-size: 1.1rem;
-}
-
-.employee-position,
-.employee-code {
-  color: #558b2f;
-  font-size: 0.85rem;
-}
 
 /* Contenedor tabla/carpetas */
 .table-container {
@@ -559,31 +502,6 @@
   cursor: not-allowed;
 }
 
-/* Placeholders */
-.placeholder-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 200px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.table-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 1rem;
-  color: #666;
-  text-align: center;
-}
-
-.table-placeholder i {
-  font-size: 2rem;
-  color: #aaa;
-}
 
 /* Responsive */
 @media (max-width: 768px) {
