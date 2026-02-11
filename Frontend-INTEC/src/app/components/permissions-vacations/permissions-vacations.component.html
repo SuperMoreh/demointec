@@ -14,6 +14,10 @@
                 <i class="bi bi-sun"></i>
                 Agregar Vacaciones
             </button>
+            <button class="btn-incapacidad" (click)="openCreateModal('Incapacidad')">
+                <i class="bi bi-bandaid"></i>
+                Agregar Incapacidad
+            </button>
             <button class="btn-calendar" (click)="openCalendarModal()">
                 <i class="bi bi-calendar3"></i>
                 Ver Calendario
@@ -142,13 +146,12 @@
                                 <small class="text-muted">Indica de qué año se tomarán los días de vacaciones</small>
                             </div>
                         </div>
-                        <div class="row" *ngIf="requestType === 'Permiso'">
+                        <div class="row" *ngIf="requestType === 'Permiso' || requestType === 'Incapacidad'">
                             <div class="col-md-12 mb-3">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" formControlName="withPay"
                                         id="withPaySwitch">
-                                    <label class="form-check-label" for="withPaySwitch">Permiso con Goce de
-                                        Sueldo</label>
+                                    <label class="form-check-label" for="withPaySwitch">{{ requestType === 'Incapacidad' ? 'Incapacidad con Goce de Sueldo' : 'Permiso con Goce de Sueldo' }}</label>
                                 </div>
                             </div>
                         </div>
@@ -163,8 +166,18 @@
                                 <option value="Otros">Otros</option>
                             </select>
                         </div>
+                        <div class="mb-3" *ngIf="requestType === 'Incapacidad'">
+                            <label class="form-label">Motivo</label>
+                            <select formControlName="reason" class="form-select">
+                                <option value="">Seleccione un motivo...</option>
+                                <option value="Enfermedad General">Enfermedad General</option>
+                                <option value="Riesgo de Trabajo">Riesgo de Trabajo</option>
+                                <option value="Maternidad">Maternidad</option>
+                                <option value="Otros">Otros</option>
+                            </select>
+                        </div>
                         <div class="mb-3">
-                            <label class="form-label">{{ requestType === 'Permiso' ? 'Descripción Detallada' :
+                            <label class="form-label">{{ (requestType === 'Permiso' || requestType === 'Incapacidad') ? 'Descripción Detallada' :
                                 'Descripción / Motivo' }}</label>
                             <textarea formControlName="description" class="form-control" rows="3"></textarea>
                         </div>
@@ -226,9 +239,9 @@
                             <tr *ngFor="let req of selectedEmployeeHistory">
                                 <td>
                                     <span class="status-badge"
-                                        [ngClass]="req.type === 'Vacaciones' ? 'status-active' : 'status-late'">
+                                        [ngClass]="{'status-active': req.type === 'Vacaciones', 'status-late': req.type === 'Permiso', 'status-incapacidad': req.type === 'Incapacidad'}">
                                         <i class="bi"
-                                            [ngClass]="req.type === 'Vacaciones' ? 'bi-sun' : 'bi-file-earmark-medical'"></i>
+                                            [ngClass]="{'bi-sun': req.type === 'Vacaciones', 'bi-file-earmark-medical': req.type === 'Permiso', 'bi-bandaid': req.type === 'Incapacidad'}"></i>
                                         {{ req.type }}
                                     </span>
                                 </td>
@@ -243,7 +256,7 @@
                                 </td>
                                 <td>
                                     <div class="fw-bold">{{ req.reason || '-' }}</div>
-                                    <div class="small text-muted" *ngIf="req.type === 'Permiso'">
+                                    <div class="small text-muted" *ngIf="req.type === 'Permiso' || req.type === 'Incapacidad'">
                                         {{ req.withPay ? 'Con Goce' : 'Sin Goce' }}
                                     </div>
                                 </td>
@@ -317,7 +330,7 @@
 
                             <div class="events-list" *ngIf="dayObj.day">
                                 <div *ngFor="let event of dayObj.events" class="event-pill"
-                                    [ngClass]="event.type === 'Vacaciones' ? 'event-vacation' : 'event-permission'"
+                                    [ngClass]="{'event-vacation': event.type === 'Vacaciones', 'event-permission': event.type === 'Permiso', 'event-incapacidad': event.type === 'Incapacidad'}"
                                     [title]="event.employeeName + ' - ' + event.description"
                                     (click)="onEventClick(event)">
                                     <span class="event-name">{{ event.employeeName }}</span>
@@ -336,6 +349,10 @@
                     <div class="d-flex align-items-center gap-2">
                         <div class="legend-dot event-permission"></div>
                         <span>Permisos</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="legend-dot event-incapacidad"></div>
+                        <span>Incapacidades</span>
                     </div>
                 </div>
 

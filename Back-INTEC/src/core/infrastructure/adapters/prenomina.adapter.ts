@@ -2,12 +2,15 @@ import database from "../../../config/db";
 import { PrenominaRepository } from "../../domain/repository/prenomina.repository";
 import { EmployeeEntity } from "../entity/employees.entity";
 import { AttendanceEntity } from "../entity/attendances.entity";
+import { AbsenceRequestEntity } from "../entity/absence-request.entity";
+import { LessThanOrEqual, MoreThanOrEqual } from "typeorm";
 
 export class PrenominaAdapterRepository implements PrenominaRepository {
 
   async getList(startDate: string, endDate: string): Promise<any[]> {
     const employeeRepo = database.getRepository(EmployeeEntity);
     const attendanceRepo = database.getRepository(AttendanceEntity);
+    const absenceRepo = database.getRepository(AbsenceRequestEntity);
 
     const employees = await employeeRepo.find({
       where: { status: true },
@@ -19,6 +22,13 @@ export class PrenominaAdapterRepository implements PrenominaRepository {
       .where('a.date BETWEEN :startDate AND :endDate', { startDate, endDate })
       .andWhere('a.status = :status', { status: true })
       .getMany();
+
+    const absences = await absenceRepo.find({
+      where: {
+        start_date: LessThanOrEqual(endDate),
+        end_date: MoreThanOrEqual(startDate)
+      }
+    });
 
     const attendanceMap = new Map<string, AttendanceEntity[]>();
     for (const att of attendances) {
@@ -41,11 +51,24 @@ export class PrenominaAdapterRepository implements PrenominaRepository {
         const entrada = dayAttendances.find(a => a.type === 'Entrada');
         const salida = dayAttendances.find(a => a.type === 'Salida');
 
+        let status = entrada ? 'En Obra' : 'Falta';
+
+        if (!entrada) {
+          const absence = absences.find(a =>
+            a.id_employee === employee.id_employee &&
+            dateKey >= String(a.start_date) &&
+            dateKey <= String(a.end_date)
+          );
+          if (absence) {
+            status = absence.type;
+          }
+        }
+
         results.push({
           name_employee: employee.name_employee,
           project: employee.project || '',
           date: dateKey,
-          status: entrada ? 'En Obra' : 'Falta',
+          status,
           entry_time: entrada ? entrada.hour : null,
           exit_time: salida ? salida.hour : null,
         });

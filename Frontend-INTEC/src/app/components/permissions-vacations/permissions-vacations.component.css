@@ -84,6 +84,25 @@
     background-color: #59359a;
 }
 
+.btn-incapacidad {
+    background-color: #dc3545;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    color: white;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    transition: background-color 0.3s;
+    cursor: pointer;
+}
+
+.btn-incapacidad:hover {
+    background-color: #bb2d3b;
+}
+
 .btn-back {
     display: flex;
     align-items: center;
@@ -225,6 +244,11 @@
 .status-late {
     background-color: #fff3cd;
     color: #856404;
+}
+
+.status-incapacidad {
+    background-color: #f8d7da;
+    color: #721c24;
 }
 
 /* Column specifics from user request/image */
@@ -476,6 +500,12 @@
     /* Bootstrap Primary/Blue */
     color: white;
     border-left: 3px solid #063e91;
+}
+
+.event-incapacidad {
+    background-color: #dc3545;
+    color: white;
+    border-left: 3px solid #a71d2a;
 }
 
 /* Legend */

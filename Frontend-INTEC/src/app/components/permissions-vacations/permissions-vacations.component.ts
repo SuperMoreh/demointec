@@ -5,7 +5,9 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { Observable, firstValueFrom } from 'rxjs';
 import { EmployeesAdapterService } from '../../adapters/employees.adapter';
 import { EmployeeDocumentsAdapterService } from '../../adapters/employee-documents.adapter';
+import { AbsenceRequestAdapterService } from '../../adapters/absence-request.adapter';
 import { Employee } from '../../models/employees';
+import { AbsenceRequest } from '../../models/absence-request';
 import { UploadAdapterService } from '../../adapters/upload.adapter';
 import { ToastrService } from 'ngx-toastr';
 
@@ -26,7 +28,8 @@ interface VacationRow {
 
 interface RequestRecord {
     id: string;
-    type: 'Vacaciones' | 'Permiso';
+    employeeId: string;
+    type: 'Vacaciones' | 'Permiso' | 'Incapacidad';
     startDate: string;
     endDate: string;
     daysCount: number;
@@ -51,7 +54,7 @@ export class PermissionsVacationsComponent implements OnInit {
     searchTerm: string = '';
     loading: boolean = true;
     requestForm: FormGroup;
-    requestType: 'Vacaciones' | 'Permiso' = 'Vacaciones';
+    requestType: 'Vacaciones' | 'Permiso' | 'Incapacidad' = 'Vacaciones';
     selectedFile: File | null = null;
 
     // Dynamic Years
@@ -84,6 +87,7 @@ export class PermissionsVacationsComponent implements OnInit {
     constructor(
         private employeesAdapter: EmployeesAdapterService,
         private docService: EmployeeDocumentsAdapterService,
+        private absenceRequestAdapter: AbsenceRequestAdapterService,
         private fb: FormBuilder,
         private uploadService: UploadAdapterService,
         private toastr: ToastrService
@@ -111,8 +115,18 @@ export class PermissionsVacationsComponent implements OnInit {
         this.loading = true;
         this.employeesAdapter.getList().subscribe({
             next: (employees) => {
-                this.processEmployees(employees);
-                this.loading = false;
+                this.absenceRequestAdapter.getList().subscribe({
+                    next: (requests) => {
+                        const mappedRequests = this.mapToRequestRecords(requests);
+                        this.processEmployees(employees, mappedRequests);
+                        this.loading = false;
+                    },
+                    error: (err) => {
+                        console.error('Error loading absence requests', err);
+                        this.processEmployees(employees, []);
+                        this.loading = false;
+                    }
+                });
             },
             error: (err) => {
                 console.error('Error loading employees for vacations', err);
@@ -122,7 +136,24 @@ export class PermissionsVacationsComponent implements OnInit {
         });
     }
 
-    processEmployees(employees: Employee[]): void {
+    private mapToRequestRecords(requests: AbsenceRequest[]): RequestRecord[] {
+        return requests.map(r => ({
+            id: r.id || '',
+            employeeId: r.id_employee,
+            type: r.type,
+            startDate: r.start_date,
+            endDate: r.end_date,
+            daysCount: r.days_count,
+            description: r.description || '',
+            reason: r.reason,
+            withPay: r.with_pay,
+            vacationYear: r.vacation_year || undefined,
+            documentUrl: r.document_url || '',
+            requestDate: r.request_date
+        }));
+    }
+
+    processEmployees(employees: Employee[], savedRequests: RequestRecord[]): void {
         const currentYear = this.currentYear;
         const previousYear = this.previousYear;
 
@@ -146,19 +177,6 @@ export class PermissionsVacationsComponent implements OnInit {
                     }
                 } catch (e) {
                     console.error('Error parsing user for permissions', e);
-                }
-            }
-        }
-
-        // Load persistency
-        let savedRequests: RequestRecord[] = [];
-        if (typeof localStorage !== 'undefined') {
-            const saved = localStorage.getItem('vacation_requests');
-            if (saved) {
-                try {
-                    savedRequests = JSON.parse(saved);
-                } catch (e) {
-                    console.error('Error parsing saved requests', e);
                 }
             }
         }
@@ -271,11 +289,11 @@ export class PermissionsVacationsComponent implements OnInit {
 
     // --- Modal Logic ---
 
-    openCreateModal(type: 'Vacaciones' | 'Permiso'): void {
+    openCreateModal(type: 'Vacaciones' | 'Permiso' | 'Incapacidad'): void {
         this.requestType = type;
         this.requestForm.reset({
             withPay: false,
-            reason: type === 'Vacaciones' ? 'Vacaciones' : ''
+            reason: type === 'Vacaciones' ? 'Vacaciones' : (type === 'Incapacidad' ? 'Incapacidad' : '')
         });
         this.requestForm.enable();
         this.selectedFile = null;
@@ -331,30 +349,19 @@ export class PermissionsVacationsComponent implements OnInit {
 
     deleteRequest(record: RequestRecord): void {
         if (!confirm('¿Está seguro de que desea eliminar este registro?')) return;
+        if (!record.id) return;
 
-        let savedRequests: any[] = [];
-        if (typeof localStorage !== 'undefined') {
-            const saved = localStorage.getItem('vacation_requests');
-            if (saved) savedRequests = JSON.parse(saved);
-        }
-
-        const initialLength = savedRequests.length;
-        savedRequests = savedRequests.filter(r => r.id !== record.id);
-
-        if (savedRequests.length < initialLength) {
-            localStorage.setItem('vacation_requests', JSON.stringify(savedRequests));
-            this.toastr.success('Registro eliminado');
-            this.loadEmployees(); // Reload to update lists
-
-            // Also need to refresh the open history modal if it's open
-            // Simplest way is to close it or re-fetch data for it.
-            // Since loadEmployees refreshes allRows, we can re-find the row and update selectedEmployeeHistory
-            // However, `loadEmployees` is async observable... so we might need to handle that.
-            // Ideally we just remove it from `selectedEmployeeHistory` locally too.
-            this.selectedEmployeeHistory = this.selectedEmployeeHistory.filter(r => r.id !== record.id);
-        } else {
-            this.toastr.error('No se pudo encontrar el registro para eliminar');
-        }
+        this.absenceRequestAdapter.delete(record.id).subscribe({
+            next: () => {
+                this.toastr.success('Registro eliminado');
+                this.selectedEmployeeHistory = this.selectedEmployeeHistory.filter(r => r.id !== record.id);
+                this.loadEmployees();
+            },
+            error: (err) => {
+                console.error('Error deleting request', err);
+                this.toastr.error('Error al eliminar el registro');
+            }
+        });
     }
 
     private switchModal(): void {
@@ -378,9 +385,12 @@ export class PermissionsVacationsComponent implements OnInit {
     async saveRequest(): Promise<void> {
         if (this.isReadOnly) return; // Prevention
 
-        // If it's Vacations, ensure a default reason to pass validation
+        // If it's Vacations or Incapacidad, ensure a default reason to pass validation
         if (this.requestType === 'Vacaciones' && !this.requestForm.get('reason')?.value) {
             this.requestForm.patchValue({ reason: 'Vacaciones' });
+        }
+        if (this.requestType === 'Incapacidad' && !this.requestForm.get('reason')?.value) {
+            this.requestForm.patchValue({ reason: 'Incapacidad' });
         }
 
         if (this.requestForm.invalid) {
@@ -423,65 +433,39 @@ export class PermissionsVacationsComponent implements OnInit {
             }
         }
 
-        // Load existing
-        let savedRequests: any[] = [];
-        if (typeof localStorage !== 'undefined') {
-            const saved = localStorage.getItem('vacation_requests');
-            if (saved) {
-                try {
-                    savedRequests = JSON.parse(saved);
-                } catch (e) { }
-            }
-        }
+        const requestData: AbsenceRequest = {
+            id_employee: formValues.employeeId,
+            type: this.requestType,
+            start_date: formValues.startDate,
+            end_date: formValues.endDate,
+            days_count: daysCount,
+            reason: formValues.reason,
+            description: formValues.description || '',
+            with_pay: !!formValues.withPay,
+            vacation_year: this.requestType === 'Vacaciones' ? formValues.vacationYear : null,
+            document_url: docPath || this.currentDocumentUrl || '',
+            request_date: new Date().toISOString().split('T')[0]
+        };
 
-        if (this.editingRequestId) {
-            // UPDATE
-            const index = savedRequests.findIndex(r => r.id === this.editingRequestId);
-            if (index !== -1) {
-                savedRequests[index] = {
-                    ...savedRequests[index],
-                    employeeId: formValues.employeeId,
-                    type: this.requestType,
-                    startDate: formValues.startDate,
-                    endDate: formValues.endDate,
-                    daysCount: daysCount,
-                    reason: formValues.reason,
-                    description: formValues.description,
-                    withPay: formValues.withPay,
-                    vacationYear: this.requestType === 'Vacaciones' ? formValues.vacationYear : null,
-                    // Only update docUrl if new one uploaded, else keep old
-                    documentUrl: docPath || savedRequests[index].documentUrl
-                };
+        try {
+            if (this.editingRequestId) {
+                await firstValueFrom(this.absenceRequestAdapter.update(this.editingRequestId, requestData));
                 this.toastr.success('Registro actualizado exitosamente');
+            } else {
+                await firstValueFrom(this.absenceRequestAdapter.create(requestData));
+                this.toastr.success(`${this.requestType} registrado exitosamente`);
             }
-        } else {
-            // CREATE
-            const newRequest: any = {
-                id: Math.random().toString(36).substr(2, 9),
-                employeeId: formValues.employeeId,
-                type: this.requestType,
-                startDate: formValues.startDate,
-                endDate: formValues.endDate,
-                daysCount: daysCount,
-                reason: formValues.reason,
-                description: formValues.description,
-                withPay: formValues.withPay,
-                vacationYear: this.requestType === 'Vacaciones' ? formValues.vacationYear : null,
-                documentUrl: docPath,
-                requestDate: new Date().toISOString().split('T')[0]
-            };
-            savedRequests.push(newRequest);
-            this.toastr.success(`${this.requestType} registrado exitosamente`);
+
+            // Close Modal
+            const modalEl = document.getElementById('createRequestModal');
+            const modal = (window as any).bootstrap.Modal.getInstance(modalEl);
+            modal.hide();
+
+            this.loadEmployees(); // Refresh view
+        } catch (err) {
+            console.error('Error saving request', err);
+            this.toastr.error('Error al guardar el registro');
         }
-
-        localStorage.setItem('vacation_requests', JSON.stringify(savedRequests));
-
-        // Close Modal
-        const modalEl = document.getElementById('createRequestModal');
-        const modal = (window as any).bootstrap.Modal.getInstance(modalEl);
-        modal.hide();
-
-        this.loadEmployees(); // Refresh view
     }
 
     openHistoryModal(row: VacationRow): void {

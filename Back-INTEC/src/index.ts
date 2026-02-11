@@ -25,6 +25,7 @@ import terminationRouter from './core/infrastructure/rest/routes/terminations.ro
 import employeeProjectRouter from './core/infrastructure/rest/routes/employee-project.route';
 import prenominaRouter from './core/infrastructure/rest/routes/prenomina.route';
 import committeeDocumentsRouter from './core/infrastructure/rest/routes/committee-documents.route';
+import absenceRequestRouter from './core/infrastructure/rest/routes/absence-request.route';
 
 import { RoleEntity } from './core/infrastructure/entity/roles.entity';
 import { UserEntity } from './core/infrastructure/entity/users.entity';
@@ -64,6 +65,7 @@ app.use('/api', terminationRouter);
 app.use('/api', employeeProjectRouter);
 app.use('/api', prenominaRouter);
 app.use('/api', committeeDocumentsRouter);
+app.use('/api', absenceRequestRouter);
 
 // Serve Frontend Static Files
 app.use(express.static(path.join(__dirname, '../public')));

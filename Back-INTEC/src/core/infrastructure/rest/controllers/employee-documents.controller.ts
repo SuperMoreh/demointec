@@ -6,39 +6,27 @@ import { v4 as uuidv4 } from 'uuid';
 export class EmployeeDocumentsController {
     constructor(private adapter: EmployeeDocumentsAdapter) { }
 
-    // --- Helper: Upload to Firebase (Reused Logic) ---
     private async uploadFile(file: Express.Multer.File): Promise<string> {
-        console.log('Starting document upload to Firebase:', file.originalname);
-        const fileName = `docs/${uuidv4()}_${file.originalname}`;
+        const token = uuidv4();
+        const fileName = `docs/${token}_${file.originalname}`;
         const fileUpload = storage.file(fileName);
 
         const blobStream = fileUpload.createWriteStream({
             metadata: {
-                contentType: file.mimetype
+                contentType: file.mimetype,
+                metadata: {
+                    firebaseStorageDownloadTokens: token
+                }
             }
         });
 
         return new Promise((resolve, reject) => {
             blobStream.on('error', (error) => {
-                console.error('Firebase Storage Error:', error);
                 reject(error);
             });
-            blobStream.on('finish', async () => {
-                try {
-                    console.log('File upload finished, attempting to make public...');
-                    try {
-                        await fileUpload.makePublic();
-                    } catch (e) {
-                        console.warn('Could not make file public (might need IAM permissions):', e);
-                    }
-
-                    const publicUrl = `https://storage.googleapis.com/${storage.name}/${fileUpload.name}`;
-                    console.log('File public URL:', publicUrl);
-                    resolve(publicUrl);
-                } catch (error) {
-                    console.error('Error in upload finish callback:', error);
-                    reject(error);
-                }
+            blobStream.on('finish', () => {
+                const publicUrl = `https://firebasestorage.googleapis.com/v0/b/${storage.name}/o/${encodeURIComponent(fileUpload.name)}?alt=media&token=${token}`;
+                resolve(publicUrl);
             });
             blobStream.end(file.buffer);
         });
@@ -69,10 +57,12 @@ export class EmployeeDocumentsController {
 
             if (req.file) {
                 try {
+                    console.log('[DEBUG] Uploading file to Firebase...');
                     const fileUrl = await this.uploadFile(req.file);
+                    console.log('[DEBUG] Firebase upload OK. URL:', fileUrl);
                     body.document_path = fileUrl;
                 } catch (uploadError) {
-                    console.error('Document upload failed:', uploadError);
+                    console.error('[ERROR] Document upload failed:', uploadError);
                     res.status(500).json({ message: "Error al subir archivo", error: uploadError });
                     return;
                 }
@@ -81,12 +71,15 @@ export class EmployeeDocumentsController {
                 return;
             }
 
+            console.log('[DEBUG] Saving to DB with data:', JSON.stringify(body));
             const doc = await this.adapter.saveDocument(body);
+            console.log('[DEBUG] Document saved to DB:', JSON.stringify(doc));
             res.status(201).json({ message: "Documento guardado correctamente", doc });
 
-        } catch (error) {
-            console.error('Error saving document:', error);
-            res.status(500).json({ message: "Error al guardar documento", error });
+        } catch (error: any) {
+            console.error('[ERROR] Error saving document:', error?.message || error);
+            console.error('[ERROR] Stack:', error?.stack);
+            res.status(500).json({ message: "Error al guardar documento", error: error?.message });
         }
     }
 
