@@ -29,12 +29,65 @@
     background-color: #f8f9fa;
 }
 
+.filters-row {
+    display: flex;
+    gap: 1rem;
+    align-items: end;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-group label {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.filter-group-search {
+    flex: 1;
+    min-width: 200px;
+}
+
 .filter-input {
     padding: 0.5rem;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 0.9rem;
     width: 100%;
+}
+
+.btn-consult {
+    background-color: #2a7ae4;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    height: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: background-color 0.3s;
+}
+
+.btn-consult:hover {
+    background-color: #1d5fb1;
+}
+
+.employee-card {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background-color: white;
+    border-radius: 6px;
+    border: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 /* Typeahead dropdown (Same as Labor Relations) */
@@ -48,95 +101,271 @@
     cursor: pointer;
 }
 
-/* Panel 2: Document Table */
-.card {
-    border: none;
+/* Contenedor tabla/carpetas */
+.table-container {
+    background-color: white;
     border-radius: 8px;
+    overflow: hidden;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 1.5rem;
 }
 
-.card-header {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #eee;
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 1rem 1.5rem;
+    border-bottom: 1px solid #eee;
+    background-color: #f8f9fa;
+}
+
+.table-info {
+    color: #666;
+    font-size: 0.9rem;
     font-weight: 500;
-    color: #555;
 }
 
-.card-body {
-    padding: 1.5rem;
+/* Carpetas acordeón */
+.folders-list {
+    padding: 0;
 }
 
-.table {
-    margin-bottom: 0;
+.folder-item {
+    border-bottom: 1px solid #eee;
 }
 
-.table th {
-    font-weight: 500;
-    color: #555;
-    border-top: none;
+.folder-item:last-child {
+    border-bottom: none;
 }
 
-.table td {
-    vertical-align: middle;
+.folder-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.85rem 1.25rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    user-select: none;
 }
 
-/* Status Icons */
-.status-icon {
+.folder-header:hover {
+    background-color: #f0f4ff;
+}
+
+.folder-header.expanded {
+    background-color: #e8f0fe;
+    border-bottom: 1px solid #d0ddf0;
+}
+
+.folder-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.folder-arrow {
+    font-size: 0.75rem;
+    color: #888;
+    transition: transform 0.25s ease;
+}
+
+.folder-arrow.rotated {
+    transform: rotate(-90deg);
+}
+
+.folder-title .bi-folder2,
+.folder-title .bi-folder2-open {
+    color: #F58525;
+    font-size: 1.1rem;
+}
+
+.folder-label {
+    font-weight: 400;
+}
+
+.section-abbreviation {
+    display: inline-block;
+    background-color: #2a7ae4;
+    color: white;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    min-width: 30px;
+    text-align: center;
+}
+
+.section-extra {
+    background-color: #F58525;
+}
+
+.doc-count {
+    font-size: 0.8rem;
+    color: #888;
+    font-weight: 400;
+}
+
+/* Contenido expandido */
+.folder-content {
+    background-color: #fafbfc;
+    padding: 0.75rem 1.25rem 0.75rem 2.75rem;
+    border-bottom: 1px solid #e8ecf0;
+}
+
+/* Documentos */
+.document-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.65rem;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    margin-bottom: 0.4rem;
+    background-color: white;
+    transition: background-color 0.2s;
+}
+
+.document-item:hover {
+    background-color: #f0f4ff;
+}
+
+.document-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.document-info > i {
     font-size: 1.2rem;
+    color: #2a7ae4;
+    flex-shrink: 0;
 }
 
+.document-info div {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.document-name {
+    font-size: 0.82rem;
+    color: #333;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.document-date {
+    font-size: 0.72rem;
+    color: #999;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.document-actions {
+    display: flex;
+    gap: 0.3rem;
+    flex-shrink: 0;
+}
+
+.btn-doc {
+    padding: 0.3rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    transition: background-color 0.2s;
+    font-size: 0.75rem;
+    text-decoration: none;
+}
+
+.btn-doc-upload {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.btn-doc-upload:hover {
+    background-color: #bee5eb;
+}
+
+.btn-doc-view {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.btn-doc-view:hover {
+    background-color: #c3e6cb;
+    color: #155724;
+}
+
+.btn-doc-delete {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.btn-doc-delete:hover {
+    background-color: #f5c6cb;
+}
+
+/* Status icons inline */
 .status-ok {
     color: #28a745;
-    /* Green */
 }
 
 .status-missing {
     color: #dc3545;
-    /* Red */
 }
 
-/* Buttons */
-.btn-upload {
-    background-color: #54ADEC;
-    color: white;
-    border: none;
-    padding: 0.3rem 0.8rem;
-    border-radius: 4px;
+/* Sin documentos */
+.no-documents {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 1.25rem;
+    color: #999;
     font-size: 0.85rem;
-    transition: background-color 0.2s;
 }
 
-.btn-upload:hover {
-    background-color: #4196d1;
+.no-documents i.bi-folder2-open {
+    font-size: 1.5rem;
 }
 
-.btn-view {
-    background-color: #fff3cd;
-    color: #856404;
-    border: none;
-    padding: 0.3rem 0.8rem;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    margin-left: 0.5rem;
-    text-decoration: none;
-    display: inline-block;
+/* Agregar documento */
+.add-document-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px dashed #ddd;
 }
 
-.btn-view:hover {
-    background-color: #ffeaa7;
-    color: #856404;
+.add-doc-input {
+    max-width: 220px;
+    font-size: 0.82rem;
 }
 
 .btn-add-doc {
     background-color: #f8f9fa;
     color: #2a7ae4;
     border: 1px dashed #2a7ae4;
-    padding: 0.4rem 1rem;
+    padding: 0.4rem 0.75rem;
     border-radius: 4px;
-    font-size: 0.9rem;
+    font-size: 0.82rem;
     transition: all 0.2s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
 }
 
 .btn-add-doc:hover:not(:disabled) {
@@ -168,16 +397,49 @@
     color: #721c24;
 }
 
-.btn-delete {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: none;
-    padding: 0.3rem 0.8rem;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    transition: background-color 0.2s;
+.consult-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 2rem;
+    background-color: #f0f4ff;
+    border: 1px dashed #2a7ae4;
+    border-radius: 8px;
+    color: #2a7ae4;
+    font-size: 1rem;
 }
 
-.btn-delete:hover {
-    background-color: #f5c6cb;
+.consult-placeholder i {
+    font-size: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .filters-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-group-search {
+        width: 100%;
+    }
+
+    .employee-card {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: flex-start;
+    }
+
+    .folder-content {
+        padding-left: 1.25rem;
+    }
+
+    .add-document-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .add-doc-input {
+        max-width: 100%;
+    }
 }

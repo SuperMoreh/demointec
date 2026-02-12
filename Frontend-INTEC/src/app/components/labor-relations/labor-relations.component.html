@@ -7,35 +7,36 @@
 
     <!-- Panel 1: Búsqueda -->
     <div class="filters-section">
-        <h5 class="mb-3" style="font-weight: 400; color: #555;">Búsqueda de Colaborador</h5>
-        <form [formGroup]="searchForm">
-            <div class="position-relative">
-                <div class="input-group">
-                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                    <input type="text" class="form-control filter-input" placeholder="Escribe el nombre del empleado..."
+        <form [formGroup]="searchForm" class="filters-row">
+            <div class="filter-group filter-group-search">
+                <label for="searchTerm">Buscar</label>
+                <div class="position-relative">
+                    <input type="text" id="searchTerm" class="filter-input" placeholder="Nombre del colaborador..."
                         formControlName="searchTerm" (keydown)="onKeydown($event)">
-                </div>
 
-                <!-- Lista de sugerencias -->
-                <ul class="list-group position-absolute w-100 mt-1 shadow" style="z-index: 1000;"
-                    *ngIf="filteredEmployees.length > 0">
-                    <li class="list-group-item list-group-item-action cursor-pointer border-bottom"
-                        *ngFor="let emp of filteredEmployees; let i = index"
-                        [class.active-search-item]="i === selectedIndex" (click)="selectEmployee(emp)">
-                        <strong>{{ emp.name_employee }}</strong> <small class="text-muted ms-2">({{ emp.role }})</small>
-                    </li>
-                </ul>
+                    <!-- Lista de sugerencias -->
+                    <ul class="list-group position-absolute w-100 mt-1 shadow" style="z-index: 1000;"
+                        *ngIf="filteredEmployees.length > 0">
+                        <li class="list-group-item list-group-item-action cursor-pointer border-bottom"
+                            *ngFor="let emp of filteredEmployees; let i = index"
+                            [class.active-search-item]="i === selectedIndex" (click)="selectEmployee(emp)">
+                            <strong>{{ emp.name_employee }}</strong> <small class="text-muted ms-2">({{ emp.role }})</small>
+                        </li>
+                    </ul>
+                </div>
             </div>
+            <button type="button" class="btn-consult" (click)="clearSearch()">
+                <i class="bi bi-x-lg"></i>
+                Limpiar
+            </button>
         </form>
 
         <!-- Datos básicos del empleado seleccionado -->
-        <div *ngIf="selectedEmployee"
-            class="mt-4 p-3 bg-white rounded border d-flex justify-content-between align-items-center">
+        <div *ngIf="selectedEmployee" class="employee-card">
             <div>
                 <h5 class="mb-1 text-primary">{{ selectedEmployee.name_employee }}</h5>
                 <div class="text-muted small">
-                    <span class="me-3"><i class="bi bi-briefcase"></i> {{ selectedEmployee.position || 'Sin puesto'
-                        }}</span>
+                    <span class="me-3"><i class="bi bi-briefcase"></i> {{ selectedEmployee.position || 'Sin puesto' }}</span>
                     <span class="me-3"><i class="bi bi-envelope"></i> {{ selectedEmployee.email }}</span>
                     <span><i class="bi bi-telephone"></i> {{ selectedEmployee.phone }}</span>
                 </div>
@@ -46,6 +47,12 @@
                 </span>
             </div>
         </div>
+    </div>
+
+    <!-- Placeholder cuando no hay empleado seleccionado -->
+    <div class="consult-placeholder" *ngIf="!selectedEmployee">
+        <i class="bi bi-info-circle"></i>
+        Busque un colaborador para ver sus Relaciones Laborales.
     </div>
 
     <div class="row" *ngIf="selectedEmployee">

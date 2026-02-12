@@ -39,10 +39,20 @@ export class DocumentRepositoryComponent implements OnInit {
 
     documentsList: DocumentRow[] = [];
     selectedDocTypeForUpload: string | null = null;
-    customDocName: string = ''; // For new document input
-    customDocFile: File | null = null; // For new document file
-    @ViewChild('customFileInput') customFileInput: any; // Reference to reset
+    customDocName: string = '';
+    customDocFile: File | null = null;
+    @ViewChild('customFileInput') customFileInput: any;
     canDelete: boolean = false;
+    requiredExpanded: boolean = true;
+    additionalExpanded: boolean = false;
+
+    get requiredDocs(): DocumentRow[] {
+        return this.documentsList.filter(d => this.DOCUMENT_TYPES.includes(d.name));
+    }
+
+    get additionalDocs(): DocumentRow[] {
+        return this.documentsList.filter(d => !this.DOCUMENT_TYPES.includes(d.name));
+    }
 
     constructor(
         private fb: FormBuilder,
@@ -122,6 +132,14 @@ export class DocumentRepositoryComponent implements OnInit {
                 this.selectEmployee(this.filteredEmployees[0]);
             }
         }
+    }
+
+    clearSearch() {
+        this.searchForm.patchValue({ searchTerm: '' });
+        this.selectedEmployee = null;
+        this.filteredEmployees = [];
+        this.selectedIndex = -1;
+        this.resetDocumentsList();
     }
 
     selectEmployee(employee: Employee) {

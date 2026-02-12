@@ -118,6 +118,15 @@ export class LaborRelationsComponent implements OnInit {
         }
     }
 
+    clearSearch() {
+        this.searchForm.patchValue({ searchTerm: '' });
+        this.selectedEmployee = null;
+        this.filteredEmployees = [];
+        this.selectedIndex = -1;
+        this.events = [];
+        this.uniformForm.reset();
+    }
+
     selectEmployee(employee: Employee) {
         this.selectedEmployee = employee;
         this.filteredEmployees = []; // Hide list

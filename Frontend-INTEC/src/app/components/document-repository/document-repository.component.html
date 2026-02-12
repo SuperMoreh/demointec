@@ -5,35 +5,36 @@
 
     <!-- Panel 1: Búsqueda -->
     <div class="filters-section">
-        <h5 class="mb-3" style="font-weight: 400; color: #555;">Búsqueda de Colaborador</h5>
-        <form [formGroup]="searchForm">
-            <div class="position-relative">
-                <div class="input-group">
-                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                    <input type="text" class="form-control filter-input" placeholder="Escribe el nombre del empleado..."
+        <form [formGroup]="searchForm" class="filters-row">
+            <div class="filter-group filter-group-search">
+                <label for="searchTerm">Buscar</label>
+                <div class="position-relative">
+                    <input type="text" id="searchTerm" class="filter-input" placeholder="Nombre del colaborador..."
                         formControlName="searchTerm" (keydown)="onKeydown($event)">
-                </div>
 
-                <!-- Lista de sugerencias -->
-                <ul class="list-group position-absolute w-100 mt-1 shadow" style="z-index: 1000;"
-                    *ngIf="filteredEmployees.length > 0">
-                    <li class="list-group-item list-group-item-action cursor-pointer border-bottom"
-                        *ngFor="let emp of filteredEmployees; let i = index"
-                        [class.active-search-item]="i === selectedIndex" (click)="selectEmployee(emp)">
-                        <strong>{{ emp.name_employee }}</strong> <small class="text-muted ms-2">({{ emp.role }})</small>
-                    </li>
-                </ul>
+                    <!-- Lista de sugerencias -->
+                    <ul class="list-group position-absolute w-100 mt-1 shadow" style="z-index: 1000;"
+                        *ngIf="filteredEmployees.length > 0">
+                        <li class="list-group-item list-group-item-action cursor-pointer border-bottom"
+                            *ngFor="let emp of filteredEmployees; let i = index"
+                            [class.active-search-item]="i === selectedIndex" (click)="selectEmployee(emp)">
+                            <strong>{{ emp.name_employee }}</strong> <small class="text-muted ms-2">({{ emp.role }})</small>
+                        </li>
+                    </ul>
+                </div>
             </div>
+            <button type="button" class="btn-consult" (click)="clearSearch()">
+                <i class="bi bi-x-lg"></i>
+                Limpiar
+            </button>
         </form>
 
         <!-- Datos básicos del empleado seleccionado -->
-        <div *ngIf="selectedEmployee"
-            class="mt-4 p-3 bg-white rounded border d-flex justify-content-between align-items-center">
+        <div *ngIf="selectedEmployee" class="employee-card">
             <div>
                 <h5 class="mb-1 text-primary">{{ selectedEmployee.name_employee }}</h5>
                 <div class="text-muted small">
-                    <span class="me-3"><i class="bi bi-briefcase"></i> {{ selectedEmployee.position || 'Sin puesto'
-                        }}</span>
+                    <span class="me-3"><i class="bi bi-briefcase"></i> {{ selectedEmployee.position || 'Sin puesto' }}</span>
                     <span class="me-3"><i class="bi bi-envelope"></i> {{ selectedEmployee.email }}</span>
                     <span><i class="bi bi-telephone"></i> {{ selectedEmployee.phone }}</span>
                 </div>
@@ -46,62 +47,105 @@
         </div>
     </div>
 
-    <!-- Panel 2: Lista de Documentos -->
-    <div class="card" *ngIf="selectedEmployee">
-        <div class="card-header">
-            <h5><i class="bi bi-folder2-open text-primary"></i> Documentos del Colaborador</h5>
+    <!-- Placeholder cuando no hay empleado seleccionado -->
+    <div class="consult-placeholder" *ngIf="!selectedEmployee">
+        <i class="bi bi-info-circle"></i>
+        Busque un colaborador para poder ver su Repositorio Documental.
+    </div>
+
+    <!-- Panel 2: Documentos estilo carpetas -->
+    <div class="table-container" *ngIf="selectedEmployee">
+        <div class="table-header">
+            <div class="table-info">Documentos de {{ selectedEmployee.name_employee }}</div>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th style="width: 50%;">Nombre del Documento</th>
-                            <th style="width: 20%; text-align: center;">Estatus</th>
-                            <th style="width: 30%; text-align: center;">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let doc of documentsList">
-                            <td>{{ doc.name }}</td>
-                            <td class="text-center">
-                                <i class="bi bi-check-circle-fill status-icon status-ok" *ngIf="doc.uploaded"
-                                    title="Subido"></i>
-                                <i class="bi bi-x-circle-fill status-icon status-missing" *ngIf="!doc.uploaded"
-                                    title="Pendiente"></i>
-                            </td>
-                            <td class="text-center">
-                                <button class="btn-upload" (click)="initiateUpload(doc.name)">
-                                    <i class="bi bi-upload"></i> Subir
-                                </button>
-                                <a *ngIf="doc.uploaded && doc.path" [href]="doc.path" target="_blank" class="btn-view">
-                                    <i class="bi bi-eye"></i> Ver
-                                </a>
-                                <button *ngIf="canDelete && doc.uploaded" class="btn-delete ms-2"
-                                    (click)="deleteDocument(doc)" title="Eliminar documento">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="3" class="pt-3">
-                                <div class="d-flex align-items-center">
-                                    <input type="text" class="form-control me-2" style="max-width: 300px;"
-                                        placeholder="Nombre del nuevo documento..." [(ngModel)]="customDocName"
-                                        (keydown.enter)="addCustomDocument()">
-                                    <input type="file" class="form-control me-2" style="max-width: 300px;"
-                                        (change)="onCustomFileSelected($event)" #customFileInput>
-                                    <button class="btn-add-doc" (click)="addCustomDocument()"
-                                        [disabled]="!customDocName.trim()">
-                                        <i class="bi bi-plus-circle"></i> Agregar Documento
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
+
+        <div class="folders-list">
+            <!-- Carpeta: Documentos Requeridos -->
+            <div class="folder-item">
+                <div class="folder-header" (click)="requiredExpanded = !requiredExpanded" [class.expanded]="requiredExpanded">
+                    <div class="folder-title">
+                        <i class="bi bi-chevron-down folder-arrow" [class.rotated]="!requiredExpanded"></i>
+                        <i class="bi bi-folder2" *ngIf="!requiredExpanded"></i>
+                        <i class="bi bi-folder2-open" *ngIf="requiredExpanded"></i>
+                        <span class="section-abbreviation">RH</span>
+                        <span class="folder-label">Documentos Requeridos</span>
+                        <span class="doc-count">({{ requiredDocs.length }})</span>
+                    </div>
+                </div>
+                <div class="folder-content" *ngIf="requiredExpanded">
+                    <div class="document-item" *ngFor="let doc of requiredDocs">
+                        <div class="document-info">
+                            <i class="bi bi-file-earmark-text"></i>
+                            <div>
+                                <span class="document-name">{{ doc.name }}</span>
+                                <small class="document-date">
+                                    <i class="bi" [ngClass]="doc.uploaded ? 'bi-check-circle-fill status-ok' : 'bi-x-circle-fill status-missing'"></i>
+                                    {{ doc.uploaded ? 'Subido' : 'Pendiente' }}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="document-actions">
+                            <button class="btn-doc btn-doc-upload" (click)="initiateUpload(doc.name)" title="Subir">
+                                <i class="bi bi-cloud-arrow-up"></i>
+                            </button>
+                            <a *ngIf="doc.uploaded && doc.path" [href]="doc.path" target="_blank" class="btn-doc btn-doc-view" title="Ver">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <button *ngIf="canDelete && doc.uploaded" class="btn-doc btn-doc-delete" (click)="deleteDocument(doc)" title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carpeta: Documentos Adicionales -->
+            <div class="folder-item">
+                <div class="folder-header" (click)="additionalExpanded = !additionalExpanded" [class.expanded]="additionalExpanded">
+                    <div class="folder-title">
+                        <i class="bi bi-chevron-down folder-arrow" [class.rotated]="!additionalExpanded"></i>
+                        <i class="bi bi-folder2" *ngIf="!additionalExpanded"></i>
+                        <i class="bi bi-folder2-open" *ngIf="additionalExpanded"></i>
+                        <span class="section-abbreviation section-extra">EXTRA</span>
+                        <span class="folder-label">Documentos Adicionales</span>
+                        <span class="doc-count">({{ additionalDocs.length }})</span>
+                    </div>
+                </div>
+                <div class="folder-content" *ngIf="additionalExpanded">
+                    <div class="document-item" *ngFor="let doc of additionalDocs">
+                        <div class="document-info">
+                            <i class="bi bi-file-earmark-text"></i>
+                            <div>
+                                <span class="document-name">{{ doc.name }}</span>
+                                <small class="document-date" *ngIf="doc.date">Subido: {{ doc.date }}</small>
+                            </div>
+                        </div>
+                        <div class="document-actions">
+                            <a *ngIf="doc.path" [href]="doc.path" target="_blank" class="btn-doc btn-doc-view" title="Ver">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <button *ngIf="canDelete && doc.uploaded" class="btn-doc btn-doc-delete" (click)="deleteDocument(doc)" title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="no-documents" *ngIf="additionalDocs.length === 0">
+                        <i class="bi bi-folder2-open"></i>
+                        <span>No hay documentos adicionales.</span>
+                    </div>
+
+                    <!-- Agregar documento personalizado -->
+                    <div class="add-document-row">
+                        <input type="text" class="filter-input add-doc-input" placeholder="Nombre del nuevo documento..."
+                            [(ngModel)]="customDocName" (keydown.enter)="addCustomDocument()">
+                        <input type="file" class="filter-input add-doc-input"
+                            (change)="onCustomFileSelected($event)" #customFileInput>
+                        <button class="btn-add-doc" (click)="addCustomDocument()" [disabled]="!customDocName.trim()">
+                            <i class="bi bi-plus-circle"></i> Agregar
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
