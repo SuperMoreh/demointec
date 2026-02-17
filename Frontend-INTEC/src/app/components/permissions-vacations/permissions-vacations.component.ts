@@ -10,6 +10,7 @@ import { Employee } from '../../models/employees';
 import { AbsenceRequest } from '../../models/absence-request';
 import { UploadAdapterService } from '../../adapters/upload.adapter';
 import { ToastrService } from 'ngx-toastr';
+import { ReportPermissionsVacationsService } from '../../services/reports/report_permissions_vacations.service';
 
 interface VacationRow {
     id: string; // Employee ID
@@ -90,7 +91,8 @@ export class PermissionsVacationsComponent implements OnInit {
         private absenceRequestAdapter: AbsenceRequestAdapterService,
         private fb: FormBuilder,
         private uploadService: UploadAdapterService,
-        private toastr: ToastrService
+        private toastr: ToastrService,
+        private reportService: ReportPermissionsVacationsService
     ) {
         this.requestForm = this.fb.group({
             employeeId: ['', Validators.required],
@@ -592,5 +594,9 @@ export class PermissionsVacationsComponent implements OnInit {
                 this.openCalendarModal();
             }, 150);
         }
+    }
+
+    exportToExcel(): void {
+        this.reportService.exportToExcel(this.filteredData, this.previousYear, this.currentYear);
     }
 }

@@ -37,6 +37,10 @@
                 (click)="loadEmployees()">
                 <i class="bi bi-arrow-repeat"></i> Consultar
             </button>
+            <button class="btn-primary" style="background-color: #0fc330; height: fit-content; align-self: flex-end;"
+                (click)="exportToExcel()" [disabled]="loading || filteredData.length === 0">
+                <i class="bi bi-file-earmark-excel"></i> Exportar 
+            </button>
         </div>
     </div>
 
