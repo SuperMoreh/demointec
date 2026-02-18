@@ -22,6 +22,7 @@ import { JobDescriptionEntity } from '../core/infrastructure/entity/job-descript
 import { TerminationEntity } from '../core/infrastructure/entity/terminations.entity';
 import { CommitteeDocumentEntity } from '../core/infrastructure/entity/committee-documents.entity';
 import { AbsenceRequestEntity } from '../core/infrastructure/entity/absence-request.entity';
+import { DisabilityEntity } from '../core/infrastructure/entity/disability.entity';
 
 dotenv.config();
 
@@ -40,7 +41,7 @@ export const AppDataSource = new DataSource({
   entities: [UserEntity, RoleEntity, AttendanceEntity, ToolsEntity, MaterialEntity, ProjectEntity,
     CategoriesEntity, SubcategoriesEntity, EmployeeEntity, RequestDetailsEntity, RequestHeadersEntity, RequestsAdditionalEntity,
     LaborEventEntity, EmployeeUniformEntity, EmployeeDocumentEntity, JobDescriptionEntity, TerminationEntity,
-    CommitteeDocumentEntity, AbsenceRequestEntity],
+    CommitteeDocumentEntity, AbsenceRequestEntity, DisabilityEntity],
 });
 
 

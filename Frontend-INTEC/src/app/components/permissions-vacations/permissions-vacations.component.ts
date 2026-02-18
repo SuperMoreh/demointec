@@ -6,8 +6,10 @@ import { Observable, firstValueFrom } from 'rxjs';
 import { EmployeesAdapterService } from '../../adapters/employees.adapter';
 import { EmployeeDocumentsAdapterService } from '../../adapters/employee-documents.adapter';
 import { AbsenceRequestAdapterService } from '../../adapters/absence-request.adapter';
+import { DisabilityAdapterService } from '../../adapters/disability.adapter';
 import { Employee } from '../../models/employees';
 import { AbsenceRequest } from '../../models/absence-request';
+import { Disability } from '../../models/disability';
 import { UploadAdapterService } from '../../adapters/upload.adapter';
 import { ToastrService } from 'ngx-toastr';
 import { ReportPermissionsVacationsService } from '../../services/reports/report_permissions_vacations.service';
@@ -18,6 +20,8 @@ interface VacationRow {
     num: string;
     nombre: string;
     fechaIngreso: string;
+    position: string;
+    location: string;
     diasPorTomarPrevious: number;
     aniversarioCurrent: string;
     totalVacaciones: number;
@@ -74,6 +78,9 @@ export class PermissionsVacationsComponent implements OnInit {
     selectedEmployeeId: string = '';
     selectedEmployeeHistory: RequestRecord[] = [];
 
+    // Disabilities cache
+    disabilities: Disability[] = [];
+
     // Permission State
     canManage: boolean = false;
 
@@ -89,6 +96,7 @@ export class PermissionsVacationsComponent implements OnInit {
         private employeesAdapter: EmployeesAdapterService,
         private docService: EmployeeDocumentsAdapterService,
         private absenceRequestAdapter: AbsenceRequestAdapterService,
+        private disabilityAdapter: DisabilityAdapterService,
         private fb: FormBuilder,
         private uploadService: UploadAdapterService,
         private toastr: ToastrService,
@@ -101,7 +109,19 @@ export class PermissionsVacationsComponent implements OnInit {
             reason: ['', Validators.required],
             description: [''],
             withPay: [false],
-            vacationYear: [null]
+            vacationYear: [null],
+            // Campos exclusivos de Incapacidad
+            position: [''],
+            location: [''],
+            folio: [''],
+            incapacidadType: [''],
+            insuranceBranch: [''],
+            eg: [false],
+            rt: [false],
+            at_field: [false],
+            st7: [false],
+            st2: [false],
+            returnToWorkDate: ['']
         });
 
         // Generate available years: only current year and previous year
@@ -128,6 +148,10 @@ export class PermissionsVacationsComponent implements OnInit {
                         this.processEmployees(employees, []);
                         this.loading = false;
                     }
+                });
+                this.disabilityAdapter.getList().subscribe({
+                    next: (disabilities) => { this.disabilities = disabilities; },
+                    error: (err) => { console.error('Error loading disabilities', err); }
                 });
             },
             error: (err) => {
@@ -237,6 +261,8 @@ export class PermissionsVacationsComponent implements OnInit {
                     num: num,
                     nombre: emp.name_employee,
                     fechaIngreso: admissionStr,
+                    position: emp.position || '',
+                    location: emp.location || '',
                     diasPorTomarPrevious: diasPorTomarPrevious,
                     aniversarioCurrent: anniversaryStr,
                     totalVacaciones: entitlementCurrent, // Label is 'TOTAL DIAS LEY', usually refers to current entitlement
@@ -289,6 +315,17 @@ export class PermissionsVacationsComponent implements OnInit {
         }
     }
 
+    onEmployeeChange(employeeId: string): void {
+        if (this.requestType !== 'Incapacidad') return;
+        const selected = this.allRows.find(r => r.id === employeeId);
+        if (selected) {
+            this.requestForm.patchValue({
+                position: selected.position,
+                location: selected.location
+            });
+        }
+    }
+
     // --- Modal Logic ---
 
     openCreateModal(type: 'Vacaciones' | 'Permiso' | 'Incapacidad'): void {
@@ -323,8 +360,12 @@ export class PermissionsVacationsComponent implements OnInit {
             withPay: !!record.withPay,
             vacationYear: record.vacationYear || null
         });
-        this.requestForm.enable();
 
+        if (record.type === 'Incapacidad') {
+            this.patchDisabilityFields(employeeId, record.startDate);
+        }
+
+        this.requestForm.enable();
         this.switchModal();
     }
 
@@ -344,9 +385,34 @@ export class PermissionsVacationsComponent implements OnInit {
             withPay: !!record.withPay,
             vacationYear: record.vacationYear || null
         });
-        this.requestForm.disable();
 
+        if (record.type === 'Incapacidad') {
+            this.patchDisabilityFields(employeeId, record.startDate);
+        }
+
+        this.requestForm.disable();
         this.switchModal();
+    }
+
+    private patchDisabilityFields(employeeId: string, startDate: string): void {
+        const disability = this.disabilities.find(
+            d => d.id_employee === employeeId && d.start_date === startDate
+        );
+        if (disability) {
+            this.requestForm.patchValue({
+                position: disability.position || '',
+                location: disability.location || '',
+                folio: disability.folio || '',
+                incapacidadType: disability.type || '',
+                insuranceBranch: disability.insurance_branch || '',
+                eg: !!disability.eg,
+                rt: !!disability.rt,
+                at_field: !!disability.at_field,
+                st7: !!disability.st7,
+                st2: !!disability.st2,
+                returnToWorkDate: disability.return_to_work_date || ''
+            });
+        }
     }
 
     deleteRequest(record: RequestRecord): void {
@@ -456,6 +522,38 @@ export class PermissionsVacationsComponent implements OnInit {
             } else {
                 await firstValueFrom(this.absenceRequestAdapter.create(requestData));
                 this.toastr.success(`${this.requestType} registrado exitosamente`);
+            }
+
+            // Si es Incapacidad, guardar también en la tabla de incapacidades
+            if (this.requestType === 'Incapacidad') {
+                const selectedEmployee = this.allRows.find(r => r.id === formValues.employeeId);
+                const disabilityData: Disability = {
+                    id_employee: formValues.employeeId,
+                    name: selectedEmployee?.nombre || '',
+                    admission_date: selectedEmployee?.fechaIngreso || '',
+                    position: formValues.position || '',
+                    location: formValues.location || '',
+                    start_date: formValues.startDate,
+                    end_date: formValues.endDate,
+                    days: daysCount,
+                    folio: formValues.folio || '',
+                    type: formValues.incapacidadType || '',
+                    insurance_branch: formValues.insuranceBranch || '',
+                    eg: !!formValues.eg,
+                    rt: !!formValues.rt,
+                    at_field: !!formValues.at_field,
+                    st7: !!formValues.st7,
+                    st2: !!formValues.st2,
+                    return_to_work_date: formValues.returnToWorkDate || '',
+                    document_path: docPath || this.currentDocumentUrl || '',
+                    document_name: this.selectedFile?.name || ''
+                };
+                try {
+                    await firstValueFrom(this.disabilityAdapter.create(disabilityData));
+                } catch (disabilityErr) {
+                    console.error('Error guardando incapacidad', disabilityErr);
+                    this.toastr.warning('El registro se guardó pero hubo un error al guardar la incapacidad en el detalle');
+                }
             }
 
             // Close Modal

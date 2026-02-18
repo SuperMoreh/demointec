@@ -120,7 +120,8 @@
                         <h6 class="mb-3">Datos del Colaborador</h6>
                         <div class="mb-3">
                             <label class="form-label">Colaborador</label>
-                            <select formControlName="employeeId" class="form-select">
+                            <select formControlName="employeeId" class="form-select"
+                                (change)="onEmployeeChange($any($event.target).value)">
                                 <option value="">Seleccione un colaborador...</option>
                                 <option *ngFor="let emp of allRows" [value]="emp.id">{{ emp.nombre }}</option>
                             </select>
@@ -180,6 +181,76 @@
                                 <option value="Otros">Otros</option>
                             </select>
                         </div>
+
+                        <!-- Campos exclusivos de Incapacidad -->
+                        <ng-container *ngIf="requestType === 'Incapacidad'">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Puesto</label>
+                                    <input type="text" formControlName="position" class="form-control" readonly>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Localización</label>
+                                    <input type="text" formControlName="location" class="form-control" readonly>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Folio IMSS</label>
+                                    <input type="text" formControlName="folio" class="form-control" placeholder="Folio asignado por el IMSS">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Tipo</label>
+                                    <select formControlName="incapacidadType" class="form-select">
+                                        <option value="">Seleccione...</option>
+                                        <option value="Inicial">Inicial</option>
+                                        <option value="Subsecuente">Subsecuente</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Ramo de Seguro</label>
+                                    <select formControlName="insuranceBranch" class="form-select">
+                                        <option value="">Seleccione...</option>
+                                        <option value="Enfermedad General">Enfermedad General</option>
+                                        <option value="Riesgo de Trabajo">Riesgo de Trabajo</option>
+                                        <option value="Accidente en Trayecto">Accidente en Trayecto</option>
+                                        <option value="Capacidad Parcial Permanente">Capacidad Parcial Permanente</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Inicio Labores</label>
+                                    <input type="date" formControlName="returnToWorkDate" class="form-control">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label d-block">Formatos y Documentos</label>
+                                <div class="d-flex flex-wrap gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" formControlName="eg" id="checkEG">
+                                        <label class="form-check-label" for="checkEG">EG (Enfermedad General)</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" formControlName="rt" id="checkRT">
+                                        <label class="form-check-label" for="checkRT">RT (Riesgo de Trabajo)</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" formControlName="at_field" id="checkAT">
+                                        <label class="form-check-label" for="checkAT">AT (Accidente en Trayecto)</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" formControlName="st7" id="checkST7">
+                                        <label class="form-check-label" for="checkST7">ST7</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" formControlName="st2" id="checkST2">
+                                        <label class="form-check-label" for="checkST2">ST2</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+
                         <div class="mb-3">
                             <label class="form-label">{{ (requestType === 'Permiso' || requestType === 'Incapacidad') ? 'Descripción Detallada' :
                                 'Descripción / Motivo' }}</label>

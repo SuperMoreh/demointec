@@ -26,6 +26,7 @@ import employeeProjectRouter from './core/infrastructure/rest/routes/employee-pr
 import prenominaRouter from './core/infrastructure/rest/routes/prenomina.route';
 import committeeDocumentsRouter from './core/infrastructure/rest/routes/committee-documents.route';
 import absenceRequestRouter from './core/infrastructure/rest/routes/absence-request.route';
+import disabilityRouter from './core/infrastructure/rest/routes/disability.route';
 
 import { RoleEntity } from './core/infrastructure/entity/roles.entity';
 import { UserEntity } from './core/infrastructure/entity/users.entity';
@@ -66,6 +67,7 @@ app.use('/api', employeeProjectRouter);
 app.use('/api', prenominaRouter);
 app.use('/api', committeeDocumentsRouter);
 app.use('/api', absenceRequestRouter);
+app.use('/api', disabilityRouter);
 
 // Serve Frontend Static Files
 app.use(express.static(path.join(__dirname, '../public')));
