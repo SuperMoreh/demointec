@@ -35,6 +35,7 @@ export class SalaryReportComponent implements OnInit {
     this.hasConsulted = true;
     this.adapter.getList().subscribe({
       next: (data) => {
+        console.log('salary-report API response:', data);
         this.records = data;
         this.applyFilter();
         this.isLoading = false;
@@ -47,13 +48,12 @@ export class SalaryReportComponent implements OnInit {
 
   applyFilter(): void {
     const term = this.searchTerm.toLowerCase();
-    const base = this.records.filter(r => !!r.admission_date);
     this.filteredRecords = term
-      ? base.filter(r =>
+      ? this.records.filter(r =>
           r.name_employee?.toLowerCase().includes(term) ||
           r.position?.toLowerCase().includes(term)
         )
-      : [...base];
+      : [...this.records];
     this.currentPage = 1;
     this.updatePagination();
   }
