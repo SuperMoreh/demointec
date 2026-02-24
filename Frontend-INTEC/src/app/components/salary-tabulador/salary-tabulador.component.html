@@ -1,0 +1,188 @@
+<div class="content-container">
+  <!-- Header de la página -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Tabulador General de Salarios</h1>
+    </div>
+    <button class="btn-primary" (click)="openAdd()">
+      <i class="bi bi-plus-circle"></i>
+      Agregar Registro
+    </button>
+  </div>
+
+  <!-- Filtros y búsqueda -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <div class="filter-group">
+        <label for="search">Buscar</label>
+        <input type="text" id="search" class="filter-input" placeholder="Puesto, zona geográfica..."
+          [value]="searchTerm" (input)="searchTerm = $any($event.target).value; applyFilter()">
+      </div>
+      <button class="btn-consult" (click)="load()" [disabled]="isLoading">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-container" *ngIf="hasConsulted && !isLoading">
+    <div class="table-header">
+      <div class="table-info">
+        Mostrando {{ pagedRecords.length }} de {{ filteredRecords.length }} registros
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Puesto</th>
+            <th>Zona Geográfica</th>
+            <th>Salario Semanal</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let record of pagedRecords; let i = index">
+            <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+            <td>{{ record.position }}</td>
+            <td>{{ record.geographic_zone }}</td>
+            <td>{{ record.weekly_salary | currency:'MXN':'symbol':'1.2-2' }}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn-action btn-edit" (click)="openEdit(record)" title="Editar">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn-action btn-delete" (click)="delete(record.id_salary_tabulator)" title="Eliminar">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="pagedRecords.length === 0">
+            <td colspan="5" class="text-center text-muted py-3">No hay registros disponibles</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination-container" *ngIf="totalPages > 1">
+      <div class="pagination">
+        <button [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button *ngFor="let page of pages" [class.active]="page === currentPage" (click)="goToPage(page)">
+          {{ page }}
+        </button>
+        <button [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-container placeholder-container" *ngIf="hasConsulted && isLoading">
+    <div class="table-placeholder">
+      <i class="bi bi-arrow-repeat loading-icon"></i>
+      Cargando tabulador...
+    </div>
+  </div>
+
+  <div class="consult-placeholder" *ngIf="!hasConsulted">
+    <i class="bi bi-info-circle"></i>
+    Consulte para ver la información del tabulador de salarios.
+  </div>
+</div>
+
+<!-- Modal Agregar -->
+<div class="modal fade" id="agregarTabuladorModal" tabindex="-1" aria-labelledby="agregarTabuladorModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="agregarTabuladorModalLabel">Agregar Registro de Tabulador</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"
+          aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="addForm">
+          <div class="section-panel">
+            <h6><i class="bi bi-briefcase me-2"></i>Información del Puesto</h6>
+            <div class="row">
+              <div class="col-md-12 mb-3">
+                <label class="form-label">Puesto <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" formControlName="position" placeholder="Nombre del puesto"
+                  [class.is-invalid]="addForm.get('position')?.invalid && addForm.get('position')?.touched">
+                <div class="invalid-feedback">El puesto es requerido.</div>
+              </div>
+              <div class="col-md-12 mb-3">
+                <label class="form-label">Zona Geográfica <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" formControlName="geographic_zone" placeholder="Zona geográfica"
+                  [class.is-invalid]="addForm.get('geographic_zone')?.invalid && addForm.get('geographic_zone')?.touched">
+                <div class="invalid-feedback">La zona geográfica es requerida.</div>
+              </div>
+              <div class="col-md-12 mb-3">
+                <label class="form-label">Salario Semanal <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" formControlName="weekly_salary" placeholder="0.00" min="0"
+                  [class.is-invalid]="addForm.get('weekly_salary')?.invalid && addForm.get('weekly_salary')?.touched">
+                <div class="invalid-feedback">El salario semanal es requerido y debe ser mayor o igual a 0.</div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" style="background-color: #F58525; border: none;" (click)="save()">
+          Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar -->
+<div class="modal fade" id="editarTabuladorModal" tabindex="-1" aria-labelledby="editarTabuladorModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="editarTabuladorModalLabel">Editar Registro de Tabulador</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"
+          aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="editForm">
+          <div class="section-panel">
+            <h6><i class="bi bi-briefcase me-2"></i>Información del Puesto</h6>
+            <div class="row">
+              <div class="col-md-12 mb-3">
+                <label class="form-label">Puesto <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" formControlName="position" placeholder="Nombre del puesto"
+                  [class.is-invalid]="editForm.get('position')?.invalid && editForm.get('position')?.touched">
+                <div class="invalid-feedback">El puesto es requerido.</div>
+              </div>
+              <div class="col-md-12 mb-3">
+                <label class="form-label">Zona Geográfica <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" formControlName="geographic_zone" placeholder="Zona geográfica"
+                  [class.is-invalid]="editForm.get('geographic_zone')?.invalid && editForm.get('geographic_zone')?.touched">
+                <div class="invalid-feedback">La zona geográfica es requerida.</div>
+              </div>
+              <div class="col-md-12 mb-3">
+                <label class="form-label">Salario Semanal <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" formControlName="weekly_salary" placeholder="0.00" min="0"
+                  [class.is-invalid]="editForm.get('weekly_salary')?.invalid && editForm.get('weekly_salary')?.touched">
+                <div class="invalid-feedback">El salario semanal es requerido y debe ser mayor o igual a 0.</div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" style="background-color: #F58525; border: none;" (click)="update()">
+          Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

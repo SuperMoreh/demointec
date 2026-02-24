@@ -18,6 +18,9 @@ import { TerminationsComponent } from './components/terminations/terminations.co
 import { PrenominaComponent } from './components/prenomina/prenomina.component';
 import { EmployeeProjectComponent } from './components/employee-project/employee-project.component';
 import { JointCommitteesComponent } from './components/joint-committees/joint-committees.component';
+import { SalaryTabuladorComponent } from './components/salary-tabulador/salary-tabulador.component';
+import { SalaryReportComponent } from './components/salary-report/salary-report.component';
+import { TemplateAnalysisComponent } from './components/template-analysis/template-analysis.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -43,6 +46,9 @@ export const routes: Routes = [
       { path: 'prenomina', component: PrenominaComponent },
       { path: 'asignar-obras', component: EmployeeProjectComponent },
       { path: 'comisiones-mixtas', component: JointCommitteesComponent },
+      { path: 'tabulador-salarios', component: SalaryTabuladorComponent },
+      { path: 'reporte-salarios', component: SalaryReportComponent },
+      { path: 'analisis-plantillas', component: TemplateAnalysisComponent },
       { path: 'permisos-vacaciones', loadComponent: () => import('./components/permissions-vacations/permissions-vacations.component').then(m => m.PermissionsVacationsComponent) },
     ]
   },

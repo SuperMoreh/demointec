@@ -1,0 +1,97 @@
+<div class="content-container">
+  <!-- Header de la página -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Tabulador de Salarios</h1>
+    </div>
+  </div>
+
+  <!-- Filtros y búsqueda -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <div class="filter-group">
+        <label for="search">Buscar</label>
+        <input type="text" id="search" class="filter-input" placeholder="Colaborador, puesto..."
+          [value]="searchTerm" (input)="searchTerm = $any($event.target).value; applyFilter()">
+      </div>
+      <div class="filter-group">
+        <label for="incrementPercent">% Incremento Sugerido</label>
+        <input type="number" id="incrementPercent" class="filter-input" placeholder="Ej. 5"
+          min="0" max="100"
+          [value]="incrementPercent ?? ''"
+          (input)="incrementPercent = $any($event.target).value ? +$any($event.target).value : null">
+      </div>
+      <button class="btn-consult" (click)="load()" [disabled]="isLoading">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-container" *ngIf="hasConsulted && !isLoading">
+    <div class="table-header">
+      <div class="table-info">
+        Mostrando {{ pagedRecords.length }} de {{ filteredRecords.length }} registros
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Fecha de Ingreso</th>
+            <th>Puesto</th>
+            <th>Sueldo Semanal Actual</th>
+            <th>Incremento Sugerido a Mercado Promedio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let record of pagedRecords">
+            <td>{{ record.id_employee }}</td>
+            <td>{{ record.name_employee }}</td>
+            <td>{{ record.admission_date | date:'d \'de\' MMMM \'de\' y':'':'es' }}</td>
+            <td>{{ record.position }}</td>
+            <td>{{ record.base_salary | currency:'MXN':'symbol':'1.2-2' }}</td>
+            <td>
+              <ng-container *ngIf="calcIncrement(record.base_salary) !== null; else sinIncremento">
+                {{ calcIncrement(record.base_salary) | currency:'MXN':'symbol':'1.2-2' }}
+              </ng-container>
+              <ng-template #sinIncremento>
+                <span class="text-muted">-</span>
+              </ng-template>
+            </td>
+          </tr>
+          <tr *ngIf="pagedRecords.length === 0">
+            <td colspan="6" class="text-center text-muted py-3">No hay registros disponibles</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination-container" *ngIf="totalPages > 1">
+      <div class="pagination">
+        <button [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button *ngFor="let page of pages" [class.active]="page === currentPage" (click)="goToPage(page)">
+          {{ page }}
+        </button>
+        <button [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-container placeholder-container" *ngIf="hasConsulted && isLoading">
+    <div class="table-placeholder">
+      <i class="bi bi-arrow-repeat loading-icon"></i>
+      Cargando reporte...
+    </div>
+  </div>
+
+  <div class="consult-placeholder" *ngIf="!hasConsulted">
+    <i class="bi bi-info-circle"></i>
+    Consulte para ver la información del tabulador de salarios.
+  </div>
+</div>

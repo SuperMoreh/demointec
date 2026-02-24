@@ -1,0 +1,75 @@
+<div class="content-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Análisis de Plantillas</h1>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <div class="filter-group">
+        <label for="search">Buscar proyecto</label>
+        <input type="text" id="search" class="filter-input" placeholder="Nombre del proyecto..."
+          [value]="searchTerm" (input)="searchTerm = $any($event.target).value">
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-container" *ngIf="hasConsulted && !isLoading">
+    <div class="analysis-header-row">
+      <div class="rh-label"></div>
+    </div>
+    <div class="table-responsive">
+      <table class="analysis-table">
+        <thead>
+          <tr>
+            <th class="th-rh">Oficiales</th>
+            <th class="th-rh">MO</th>
+            <th class="th-rh">Ayudantes</th>
+            <th class="th-project">Proyectos</th>
+            <th class="th-avance">Avance %</th>
+            <th class="th-req">Requerimiento</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of projects">
+            <td class="td-num">{{ row.oficiales || '' }}</td>
+            <td class="td-num">{{ row.mo || '' }}</td>
+            <td class="td-num">{{ row.ayudantes || '' }}</td>
+            <td class="td-project">{{ row.project }}</td>
+            <td class="td-num">{{ row.avance_percent || '' }}</td>
+            <td class="td-req">{{ row.requirement || '' }}</td>
+          </tr>
+          <tr *ngIf="projects.length === 0">
+            <td colspan="6" class="text-center text-muted py-3">No hay registros disponibles</td>
+          </tr>
+        </tbody>
+        <tfoot *ngIf="totals">
+          <tr class="totals-row">
+            <td class="td-total">{{ totals.oficiales }}</td>
+            <td class="td-total">{{ totals.mo }}</td>
+            <td class="td-total">{{ totals.ayudantes }}</td>
+            <td class="td-total-label">OBRAS ACTIVAS</td>
+            <td class="td-total">{{ totals.active_projects }}</td>
+            <td class="td-total">{{ totals.requirement }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="table-container placeholder-container" *ngIf="hasConsulted && isLoading">
+    <div class="table-placeholder">
+      <i class="bi bi-arrow-repeat loading-icon"></i>
+      Cargando análisis...
+    </div>
+  </div>
+
+  <div class="consult-placeholder" *ngIf="!hasConsulted">
+    <i class="bi bi-info-circle"></i>
+    Consulte para ver la información del análisis de plantillas.
+  </div>
+</div>

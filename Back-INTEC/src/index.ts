@@ -27,6 +27,9 @@ import prenominaRouter from './core/infrastructure/rest/routes/prenomina.route';
 import committeeDocumentsRouter from './core/infrastructure/rest/routes/committee-documents.route';
 import absenceRequestRouter from './core/infrastructure/rest/routes/absence-request.route';
 import disabilityRouter from './core/infrastructure/rest/routes/disability.route';
+import salaryTabulatorRouter from './core/infrastructure/rest/routes/salary-tabulator.route';
+import salaryReportRouter from './core/infrastructure/rest/routes/salary-report.route';
+import templateAnalysisRouter from './core/infrastructure/rest/routes/template-analysis.route';
 
 import { RoleEntity } from './core/infrastructure/entity/roles.entity';
 import { UserEntity } from './core/infrastructure/entity/users.entity';
@@ -68,6 +71,9 @@ app.use('/api', prenominaRouter);
 app.use('/api', committeeDocumentsRouter);
 app.use('/api', absenceRequestRouter);
 app.use('/api', disabilityRouter);
+app.use('/api', salaryTabulatorRouter);
+app.use('/api', salaryReportRouter);
+app.use('/api', templateAnalysisRouter);
 
 // Serve Frontend Static Files
 app.use(express.static(path.join(__dirname, '../public')));
