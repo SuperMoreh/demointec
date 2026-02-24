@@ -47,12 +47,13 @@ export class SalaryReportComponent implements OnInit {
 
   applyFilter(): void {
     const term = this.searchTerm.toLowerCase();
+    const base = this.records.filter(r => !!r.admission_date);
     this.filteredRecords = term
-      ? this.records.filter(r =>
+      ? base.filter(r =>
           r.name_employee?.toLowerCase().includes(term) ||
           r.position?.toLowerCase().includes(term)
         )
-      : [...this.records];
+      : [...base];
     this.currentPage = 1;
     this.updatePagination();
   }
