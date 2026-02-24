@@ -22,7 +22,7 @@ export class SalaryReportComponent implements OnInit {
   hasConsulted: boolean = false;
 
   currentPage: number = 1;
-  itemsPerPage: number = 10;
+  itemsPerPage: number = 50;
   totalPages: number = 1;
   pages: number[] = [];
 

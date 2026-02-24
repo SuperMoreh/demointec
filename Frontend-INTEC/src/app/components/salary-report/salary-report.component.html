@@ -12,14 +12,14 @@
       <div class="filter-group">
         <label for="search">Buscar</label>
         <input type="text" id="search" class="filter-input" placeholder="Colaborador, puesto..."
-          [value]="searchTerm" (input)="searchTerm = $any($event.target).value; applyFilter()">
+          [value]="searchTerm" (input)="searchTerm = $any($event.target).value; applyFilter()" (keydown.enter)="$event.preventDefault()">
       </div>
       <div class="filter-group">
         <label for="incrementPercent">% Incremento Sugerido</label>
         <input type="number" id="incrementPercent" class="filter-input" placeholder="Ej. 5"
           min="0" max="100"
           [value]="incrementPercent ?? ''"
-          (input)="incrementPercent = $any($event.target).value ? +$any($event.target).value : null">
+          (input)="incrementPercent = $any($event.target).value ? +$any($event.target).value : null" (keydown.enter)="$event.preventDefault()">
       </div>
       <button class="btn-consult" (click)="load()" [disabled]="isLoading">
         <i class="bi bi-search"></i>
