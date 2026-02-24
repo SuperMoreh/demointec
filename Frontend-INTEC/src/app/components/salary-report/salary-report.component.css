@@ -374,6 +374,65 @@
     border-bottom: 2px solid #f0f2f5;
 }
 
+.analysis-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+}
+
+.analysis-table thead tr th {
+    background-color: #2c3e6b;
+    color: white;
+    padding: 0.65rem 1rem;
+    text-align: center;
+    font-weight: 500;
+    border: 1px solid #3a4f84;
+}
+
+.analysis-table tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+.analysis-table tbody tr:nth-child(even) {
+    background-color: #f5f7fa;
+}
+
+.analysis-table tbody tr:hover {
+    background-color: #eaf2ff;
+}
+
+.analysis-table td {
+    padding: 0.45rem 1rem;
+    border-bottom: 1px solid #e8e8e8;
+    border-right: 1px solid #e8e8e8;
+    vertical-align: middle;
+}
+
+.td-id {
+    text-align: right;
+    color: #555;
+    font-size: 0.78rem;
+    padding-right: 0.75rem;
+    border-left: 4px solid #2c3e6b;
+}
+
+.td-num {
+    text-align: center;
+    font-weight: 500;
+}
+
+.td-project {
+    text-align: left;
+    font-weight: 500;
+    color: #222;
+}
+
+.td-req {
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
 @media (max-width: 768px) {
     .content-container {
         padding: 1rem;

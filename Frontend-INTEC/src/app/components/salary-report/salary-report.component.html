@@ -35,7 +35,7 @@
       </div>
     </div>
     <div class="table-responsive">
-      <table class="users-table">
+      <table class="analysis-table">
         <thead>
           <tr>
             <th>ID</th>
@@ -48,12 +48,12 @@
         </thead>
         <tbody>
           <tr *ngFor="let record of pagedRecords">
-            <td>{{ record.id_employee }}</td>
-            <td>{{ record.name_employee }}</td>
-            <td>{{ record.admission_date | date:'d \'de\' MMMM \'de\' y':'':'es' }}</td>
-            <td>{{ record.position }}</td>
-            <td>{{ record.base_salary | currency:'MXN':'symbol':'1.2-2' }}</td>
-            <td>
+            <td class="td-id">{{ record.id_employee }}</td>
+            <td class="td-project">{{ record.name_employee }}</td>
+            <td class="td-num">{{ record.admission_date | date:'d \'de\' MMMM \'de\' y':'':'es' }}</td>
+            <td class="td-num">{{ record.position }}</td>
+            <td class="td-num">{{ record.base_salary | currency:'MXN':'symbol':'1.2-2' }}</td>
+            <td class="td-req">
               <ng-container *ngIf="calcIncrement(record.base_salary) !== null; else sinIncremento">
                 {{ calcIncrement(record.base_salary) | currency:'MXN':'symbol':'1.2-2' }}
               </ng-container>
