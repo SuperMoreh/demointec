@@ -76,6 +76,8 @@ export class SalaryReportComponent implements OnInit {
 
   calcIncrement(salary: number): number | null {
     if (this.incrementPercent === null || this.incrementPercent === 0) return null;
-    return salary * (this.incrementPercent / 100);
+    const numSalary = +salary;
+    if (isNaN(numSalary) || numSalary === 0) return null;
+    return numSalary * (this.incrementPercent / 100);
   }
 }

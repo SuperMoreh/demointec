@@ -19,7 +19,7 @@
         <input type="number" id="incrementPercent" class="filter-input" placeholder="Ej. 5"
           min="0" max="100"
           [value]="incrementPercent ?? ''"
-          (input)="incrementPercent = $any($event.target).value ? +$any($event.target).value : null" (keydown.enter)="$event.preventDefault()">
+          (input)="incrementPercent = $any($event.target).value ? +$any($event.target).value : null; applyFilter()" (keydown.enter)="$event.preventDefault()">
       </div>
       <button class="btn-consult" (click)="load()" [disabled]="isLoading">
         <i class="bi bi-search"></i>
@@ -50,12 +50,12 @@
           <tr *ngFor="let record of pagedRecords">
             <td class="td-id">{{ record.id_employee }}</td>
             <td class="td-project">{{ record.name_employee }}</td>
-            <td class="td-num">{{ record.admission_date ? (record.admission_date | date:'d \'de\' MMMM \'de\' y':'':'es') : '-' }}</td>
+            <td class="td-num">{{ record.admission_date || '-' }}</td>
             <td class="td-num">{{ record.position || '-' }}</td>
-            <td class="td-num">{{ record.base_salary != null ? (record.base_salary | currency:'MXN':'symbol':'1.2-2') : '-' }}</td>
+            <td class="td-num">{{ (record.base_salary != null && +record.base_salary > 0) ? (+record.base_salary | currency:'MXN':'symbol':'1.2-2') : '-' }}</td>
             <td class="td-req">
-              <ng-container *ngIf="calcIncrement(record.base_salary) !== null; else sinIncremento">
-                {{ calcIncrement(record.base_salary) | currency:'MXN':'symbol':'1.2-2' }}
+              <ng-container *ngIf="calcIncrement(+record.base_salary) !== null; else sinIncremento">
+                {{ calcIncrement(+record.base_salary) | currency:'MXN':'symbol':'1.2-2' }}
               </ng-container>
               <ng-template #sinIncremento>
                 <span class="text-muted">-</span>
