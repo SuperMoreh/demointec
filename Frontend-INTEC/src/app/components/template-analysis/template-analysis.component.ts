@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TemplateAnalysisAdapterService } from '../../adapters/template-analysis.adapter';
 import { TemplateAnalysis, ProjectStaffing } from '../../models/template-analysis';
+import { ReportTemplateAnalysisService } from '../../services/reports/report_template_analysis.service';
 
 @Component({
   selector: 'app-template-analysis',
@@ -12,6 +13,7 @@ import { TemplateAnalysis, ProjectStaffing } from '../../models/template-analysi
 })
 export class TemplateAnalysisComponent implements OnInit {
   private adapter = inject(TemplateAnalysisAdapterService);
+  private reportService = inject(ReportTemplateAnalysisService);
 
   data: TemplateAnalysis | null = null;
   searchTerm: string = '';
@@ -49,5 +51,10 @@ export class TemplateAnalysisComponent implements OnInit {
 
   get totalAvance(): number {
     return this.projects.reduce((sum, r) => sum + (r.avance_percent ?? 0), 0);
+  }
+
+  exportToExcel(): void {
+    if (!this.data) return;
+    this.reportService.exportToExcel(this.data);
   }
 }

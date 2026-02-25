@@ -124,6 +124,30 @@
     background-color: #1d5fb1;
 }
 
+.btn-export-analysis {
+    background-color: #1e7b45;
+    border: none;
+    padding: 0.5rem 1.1rem;
+    border-radius: 4px;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: background-color 0.3s;
+}
+
+.btn-export-analysis:hover {
+    background-color: #155c33;
+}
+
+.btn-export-analysis:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 .btn-consult:disabled {
     opacity: 0.6;
     cursor: not-allowed;
