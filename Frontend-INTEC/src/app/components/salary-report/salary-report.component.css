@@ -129,6 +129,55 @@
     cursor: not-allowed;
 }
 
+.btn-export {
+    background-color: #1e7b45;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: background-color 0.3s;
+}
+
+.btn-export:hover {
+    background-color: #155c33;
+}
+
+.btn-export:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-tabulador {
+    background-color: #2C3E6B;
+    border: none;
+    padding: 0.5rem 1.1rem;
+    border-radius: 4px;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: background-color 0.3s;
+}
+
+.btn-tabulador:hover {
+    background-color: #1e2b4d;
+}
+
+.tabulador-modal-header {
+    background-color: #2C3E6B;
+    color: white;
+    padding: 0.85rem 1.25rem;
+}
+
 .table-container {
     background-color: white;
     border-radius: 8px;

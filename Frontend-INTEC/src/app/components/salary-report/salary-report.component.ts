@@ -2,16 +2,19 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SalaryReportAdapterService } from '../../adapters/salary-report.adapter';
 import { SalaryReport } from '../../models/salary-report';
+import { ReportSalaryService } from '../../services/reports/report_salary.service';
+import { SalaryTabuladorComponent } from '../salary-tabulador/salary-tabulador.component';
 
 @Component({
   selector: 'app-salary-report',
   templateUrl: './salary-report.component.html',
   styleUrl: './salary-report.component.css',
   standalone: true,
-  imports: [CommonModule]
+  imports: [CommonModule, SalaryTabuladorComponent]
 })
 export class SalaryReportComponent implements OnInit {
   private adapter = inject(SalaryReportAdapterService);
+  private reportSalaryService = inject(ReportSalaryService);
 
   records: SalaryReport[] = [];
   filteredRecords: SalaryReport[] = [];
@@ -79,5 +82,14 @@ export class SalaryReportComponent implements OnInit {
     const numSalary = +salary;
     if (isNaN(numSalary) || numSalary === 0) return null;
     return numSalary * (this.incrementPercent / 100);
+  }
+
+  exportToExcel(): void {
+    this.reportSalaryService.exportToExcel(this.filteredRecords, this.incrementPercent);
+  }
+
+  openTabulador(): void {
+    const el = document.getElementById('tabuladorGeneralModal');
+    if (el) new (window as any).bootstrap.Modal(el).show();
   }
 }

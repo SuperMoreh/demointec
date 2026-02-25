@@ -24,6 +24,9 @@
       <button class="btn-consult" (click)="load()" [disabled]="isLoading">
         <i class="bi bi-search"></i>
       </button>
+      <button class="btn-tabulador ms-auto" (click)="openTabulador()">
+        <i class="bi bi-table"></i> Tabulador General de Sueldos
+      </button>
     </div>
   </div>
 
@@ -33,6 +36,9 @@
       <div class="table-info">
         Mostrando {{ pagedRecords.length }} de {{ filteredRecords.length }} registros
       </div>
+      <button class="btn-export" (click)="exportToExcel()" [disabled]="isLoading || filteredRecords.length === 0">
+        <i class="bi bi-file-earmark-excel"></i> Exportar
+      </button>
     </div>
     <div class="table-responsive">
       <table class="analysis-table">
@@ -93,5 +99,22 @@
   <div class="consult-placeholder" *ngIf="!hasConsulted">
     <i class="bi bi-info-circle"></i>
     Consulte para ver la información del tabulador de salarios.
+  </div>
+</div>
+
+<!-- Modal Tabulador General de Sueldos -->
+<div class="modal fade" id="tabuladorGeneralModal" tabindex="-1" aria-labelledby="tabuladorGeneralModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header tabulador-modal-header">
+        <h5 class="modal-title" id="tabuladorGeneralModalLabel">
+          <i class="bi bi-table me-2"></i>Tabulador General de Sueldos
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body p-0">
+        <app-salary-tabulador></app-salary-tabulador>
+      </div>
+    </div>
   </div>
 </div>
