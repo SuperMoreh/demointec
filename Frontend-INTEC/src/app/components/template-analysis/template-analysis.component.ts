@@ -46,4 +46,8 @@ export class TemplateAnalysisComponent implements OnInit {
   get totals() {
     return this.data?.totals ?? null;
   }
+
+  get totalAvance(): number {
+    return this.projects.reduce((sum, r) => sum + (r.avance_percent ?? 0), 0);
+  }
 }

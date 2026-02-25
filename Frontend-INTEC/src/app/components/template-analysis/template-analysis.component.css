@@ -458,6 +458,13 @@
     font-size: 0.9rem;
 }
 
+.td-req-centered {
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    vertical-align: middle;
+}
+
 /* Fila de totales */
 .totals-row td {
     background-color: #dde3ec;
