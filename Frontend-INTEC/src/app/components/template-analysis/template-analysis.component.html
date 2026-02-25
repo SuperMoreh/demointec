@@ -4,9 +4,6 @@
     <div>
       <h1 class="page-title">Análisis de Plantillas</h1>
     </div>
-    <button class="btn-export-analysis" (click)="exportToExcel()" *ngIf="data" [disabled]="isLoading">
-      <i class="bi bi-file-earmark-excel"></i> Exportar
-    </button>
   </div>
 
   <!-- Filtros -->
@@ -24,6 +21,9 @@
   <div class="table-container" *ngIf="hasConsulted && !isLoading">
     <div class="analysis-header-row">
       <div class="rh-label"></div>
+      <button class="btn-export-analysis" (click)="exportToExcel()" [disabled]="isLoading">
+        <i class="bi bi-file-earmark-excel"></i> Exportar
+      </button>
     </div>
     <div class="table-responsive">
       <table class="analysis-table">
