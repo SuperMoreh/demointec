@@ -10,6 +10,8 @@ import { Employee } from '../../models/employees';
 import { ReportEmployeesService } from '../../services/reports/report_employees.service';
 import { JobDescription, JobDescriptionAdapterService } from '../../adapters/job-description.adapter';
 import { AttendancesAdapterService } from '../../adapters/attendances.adapter';
+import { SalaryTabulatorAdapterService } from '../../adapters/salary-tabulator.adapter';
+import { SalaryTabulator } from '../../models/salary-tabulator';
 import { Attendance } from '../../models/attendances';
 import { UploadAdapterService } from '../../adapters/upload.adapter';
 import { LaborRelationsAdapterService } from '../../adapters/labor-relations.adapter';
@@ -37,6 +39,7 @@ export class EmployeesComponent implements OnInit {
   hasConsulted: boolean = false;
   isLoading: boolean = false;
   jobDescriptions: JobDescription[] = [];
+  salaryPositions: SalaryTabulator[] = [];
   roles: any[] = [];
 
   genderOptions = ['Masculino', 'Femenino'];
@@ -71,7 +74,8 @@ export class EmployeesComponent implements OnInit {
     private rolesAdapter: RoleAdapterService,
     private attendancesAdapter: AttendancesAdapterService,
     private uploadService: UploadAdapterService,
-    private laborRelationsAdapter: LaborRelationsAdapterService
+    private laborRelationsAdapter: LaborRelationsAdapterService,
+    private salaryTabulatorAdapter: SalaryTabulatorAdapterService
   ) {
     this.employeesForm = this.fb.group({
       name_employee: ['', Validators.required],
@@ -177,6 +181,7 @@ export class EmployeesComponent implements OnInit {
     this.setCreateMode();
     this.loadJobDescriptions();
     this.loadRoles();
+    this.loadSalaryPositions();
 
     this.employeesForm.get('birth_date')?.valueChanges.subscribe(date => {
       this.calculateAge(date);
@@ -232,6 +237,17 @@ export class EmployeesComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al cargar descripciones de puesto', err);
+      }
+    });
+  }
+
+  loadSalaryPositions(): void {
+    this.salaryTabulatorAdapter.getList().subscribe({
+      next: (data) => {
+        this.salaryPositions = data;
+      },
+      error: (err) => {
+        console.error('Error al cargar puestos del tabulador', err);
       }
     });
   }
