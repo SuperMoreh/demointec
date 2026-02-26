@@ -60,7 +60,7 @@ export class TemplateAnalysisAdapterRepository implements TemplateAnalysisReposi
         staffing.oficiales++;
       } else if (position === 'medio oficial') {
         staffing.mo++;
-      } else if (position === 'Ayudante General') {
+      } else if (position === 'ayudante general') {
         staffing.ayudantes++;
       }
     }
