@@ -13,6 +13,8 @@ import { Disability } from '../../models/disability';
 import { UploadAdapterService } from '../../adapters/upload.adapter';
 import { ToastrService } from 'ngx-toastr';
 import { ReportPermissionsVacationsService } from '../../services/reports/report_permissions_vacations.service';
+import { ReportPermisoPdfService } from '../../services/reports/report_permiso_pdf.service';
+import { ReportVacacionesPdfService } from '../../services/reports/report_vacaciones_pdf.service';
 
 interface VacationRow {
     id: string; // Employee ID
@@ -100,7 +102,9 @@ export class PermissionsVacationsComponent implements OnInit {
         private fb: FormBuilder,
         private uploadService: UploadAdapterService,
         private toastr: ToastrService,
-        private reportService: ReportPermissionsVacationsService
+        private reportService: ReportPermissionsVacationsService,
+        private permisoPdfService: ReportPermisoPdfService,
+        private vacacionesPdfService: ReportVacacionesPdfService
     ) {
         this.requestForm = this.fb.group({
             employeeId: ['', Validators.required],
@@ -561,6 +565,14 @@ export class PermissionsVacationsComponent implements OnInit {
             const modal = (window as any).bootstrap.Modal.getInstance(modalEl);
             modal.hide();
 
+            // Generar PDF si el tipo requiere formato
+            if (this.requestType !== 'Incapacidad') {
+                const empRow = this.allRows.find(r => r.id === formValues.employeeId);
+                if (empRow) {
+                    this.generarPdf(empRow, requestData, daysCount);
+                }
+            }
+
             this.loadEmployees(); // Refresh view
         } catch (err) {
             console.error('Error saving request', err);
@@ -696,5 +708,61 @@ export class PermissionsVacationsComponent implements OnInit {
 
     exportToExcel(): void {
         this.reportService.exportToExcel(this.filteredData, this.previousYear, this.currentYear);
+    }
+
+    printRecord(record: RequestRecord): void {
+        if (record.type === 'Incapacidad') return;
+        const empRow = this.allRows.find(r => r.id === this.selectedEmployeeId);
+        if (!empRow) return;
+        const absReq = {
+            id_employee: empRow.id,
+            type: record.type,
+            start_date: record.startDate,
+            end_date: record.endDate,
+            days_count: record.daysCount,
+            reason: record.reason,
+            description: record.description,
+            with_pay: record.withPay,
+            vacation_year: record.vacationYear ?? null,
+            document_url: record.documentUrl || '',
+            request_date: record.requestDate
+        };
+        const daysCount = record.daysCount;
+        this.generarPdf(empRow, absReq as any, daysCount);
+    }
+
+    private generarPdf(empRow: VacationRow, requestData: any, daysCount: number): void {
+        if (requestData.type === 'Permiso') {
+            this.permisoPdfService.generate(
+                { nombre: empRow.nombre, fechaIngreso: empRow.fechaIngreso },
+                {
+                    startDate: requestData.start_date,
+                    endDate: requestData.end_date,
+                    reason: requestData.reason,
+                    withPay: !!requestData.with_pay,
+                    requestDate: requestData.request_date
+                }
+            );
+        } else if (requestData.type === 'Vacaciones') {
+            this.vacacionesPdfService.generate(
+                {
+                    nombre: empRow.nombre,
+                    fechaIngreso: empRow.fechaIngreso,
+                    antiguedad: empRow.antiguedad,
+                    totalVacaciones: empRow.totalVacaciones,
+                    diasTomados: empRow.diasTomados,
+                    diasPorTomarPrevious: empRow.diasPorTomarPrevious,
+                    diasPorTomarCurrent: empRow.diasPorTomarCurrent,
+                    saldoTotal: empRow.saldoTotal
+                },
+                {
+                    startDate: requestData.start_date,
+                    endDate: requestData.end_date,
+                    daysCount: daysCount,
+                    requestDate: requestData.request_date,
+                    vacationYear: requestData.vacation_year ?? null
+                }
+            );
+        }
     }
 }

@@ -350,6 +350,11 @@
                                             *ngIf="canManage" (click)="deleteRequest(req)">
                                             <i class="bi bi-trash"></i>
                                         </button>
+                                        <button class="btn-action btn-icon btn-print" title="Imprimir formato"
+                                            *ngIf="req.type !== 'Incapacidad'"
+                                            (click)="printRecord(req)">
+                                            <i class="bi bi-printer"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>

@@ -326,6 +326,15 @@
     background-color: #f5c6cb;
 }
 
+.btn-print {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.btn-print:hover {
+    background-color: #bee5eb;
+}
+
 /* For the "Ver Registros" button (with text) */
 .btn-view-records {
     background-color: #dcd0ff;
