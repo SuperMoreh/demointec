@@ -84,7 +84,7 @@ export class ReportVacacionesPdfService {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8.5);
     doc.setTextColor(42, 122, 228);
-    doc.text('INTEC DE JALIS CO, S.A. DE C.V.', lm + 34, sy + 6);
+    doc.text('INTEC DE JALISCO, S.A. DE C.V.', lm + 34, sy + 6);
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
@@ -107,75 +107,78 @@ export class ReportVacacionesPdfService {
     const colFechaW = 28;
     const colDatosW = pw - colFechaW;
 
-    // Encabezado "DATOS DE EMPLEADO" — fondo azul, texto blanco, borde
+    const r = 1.5; // radio esquinas redondeadas
+    const headerH = 6;
+    const rowH = 8;
+
+    // Encabezado "DATOS DE EMPLEADO" — fondo azul, texto blanco, esquinas redondeadas arriba
     doc.setFillColor(42, 122, 228);
     doc.setDrawColor(42, 122, 228);
     doc.setLineWidth(0.3);
-    doc.rect(lm, tY, colDatosW, 6, 'FD');
+    doc.roundedRect(lm, tY, colDatosW, headerH, r, r, 'FD');
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8);
     doc.setTextColor(255, 255, 255);
     doc.text('DATOS DE EMPLEADO', lm + colDatosW / 2, tY + 4.2, { align: 'center' });
 
-    // Encabezado "FECHA" — sin fondo, texto azul, borde
+    // Encabezado "FECHA" — sin fondo, texto azul, esquinas redondeadas arriba
     doc.setFillColor(255, 255, 255);
-    doc.rect(lm + colDatosW, tY, colFechaW, 6, 'FD');
+    doc.roundedRect(lm + colDatosW, tY, colFechaW, headerH, r, r, 'FD');
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8);
     doc.setTextColor(42, 122, 228);
     doc.text('FECHA', lm + colDatosW + colFechaW / 2, tY + 4.2, { align: 'center' });
 
-    // Fila de datos: una sola fila con Empleado + Fecha de ingreso + Fecha doc
-    const rowH = 12;
+    // Fila de datos: Empleado + Fecha de ingreso + Fecha doc
     doc.setDrawColor(42, 122, 228);
     doc.setLineWidth(0.3);
 
     // Celda izquierda (empleado + fecha ingreso combinados)
     doc.setFillColor(255, 255, 255);
-    doc.rect(lm, tY + 6, colDatosW, rowH, 'FD');
+    doc.roundedRect(lm, tY + headerH, colDatosW, rowH, r, r, 'FD');
 
     // Celda derecha (fecha documento)
-    doc.rect(lm + colDatosW, tY + 6, colFechaW, rowH, 'FD');
+    doc.roundedRect(lm + colDatosW, tY + headerH, colFechaW, rowH, r, r, 'FD');
 
     // Línea vertical interna separando empleado de fecha ingreso
-    // "Fecha de ingreso" ocupa aprox 35% derecho de colDatosW
     const splitX = lm + colDatosW * 0.62;
     doc.setDrawColor(42, 122, 228);
-    doc.line(splitX, tY + 6, splitX, tY + 6 + rowH);
+    doc.line(splitX, tY + headerH, splitX, tY + headerH + rowH);
+
+    const midY = tY + headerH + rowH / 2 + 1;
 
     // "Empleado:" label
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(7);
     doc.setTextColor(42, 122, 228);
-    doc.text('Empleado:', lm + 2, tY + 6 + 7.5);
+    doc.text('Empleado:', lm + 2, midY);
 
     // Nombre del empleado
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(30, 30, 30);
-    doc.text(empleado.nombre, lm + 18, tY + 6 + 7.5);
+    doc.text(empleado.nombre, lm + 18, midY);
 
-    // "Fecha de" y "ingreso:" en 2 líneas (como en la imagen)
+    // "Fecha de ingreso:" en 2 líneas
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(6.5);
     doc.setTextColor(42, 122, 228);
-    doc.text('Fecha de', splitX + 2, tY + 6 + 5.5);
-    doc.text('ingreso:', splitX + 2, tY + 6 + 9.5);
+    doc.text('Fecha de', splitX + 2, midY - 1.5);
+    doc.text('ingreso:', splitX + 2, midY + 2.5);
 
     // Valor fecha ingreso
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(30, 30, 30);
-    const fIngX = splitX + 17;
-    doc.text(empleado.fechaIngreso, fIngX, tY + 6 + 7.5);
+    doc.text(empleado.fechaIngreso, splitX + 17, midY);
 
     // Fecha del documento (celda FECHA)
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(30, 30, 30);
-    doc.text(this.fmtDate(solicitud.requestDate), lm + colDatosW + colFechaW / 2, tY + 6 + 7.5, { align: 'center' });
+    doc.text(this.fmtDate(solicitud.requestDate), lm + colDatosW + colFechaW / 2, midY, { align: 'center' });
 
-    let y = tY + 6 + rowH + 5;
+    let y = tY + headerH + rowH + 5;
 
     // ---- Período de vacaciones ----
     doc.setFont('helvetica', 'bold');
@@ -211,7 +214,7 @@ export class ReportVacacionesPdfService {
         lineWidth: 0.3
       },
       bodyStyles: {
-        minCellHeight: 8,
+        minCellHeight: 6,
         valign: 'middle'
       },
       columnStyles: {
@@ -252,7 +255,7 @@ export class ReportVacacionesPdfService {
       tableWidth: pw,
       styles: {
         fontSize: 7,
-        cellPadding: { top: 2, bottom: 8, left: 2, right: 2 },
+        cellPadding: { top: 1.5, bottom: 3, left: 2, right: 2 },
         lineColor: [42, 122, 228],
         lineWidth: 0.3,
         textColor: [30, 30, 30],
@@ -268,7 +271,7 @@ export class ReportVacacionesPdfService {
         fontSize: 7,
         lineColor: [42, 122, 228],
         lineWidth: 0.3,
-        cellPadding: { top: 2, bottom: 2, left: 2, right: 2 }
+        cellPadding: { top: 1.5, bottom: 1.5, left: 2, right: 2 }
       },
       columnStyles: {
         0: { cellWidth: pw / 3 },
@@ -287,7 +290,7 @@ export class ReportVacacionesPdfService {
     doc.setDrawColor(42, 122, 228);
     doc.setLineWidth(0.3);
     doc.setFillColor(255, 255, 255);
-    doc.rect(lm, y, pw, obsH, 'FD');
+    doc.roundedRect(lm, y, pw, obsH, 1.5, 1.5, 'FD');
 
     // Etiqueta "Observaciones:" — fondo gris, texto azul
     doc.setFillColor(180, 180, 180);
@@ -329,7 +332,7 @@ export class ReportVacacionesPdfService {
     firmas.forEach((f, i) => {
       const x = lm + i * (fw + gap);
       doc.setFillColor(255, 255, 255);
-      doc.rect(x, y, fw, fh, 'FD');
+      doc.roundedRect(x, y, fw, fh, 1.5, 1.5, 'FD');
 
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(6.5);
