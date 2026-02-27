@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 
 export interface EmpleadoVacacionesPdf {
   nombre: string;
@@ -180,7 +179,7 @@ export class ReportVacacionesPdfService {
 
     let y = tY + headerH + rowH + 5;
 
-    // ---- Período de vacaciones ----
+    // ---- Tabla Período de vacaciones (manual, esquinas redondeadas) ----
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(7.5);
     doc.setTextColor(30, 30, 30);
@@ -190,99 +189,125 @@ export class ReportVacacionesPdfService {
     const vacYear = solicitud.vacationYear ?? new Date().getFullYear();
     const diasPendientes = empleado.saldoTotal - solicitud.daysCount;
 
-    // Tabla período: encabezado gris con texto azul, body sin fondo, borde azul
-    autoTable(doc, {
-      startY: y,
-      margin: { left: lm },
-      tableWidth: pw,
-      styles: {
-        fontSize: 6.5,
-        cellPadding: { top: 1.5, bottom: 1.5, left: 1, right: 1 },
-        lineColor: [42, 122, 228],
-        lineWidth: 0.3,
-        textColor: [30, 30, 30],
-        halign: 'center',
-        fillColor: [255, 255, 255]
-      },
-      headStyles: {
-        fillColor: [200, 200, 200],
-        textColor: [42, 122, 228],
-        fontStyle: 'bold',
-        halign: 'center',
-        fontSize: 6.5,
-        lineColor: [42, 122, 228],
-        lineWidth: 0.3
-      },
-      bodyStyles: {
-        minCellHeight: 6,
-        valign: 'middle'
-      },
-      columnStyles: {
-        0: { cellWidth: 30 },
-        1: { cellWidth: 20 },
-        2: { cellWidth: 50, halign: 'center', fontStyle: 'bold' },
-        3: { cellWidth: 22 },
-        4: { cellWidth: 30 },
-        5: { cellWidth: 34 }
-      },
-      head: [[
-        'Vacaciones correspondientes',
-        'del año',
-        'Periodo',
-        'No. Dias\nsolicitados',
-        'dias vac\npagadas',
-        'vacaciones\npendientes'
-      ]],
-      body: [[
-        `${empleado.antiguedad} Año(s)`,
-        `${vacYear}`,
-        `${this.fmtDate(solicitud.startDate)}  al  ${this.fmtDate(solicitud.endDate)}`,
-        `${solicitud.daysCount}`,
-        `${empleado.diasTomados}`,
-        `${diasPendientes}`
-      ]]
-    });
+    // Anchos de columna (suma = pw = 186)
+    const pCols = [30, 20, 50, 22, 30, 34];
+    const pHeads = [
+      'Vacaciones\ncorrespondientes',
+      'del año',
+      'Periodo',
+      'No. Dias\nsolicitados',
+      'dias vac\npagadas',
+      'vacaciones\npendientes'
+    ];
+    const pBody = [
+      `${empleado.antiguedad} Año(s)`,
+      `${vacYear}`,
+      `${this.fmtDate(solicitud.startDate)}  al  ${this.fmtDate(solicitud.endDate)}`,
+      `${solicitud.daysCount}`,
+      `${empleado.diasTomados}`,
+      `${diasPendientes}`
+    ];
 
-    y = (doc as any).lastAutoTable.finalY + 5;
+    const pHeadH = 9;
+    const pBodyH = 7;
+    const pTotalH = pHeadH + pBodyH;
 
-    // ---- Tabla Fecha inicio / Fecha término / Fecha reanudación ----
-    // Encabezado: fondo azul claro (gris), texto azul — body con altura grande vacía
+    doc.setDrawColor(42, 122, 228);
+    doc.setLineWidth(0.3);
+
+    // Borde exterior redondeado
+    doc.setFillColor(255, 255, 255);
+    doc.roundedRect(lm, y, pw, pTotalH, 1.5, 1.5, 'FD');
+
+    // Línea divisoria entre cabecera y cuerpo
+    doc.line(lm, y + pHeadH, lm + pw, y + pHeadH);
+
+    // Líneas verticales internas + contenido
+    let cx = lm;
+    for (let i = 0; i < pCols.length; i++) {
+      const cw = pCols[i];
+      const cx2 = cx + cw;
+
+      // Fondo gris en cabecera
+      if (i === 0) {
+        doc.setFillColor(200, 200, 200);
+        doc.roundedRect(lm, y, pw, pHeadH, 1.5, 1.5, 'F');
+      }
+
+      // Línea vertical (excepto la última)
+      if (i < pCols.length - 1) {
+        doc.setDrawColor(42, 122, 228);
+        doc.line(cx2, y, cx2, y + pTotalH);
+      }
+
+      // Texto cabecera (centrado, multilinea)
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(6.5);
+      doc.setTextColor(42, 122, 228);
+      const headLines = pHeads[i].split('\n');
+      const headMidY = y + (pHeadH - headLines.length * 3) / 2 + 3;
+      headLines.forEach((hl, li) => {
+        doc.text(hl, cx + cw / 2, headMidY + li * 3, { align: 'center' });
+      });
+
+      // Texto cuerpo
+      doc.setFont(i === 2 ? 'helvetica' : 'helvetica', i === 2 ? 'bold' : 'normal');
+      doc.setFontSize(6.5);
+      doc.setTextColor(30, 30, 30);
+      doc.text(pBody[i], cx + cw / 2, y + pHeadH + pBodyH / 2 + 1.5, { align: 'center' });
+
+      cx = cx2;
+    }
+
+    y += pTotalH + 5;
+
+    // ---- Tabla Fecha inicio / Fecha término / Fecha reanudación (manual, esquinas redondeadas) ----
     const retorno = this.nextDay(solicitud.endDate);
+    const fCols = [pw / 3, pw / 3, pw / 3];
+    const fHeads = ['Fecha inicio:', 'Fecha termino:', 'Fecha de reanudación de actividades:'];
+    const fBody  = [this.fmtDate(solicitud.startDate), this.fmtDate(solicitud.endDate), retorno];
 
-    autoTable(doc, {
-      startY: y,
-      margin: { left: lm },
-      tableWidth: pw,
-      styles: {
-        fontSize: 7,
-        cellPadding: { top: 1.5, bottom: 3, left: 2, right: 2 },
-        lineColor: [42, 122, 228],
-        lineWidth: 0.3,
-        textColor: [30, 30, 30],
-        halign: 'center',
-        valign: 'top',
-        fillColor: [255, 255, 255]
-      },
-      headStyles: {
-        fillColor: [200, 200, 200],
-        textColor: [42, 122, 228],
-        fontStyle: 'bold',
-        halign: 'center',
-        fontSize: 7,
-        lineColor: [42, 122, 228],
-        lineWidth: 0.3,
-        cellPadding: { top: 1.5, bottom: 1.5, left: 2, right: 2 }
-      },
-      columnStyles: {
-        0: { cellWidth: pw / 3 },
-        1: { cellWidth: pw / 3 },
-        2: { cellWidth: pw / 3 }
-      },
-      head: [['Fecha inicio:', 'Fecha termino:', 'Fecha de reanudación de actividades:']],
-      body: [[this.fmtDate(solicitud.startDate), this.fmtDate(solicitud.endDate), retorno]]
-    });
+    const fHeadH = 7;
+    const fBodyH = 8;
+    const fTotalH = fHeadH + fBodyH;
 
-    y = (doc as any).lastAutoTable.finalY + 5;
+    doc.setDrawColor(42, 122, 228);
+    doc.setLineWidth(0.3);
+
+    // Borde exterior redondeado
+    doc.setFillColor(255, 255, 255);
+    doc.roundedRect(lm, y, pw, fTotalH, 1.5, 1.5, 'FD');
+
+    // Fondo gris cabecera
+    doc.setFillColor(200, 200, 200);
+    doc.roundedRect(lm, y, pw, fHeadH, 1.5, 1.5, 'F');
+
+    // Línea divisoria cabecera/cuerpo
+    doc.setDrawColor(42, 122, 228);
+    doc.line(lm, y + fHeadH, lm + pw, y + fHeadH);
+
+    let fx = lm;
+    for (let i = 0; i < fCols.length; i++) {
+      const cw = fCols[i];
+
+      if (i < fCols.length - 1) {
+        doc.line(fx + cw, y, fx + cw, y + fTotalH);
+      }
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7);
+      doc.setTextColor(42, 122, 228);
+      doc.text(fHeads[i], fx + cw / 2, y + fHeadH / 2 + 1.5, { align: 'center' });
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(30, 30, 30);
+      doc.text(fBody[i], fx + cw / 2, y + fHeadH + fBodyH / 2 + 1.5, { align: 'center' });
+
+      fx += cw;
+    }
+
+    y += fTotalH + 5;
 
     // ---- Observaciones ----
     // Recuadro exterior con borde azul, etiqueta gris interior, línea de texto
@@ -292,9 +317,7 @@ export class ReportVacacionesPdfService {
     doc.setFillColor(255, 255, 255);
     doc.roundedRect(lm, y, pw, obsH, 1.5, 1.5, 'FD');
 
-    // Etiqueta "Observaciones:" — fondo gris, texto azul
-    doc.setFillColor(180, 180, 180);
-    doc.rect(lm + 1, y + 1, 22, 5, 'F');
+    // Etiqueta "Observaciones:" — sin fondo, texto azul
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(7);
     doc.setTextColor(42, 122, 228);
