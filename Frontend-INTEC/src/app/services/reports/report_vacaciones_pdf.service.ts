@@ -32,10 +32,10 @@ export class ReportVacacionesPdfService {
 
     this.drawCopia(doc, 5, empleado, solicitud, logoBase64);
 
-    // Línea punteada separadora
+    // Línea punteada separadora — azul, igual que en la imagen
     doc.setLineDashPattern([2, 2], 0);
     doc.setDrawColor(42, 122, 228);
-    doc.setLineWidth(0.5);
+    doc.setLineWidth(0.6);
     doc.line(10, 149, 200, 149);
     doc.setLineDashPattern([], 0);
 
@@ -72,134 +72,134 @@ export class ReportVacacionesPdfService {
 
     // ---- Logo ----
     if (logoBase64) {
-      doc.addImage(logoBase64, 'PNG', lm, sy + 1, 28, 26);
+      doc.addImage(logoBase64, 'PNG', lm, sy + 1, 30, 20);
     } else {
-      doc.setDrawColor(42, 122, 228);
-      doc.setLineWidth(0.5);
-      doc.rect(lm, sy + 1, 28, 26);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(12);
       doc.setTextColor(42, 122, 228);
-      doc.text('INTEC', lm + 5, sy + 16);
+      doc.text('INTEC', lm + 5, sy + 14);
     }
 
     // ---- Encabezado empresa ----
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8.5);
     doc.setTextColor(42, 122, 228);
-    doc.text('INTEC DE JALIS CO, S.A. DE C.V.', lm + 34, sy + 7);
+    doc.text('INTEC DE JALIS CO, S.A. DE C.V.', lm + 34, sy + 6);
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(60, 60, 60);
-    doc.text('MISIONEROS  #2138    C.P. 44210', lm + 34, sy + 12);
-    doc.text('COL. JARDINES DEL COUNTRY', lm + 34, sy + 16.5);
-    doc.text('GUADALAJARA, JALISCO', lm + 34, sy + 21);
+    doc.text('MISIONEROS  #2138    C.P. 44210', lm + 34, sy + 10.5);
+    doc.text('COL. JARDINES DEL COUNTRY', lm + 34, sy + 14.5);
+    doc.text('GUADALAJARA, JALISCO', lm + 34, sy + 18.5);
 
     // ---- Título ----
     doc.setFontSize(13);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(42, 122, 228);
-    doc.text('SOLICITUD DE VACACIONES', 105, sy + 31, { align: 'center' });
+    doc.text('SOLICITUD DE VACACIONES', 105, sy + 28, { align: 'center' });
 
-    // ---- Sección DATOS DE EMPLEADO ----
-    // Estructura: encabezado azul que abarca toda la fila
-    // Luego fila única con: Empleado | nombre | Fecha de ingreso | valor | FECHA | valor
-    const tY = sy + 34;
-    const totalW = pw;
-
-    // Ancho de columna FECHA (derecha)
+    // ---- Tabla DATOS DE EMPLEADO ----
+    // Estructura exacta de la imagen:
+    //  [ DATOS DE EMPLEADO (encabezado azul, texto blanco) | FECHA (texto azul, sin fondo) ]
+    //  [ Empleado: | valor | Fecha de ingreso: | valor     | fecha doc                     ]
+    const tY = sy + 31;
     const colFechaW = 28;
-    // Ancho parte izquierda
-    const colDatosW = totalW - colFechaW;
+    const colDatosW = pw - colFechaW;
 
-    // Encabezado: "DATOS DE EMPLEADO" abarca colDatosW, "FECHA" abarca colFechaW
+    // Encabezado "DATOS DE EMPLEADO" — fondo azul, texto blanco, borde
     doc.setFillColor(42, 122, 228);
-    doc.rect(lm, tY, colDatosW, 5.5, 'F');
+    doc.setDrawColor(42, 122, 228);
+    doc.setLineWidth(0.3);
+    doc.rect(lm, tY, colDatosW, 6, 'FD');
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7.5);
+    doc.setFontSize(8);
     doc.setTextColor(255, 255, 255);
-    doc.text('DATOS DE EMPLEADO', lm + colDatosW / 2, tY + 3.8, { align: 'center' });
+    doc.text('DATOS DE EMPLEADO', lm + colDatosW / 2, tY + 4.2, { align: 'center' });
 
-    doc.setFillColor(42, 122, 228);
-    doc.rect(lm + colDatosW, tY, colFechaW, 5.5, 'F');
+    // Encabezado "FECHA" — sin fondo, texto azul, borde
+    doc.setFillColor(255, 255, 255);
+    doc.rect(lm + colDatosW, tY, colFechaW, 6, 'FD');
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7.5);
+    doc.setFontSize(8);
     doc.setTextColor(42, 122, 228);
-    doc.text('FECHA', lm + colDatosW + colFechaW / 2, tY + 3.8, { align: 'center' });
+    doc.text('FECHA', lm + colDatosW + colFechaW / 2, tY + 4.2, { align: 'center' });
 
-    // Fila de datos: Empleado + Fecha de ingreso en la misma fila, FECHA a la derecha
+    // Fila de datos: una sola fila con Empleado + Fecha de ingreso + Fecha doc
     const rowH = 12;
     doc.setDrawColor(42, 122, 228);
     doc.setLineWidth(0.3);
 
-    // Celda izquierda grande (empleado + fecha ingreso)
-    doc.rect(lm, tY + 5.5, colDatosW, rowH);
-    // Celda derecha (fecha del documento)
-    doc.rect(lm + colDatosW, tY + 5.5, colFechaW, rowH);
+    // Celda izquierda (empleado + fecha ingreso combinados)
+    doc.setFillColor(255, 255, 255);
+    doc.rect(lm, tY + 6, colDatosW, rowH, 'FD');
 
-    // Dentro de la celda izquierda: subdividir en Empleado y Fecha de ingreso
-    // Línea vertical separadora interna
-    const midX = lm + colDatosW * 0.58;
+    // Celda derecha (fecha documento)
+    doc.rect(lm + colDatosW, tY + 6, colFechaW, rowH, 'FD');
+
+    // Línea vertical interna separando empleado de fecha ingreso
+    // "Fecha de ingreso" ocupa aprox 35% derecho de colDatosW
+    const splitX = lm + colDatosW * 0.62;
     doc.setDrawColor(42, 122, 228);
-    doc.line(midX, tY + 5.5, midX, tY + 5.5 + rowH);
+    doc.line(splitX, tY + 6, splitX, tY + 6 + rowH);
 
-    // Etiqueta "Empleado:"
+    // "Empleado:" label
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(7);
     doc.setTextColor(42, 122, 228);
-    doc.text('Empleado:', lm + 2, tY + 5.5 + 7.5);
-    // Valor empleado
+    doc.text('Empleado:', lm + 2, tY + 6 + 7.5);
+
+    // Nombre del empleado
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(30, 30, 30);
-    const nombreMax = 36;
-    const nombreText = empleado.nombre.length > nombreMax
-      ? empleado.nombre.substring(0, nombreMax)
-      : empleado.nombre;
-    doc.text(nombreText, lm + 18, tY + 5.5 + 7.5);
+    doc.text(empleado.nombre, lm + 18, tY + 6 + 7.5);
 
-    // Etiqueta "Fecha de ingreso:"
+    // "Fecha de" y "ingreso:" en 2 líneas (como en la imagen)
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(6.5);
     doc.setTextColor(42, 122, 228);
-    doc.text('Fecha de', midX + 2, tY + 5.5 + 5);
-    doc.text('ingreso:', midX + 2, tY + 5.5 + 9);
+    doc.text('Fecha de', splitX + 2, tY + 6 + 5.5);
+    doc.text('ingreso:', splitX + 2, tY + 6 + 9.5);
+
     // Valor fecha ingreso
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(30, 30, 30);
-    doc.text(empleado.fechaIngreso, midX + 16, tY + 5.5 + 7.5);
+    const fIngX = splitX + 17;
+    doc.text(empleado.fechaIngreso, fIngX, tY + 6 + 7.5);
 
-    // Fecha del documento (celda derecha)
+    // Fecha del documento (celda FECHA)
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
+    doc.setFontSize(7.5);
     doc.setTextColor(30, 30, 30);
-    doc.text(this.fmtDate(solicitud.requestDate), lm + colDatosW + colFechaW / 2, tY + 5.5 + 7.5, { align: 'center' });
+    doc.text(this.fmtDate(solicitud.requestDate), lm + colDatosW + colFechaW / 2, tY + 6 + 7.5, { align: 'center' });
 
-    let y = tY + 5.5 + rowH + 5;
+    let y = tY + 6 + rowH + 5;
 
     // ---- Período de vacaciones ----
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(7.5);
     doc.setTextColor(30, 30, 30);
-    doc.text('Período al que corresponden las vacaciones:', lm, y);
+    doc.text('Periodo al que corresponden las vacaciones:', lm, y);
     y += 3;
 
     const vacYear = solicitud.vacationYear ?? new Date().getFullYear();
     const diasPendientes = empleado.saldoTotal - solicitud.daysCount;
 
+    // Tabla período: encabezado gris con texto azul, body sin fondo, borde azul
     autoTable(doc, {
       startY: y,
       margin: { left: lm },
       tableWidth: pw,
       styles: {
         fontSize: 6.5,
-        cellPadding: { top: 2, bottom: 2, left: 1.5, right: 1.5 },
+        cellPadding: { top: 1.5, bottom: 1.5, left: 1, right: 1 },
         lineColor: [42, 122, 228],
         lineWidth: 0.3,
         textColor: [30, 30, 30],
-        halign: 'center'
+        halign: 'center',
+        fillColor: [255, 255, 255]
       },
       headStyles: {
         fillColor: [200, 200, 200],
@@ -210,18 +210,22 @@ export class ReportVacacionesPdfService {
         lineColor: [42, 122, 228],
         lineWidth: 0.3
       },
+      bodyStyles: {
+        minCellHeight: 8,
+        valign: 'middle'
+      },
       columnStyles: {
         0: { cellWidth: 30 },
         1: { cellWidth: 20 },
-        2: { cellWidth: 50 },
-        3: { cellWidth: 24 },
+        2: { cellWidth: 50, halign: 'center', fontStyle: 'bold' },
+        3: { cellWidth: 22 },
         4: { cellWidth: 30 },
-        5: { cellWidth: 32 }
+        5: { cellWidth: 34 }
       },
       head: [[
-        'Vacaciones\ncorrespondientes',
+        'Vacaciones correspondientes',
         'del año',
-        'Período',
+        'Periodo',
         'No. Dias\nsolicitados',
         'dias vac\npagadas',
         'vacaciones\npendientes'
@@ -238,7 +242,8 @@ export class ReportVacacionesPdfService {
 
     y = (doc as any).lastAutoTable.finalY + 5;
 
-    // ---- Fechas inicio / término / reanudación ----
+    // ---- Tabla Fecha inicio / Fecha término / Fecha reanudación ----
+    // Encabezado: fondo azul claro (gris), texto azul — body con altura grande vacía
     const retorno = this.nextDay(solicitud.endDate);
 
     autoTable(doc, {
@@ -247,12 +252,13 @@ export class ReportVacacionesPdfService {
       tableWidth: pw,
       styles: {
         fontSize: 7,
-        cellPadding: { top: 2.5, bottom: 6, left: 2, right: 2 },
+        cellPadding: { top: 2, bottom: 8, left: 2, right: 2 },
         lineColor: [42, 122, 228],
         lineWidth: 0.3,
         textColor: [30, 30, 30],
         halign: 'center',
-        valign: 'top'
+        valign: 'top',
+        fillColor: [255, 255, 255]
       },
       headStyles: {
         fillColor: [200, 200, 200],
@@ -261,7 +267,8 @@ export class ReportVacacionesPdfService {
         halign: 'center',
         fontSize: 7,
         lineColor: [42, 122, 228],
-        lineWidth: 0.3
+        lineWidth: 0.3,
+        cellPadding: { top: 2, bottom: 2, left: 2, right: 2 }
       },
       columnStyles: {
         0: { cellWidth: pw / 3 },
@@ -274,12 +281,15 @@ export class ReportVacacionesPdfService {
 
     y = (doc as any).lastAutoTable.finalY + 5;
 
-    // ---- Observaciones (recuadro con borde completo) ----
-    const obsH = 12;
+    // ---- Observaciones ----
+    // Recuadro exterior con borde azul, etiqueta gris interior, línea de texto
+    const obsH = 14;
     doc.setDrawColor(42, 122, 228);
     doc.setLineWidth(0.3);
-    doc.rect(lm, y, pw, obsH);
+    doc.setFillColor(255, 255, 255);
+    doc.rect(lm, y, pw, obsH, 'FD');
 
+    // Etiqueta "Observaciones:" — fondo gris, texto azul
     doc.setFillColor(180, 180, 180);
     doc.rect(lm + 1, y + 1, 22, 5, 'F');
     doc.setFont('helvetica', 'bold');
@@ -287,7 +297,13 @@ export class ReportVacacionesPdfService {
     doc.setTextColor(42, 122, 228);
     doc.text('Observaciones:', lm + 2, y + 4.8);
 
-    y += obsH + 5;
+    // Línea horizontal de escritura
+    doc.setDrawColor(120, 120, 120);
+    doc.setLineWidth(0.2);
+    doc.line(lm + 25, y + 6.5, lm + pw - 2, y + 6.5);
+    doc.line(lm + 2, y + 11.5, lm + pw - 2, y + 11.5);
+
+    y += obsH + 6;
 
     // ---- Firmas ----
     this.drawFirmas(doc, y);
@@ -298,7 +314,7 @@ export class ReportVacacionesPdfService {
     const pw = 186;
     const gap = 3;
     const fw = (pw - gap * 3) / 4;
-    const fh = 25;
+    const fh = 26;
 
     const firmas = [
       { top: 'Trabajador(a)', bottom: 'Nombre y Firma' },
@@ -312,7 +328,8 @@ export class ReportVacacionesPdfService {
 
     firmas.forEach((f, i) => {
       const x = lm + i * (fw + gap);
-      doc.rect(x, y, fw, fh);
+      doc.setFillColor(255, 255, 255);
+      doc.rect(x, y, fw, fh, 'FD');
 
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(6.5);
