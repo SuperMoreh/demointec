@@ -47,7 +47,7 @@ export class ReportVacacionesPdfService {
 
   private async loadLogoBase64(): Promise<string | null> {
     try {
-      const response = await fetch('/assets/logo1.png');
+      const response = await fetch('/assets/logo_gris.png');
       const blob = await response.blob();
       return await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
@@ -238,70 +238,6 @@ export class ReportVacacionesPdfService {
     });
 
     y = (doc as any).lastAutoTable.finalY + 4;
-
-    // ---- Tabla Nueva Reforma Laboral ----
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7);
-    doc.setTextColor(30, 30, 30);
-    doc.text('Tabla de referencia - Nueva Reforma Laboral:', lm, y);
-    y += 3;
-
-    const reformaData = [
-      ['1', '12'], ['2', '14'], ['3', '16'], ['4', '18'], ['5', '20'],
-      ['6-10', '22'], ['11-15', '24'], ['16-20', '26'], ['21-25', '28'],
-      ['26-30', '30'], ['31-35', '32']
-    ];
-
-    const mid = Math.ceil(reformaData.length / 2);
-    const col1 = reformaData.slice(0, mid);
-    const col2 = reformaData.slice(mid);
-    const tabW = 50;
-    const gap = 8;
-
-    autoTable(doc, {
-      startY: y,
-      margin: { left: lm },
-      tableWidth: tabW,
-      styles: { fontSize: 6, cellPadding: 1, lineColor: [42, 122, 228], lineWidth: 0.3 },
-      headStyles: {
-        fillColor: [230, 160, 60],
-        textColor: [255, 255, 255],
-        fontStyle: 'bold',
-        halign: 'center',
-        fontSize: 6
-      },
-      columnStyles: {
-        0: { halign: 'center', cellWidth: 25 },
-        1: { halign: 'center', cellWidth: 25 }
-      },
-      head: [['AÑOS DE TRABAJO', 'DÍAS DE VACACIONES']],
-      body: col1
-    });
-
-    const tab1FinalY = (doc as any).lastAutoTable.finalY;
-
-    autoTable(doc, {
-      startY: y,
-      margin: { left: lm + tabW + gap },
-      tableWidth: tabW,
-      styles: { fontSize: 6, cellPadding: 1, lineColor: [42, 122, 228], lineWidth: 0.3 },
-      headStyles: {
-        fillColor: [230, 160, 60],
-        textColor: [255, 255, 255],
-        fontStyle: 'bold',
-        halign: 'center',
-        fontSize: 6
-      },
-      columnStyles: {
-        0: { halign: 'center', cellWidth: 25 },
-        1: { halign: 'center', cellWidth: 25 }
-      },
-      head: [['AÑOS DE TRABAJO', 'DÍAS DE VACACIONES']],
-      body: col2
-    });
-
-    const tab2FinalY = (doc as any).lastAutoTable.finalY;
-    y = Math.max(tab1FinalY, tab2FinalY) + 4;
 
     // ---- Observaciones ----
     doc.setFillColor(180, 180, 180);

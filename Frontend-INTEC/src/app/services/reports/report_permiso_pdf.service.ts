@@ -40,7 +40,7 @@ export class ReportPermisoPdfService {
 
   private async loadLogoBase64(): Promise<string | null> {
     try {
-      const response = await fetch('/assets/logo1.png');
+      const response = await fetch('/assets/logo_gris.png');
       const blob = await response.blob();
       return await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
