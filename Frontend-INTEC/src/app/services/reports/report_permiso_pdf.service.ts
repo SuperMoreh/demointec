@@ -318,7 +318,7 @@ export class ReportPermisoPdfService {
     const pw = 186;
     const gap = 3;
     const fw = (pw - gap * 3) / 4;
-    const fh = 26;
+    const fh = 18;
 
     const firmas = [
       { top: 'Trabajador(a)', bottom: 'Nombre y Firma' },
@@ -340,13 +340,13 @@ export class ReportPermisoPdfService {
       doc.setTextColor(42, 122, 228);
       const lines = f.top.split('\n');
       lines.forEach((line, li) => {
-        doc.text(line, x + fw / 2, y + 4.5 + li * 3.8, { align: 'center' });
+        doc.text(line, x + fw / 2, y + 3.5 + li * 3.5, { align: 'center' });
       });
 
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(6.5);
       doc.setTextColor(42, 122, 228);
-      doc.text(f.bottom, x + fw / 2, y + fh - 2.5, { align: 'center' });
+      doc.text(f.bottom, x + fw / 2, y + fh - 2, { align: 'center' });
     });
   }
 
