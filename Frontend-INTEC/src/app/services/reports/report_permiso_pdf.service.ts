@@ -23,16 +23,16 @@ export class ReportPermisoPdfService {
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const logoBase64 = await this.loadLogoBase64();
 
-    this.drawCopia(doc, 8, empleado, solicitud, logoBase64);
+    this.drawCopia(doc, 5, empleado, solicitud, logoBase64);
 
-    // Línea punteada separadora
+    // Línea punteada separadora — azul
     doc.setLineDashPattern([2, 2], 0);
-    doc.setDrawColor(150, 150, 150);
-    doc.setLineWidth(0.4);
+    doc.setDrawColor(42, 122, 228);
+    doc.setLineWidth(0.6);
     doc.line(10, 149, 200, 149);
     doc.setLineDashPattern([], 0);
 
-    this.drawCopia(doc, 153, empleado, solicitud, logoBase64);
+    this.drawCopia(doc, 152, empleado, solicitud, logoBase64);
 
     const today = new Date().toISOString().split('T')[0].replace(/-/g, '');
     doc.save(`SolicitudPermiso_${today}.pdf`);
@@ -62,14 +62,12 @@ export class ReportPermisoPdfService {
   ): void {
     const lm = 12;
     const pw = 186;
+    const r = 1.5;
 
     // ---- Logo ----
     if (logoBase64) {
       doc.addImage(logoBase64, 'PNG', lm, sy + 1, 30, 20);
     } else {
-      doc.setDrawColor(42, 122, 228);
-      doc.setLineWidth(0.5);
-      doc.rect(lm, sy + 1, 30, 20);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(12);
       doc.setTextColor(42, 122, 228);
@@ -90,81 +88,99 @@ export class ReportPermisoPdfService {
     doc.text('GUADALAJARA, JALISCO', lm + 34, sy + 18.5);
 
     // ---- Título ----
-    doc.setFontSize(12);
+    doc.setFontSize(13);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(42, 122, 228);
-    doc.text('SOLICITUD DE PERMISO', 105, sy + 27, { align: 'center' });
+    doc.text('SOLICITUD DE PERMISO', 105, sy + 28, { align: 'center' });
 
-    // ---- Tabla DATOS DEL EMPLEADO ----
+    // ---- Tabla DATOS DE EMPLEADO ----
     const tY = sy + 31;
-    const colFechaW = 34;
+    const colFechaW = 28;
     const colDatosW = pw - colFechaW;
+    const headerH = 6;
+    const rowH = 8;
 
+    // Encabezado "DATOS DE EMPLEADO" — fondo azul, texto blanco, esquinas redondeadas
     doc.setFillColor(42, 122, 228);
-    doc.rect(lm, tY, colDatosW, 6, 'F');
+    doc.setDrawColor(42, 122, 228);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(lm, tY, colDatosW, headerH, r, r, 'FD');
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7.5);
+    doc.setFontSize(8);
     doc.setTextColor(255, 255, 255);
     doc.text('DATOS DE EMPLEADO', lm + colDatosW / 2, tY + 4.2, { align: 'center' });
 
-    doc.setFillColor(42, 122, 228);
-    doc.rect(lm + colDatosW, tY, colFechaW, 6, 'F');
+    // Encabezado "FECHA" — sin fondo, texto azul, esquinas redondeadas
+    doc.setFillColor(255, 255, 255);
+    doc.roundedRect(lm + colDatosW, tY, colFechaW, headerH, r, r, 'FD');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(42, 122, 228);
     doc.text('FECHA', lm + colDatosW + colFechaW / 2, tY + 4.2, { align: 'center' });
 
-    const rowH = 7.5;
-
-    // Fila 1: Empleado / Fecha documento
+    // Fila de datos: celda izquierda (empleado + fecha ingreso) y celda derecha (fecha doc)
+    doc.setFillColor(255, 255, 255);
     doc.setDrawColor(42, 122, 228);
-    doc.setLineWidth(0.3);
-    doc.rect(lm, tY + 6, colDatosW, rowH);
-    doc.rect(lm + colDatosW, tY + 6, colFechaW, rowH * 2);
+    doc.roundedRect(lm, tY + headerH, colDatosW, rowH, r, r, 'FD');
+    doc.roundedRect(lm + colDatosW, tY + headerH, colFechaW, rowH, r, r, 'FD');
+
+    // Línea vertical interna separando empleado de fecha ingreso
+    const splitX = lm + colDatosW * 0.62;
+    doc.setDrawColor(42, 122, 228);
+    doc.line(splitX, tY + headerH, splitX, tY + headerH + rowH);
+
+    const midY = tY + headerH + rowH / 2 + 1;
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(7);
     doc.setTextColor(42, 122, 228);
-    doc.text('Empleado:', lm + 2, tY + 11);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(30, 30, 30);
-    doc.text(empleado.nombre, lm + 20, tY + 11);
+    doc.text('Empleado:', lm + 2, midY);
 
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
+    doc.setFontSize(7.5);
     doc.setTextColor(30, 30, 30);
-    doc.text(this.fmtDate(solicitud.requestDate), lm + colDatosW + colFechaW / 2, tY + 10.5, { align: 'center' });
+    doc.text(empleado.nombre, lm + 18, midY);
 
-    // Fila 2: Fecha ingreso
-    doc.rect(lm, tY + 6 + rowH, colDatosW, rowH);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7);
+    doc.setFontSize(6.5);
     doc.setTextColor(42, 122, 228);
-    doc.text('Fecha de ingreso:', lm + 2, tY + 6 + rowH + 5);
+    doc.text('Fecha de', splitX + 2, midY - 1.5);
+    doc.text('ingreso:', splitX + 2, midY + 2.5);
+
     doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
     doc.setTextColor(30, 30, 30);
-    doc.text(empleado.fechaIngreso, lm + 30, tY + 6 + rowH + 5);
+    doc.text(empleado.fechaIngreso, splitX + 17, midY);
 
-    let y = tY + 6 + rowH * 2 + 6;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(30, 30, 30);
+    doc.text(this.fmtDate(solicitud.requestDate), lm + colDatosW + colFechaW / 2, midY, { align: 'center' });
 
-    // ---- PERMISO ----
+    let y = tY + headerH + rowH + 6;
+
+    // ---- PERMISO: Sin/Con goce de sueldo ----
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8.5);
     doc.setTextColor(42, 122, 228);
     doc.text('PERMISO', lm, y);
     y += 5;
 
-    // Sin/Con goce
     const sinGoce = !solicitud.withPay;
     const conGoce = solicitud.withPay;
 
+    // Etiqueta "SIN GOCE DE SUELDO"
     doc.setFillColor(200, 200, 200);
-    doc.rect(lm, y, 38, 6.5, 'F');
+    doc.roundedRect(lm, y, 38, 6.5, r, r, 'F');
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(7);
     doc.setTextColor(60, 60, 60);
     doc.text('SIN GOCE DE SUELDO', lm + 19, y + 4.5, { align: 'center' });
 
-    doc.setDrawColor(80, 80, 80);
+    // Checkbox sin goce
+    doc.setDrawColor(42, 122, 228);
     doc.setLineWidth(0.3);
-    doc.rect(lm + 40, y + 1, 5, 5);
+    doc.roundedRect(lm + 40, y + 1, 5, 5, 0.5, 0.5, 'D');
     if (sinGoce) {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(8);
@@ -172,16 +188,18 @@ export class ReportPermisoPdfService {
       doc.text('X', lm + 41.5, y + 5.2);
     }
 
+    // Etiqueta "CON GOCE DE SUELDO"
     doc.setFillColor(200, 200, 200);
-    doc.rect(lm + 55, y, 38, 6.5, 'F');
+    doc.roundedRect(lm + 55, y, 38, 6.5, r, r, 'F');
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(7);
     doc.setTextColor(60, 60, 60);
     doc.text('CON GOCE DE SUELDO', lm + 74, y + 4.5, { align: 'center' });
 
-    doc.setDrawColor(80, 80, 80);
+    // Checkbox con goce
+    doc.setDrawColor(42, 122, 228);
     doc.setLineWidth(0.3);
-    doc.rect(lm + 95, y + 1, 5, 5);
+    doc.roundedRect(lm + 95, y + 1, 5, 5, 0.5, 0.5, 'D');
     if (conGoce) {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(8);
@@ -191,16 +209,16 @@ export class ReportPermisoPdfService {
 
     y += 10;
 
-    // Etiqueta MOTIVO
-    doc.setFillColor(180, 180, 180);
-    doc.rect(lm, y, 22, 5, 'F');
+    // ---- Etiqueta MOTIVO ----
+    doc.setFillColor(200, 200, 200);
+    doc.roundedRect(lm, y, 22, 5, r, r, 'F');
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(7);
     doc.setTextColor(42, 122, 228);
     doc.text('MOTIVO:', lm + 2, y + 3.6);
     y += 9;
 
-    // Checkboxes de motivo
+    // ---- Checkboxes de motivo ----
     const motivos: { label: string; key: string }[] = [
       { label: 'DEFUNCIÓN', key: 'DEFUN' },
       { label: 'MATRIMONIO', key: 'MATRI' },
@@ -212,9 +230,9 @@ export class ReportPermisoPdfService {
     let cx = lm;
     for (const m of motivos) {
       const checked = razonUp.includes(m.key);
-      doc.setDrawColor(80, 80, 80);
+      doc.setDrawColor(42, 122, 228);
       doc.setLineWidth(0.3);
-      doc.rect(cx, y - 4, 4, 4);
+      doc.roundedRect(cx, y - 4, 4, 4, 0.5, 0.5, 'D');
       if (checked) {
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(7);
@@ -230,66 +248,77 @@ export class ReportPermisoPdfService {
 
     y += 8;
 
-    // A partir del día / Al día
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7.5);
-    doc.setTextColor(30, 30, 30);
-    doc.text('A PARTIR DEL DÍA', lm, y);
-
-    doc.setDrawColor(100, 100, 100);
-    doc.setLineWidth(0.3);
-    doc.line(lm + 35, y, lm + 82, y);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.text(this.fmtDate(solicitud.startDate), lm + 37, y - 0.5);
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7.5);
-    doc.text('AL DÍA', lm + 87, y);
-    doc.line(lm + 99, y, lm + 145, y);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.text(this.fmtDate(solicitud.endDate), lm + 101, y - 0.5);
-
-    y += 9;
-
-    // Debiéndome presentar a laborar
+    // ---- Tabla Fechas (inicio / término / reanudación) ----
     const retorno = this.nextDay(solicitud.endDate);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7.5);
-    doc.setTextColor(30, 30, 30);
-    doc.text('DEBIÉNDOME PRESENTAR A LABORAR EL DÍA:', lm, y);
-    doc.setDrawColor(100, 100, 100);
+    const fCols = [pw / 3, pw / 3, pw / 3];
+    const fHeads = ['A partir del día:', 'Al día:', 'Debiéndome presentar a laborar:'];
+    const fBody  = [this.fmtDate(solicitud.startDate), this.fmtDate(solicitud.endDate), retorno];
+
+    const fHeadH = 7;
+    const fBodyH = 8;
+    const fTotalH = fHeadH + fBodyH;
+
+    doc.setDrawColor(42, 122, 228);
     doc.setLineWidth(0.3);
-    doc.line(lm + 82, y, lm + 135, y);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.text(retorno, lm + 84, y - 0.5);
+    doc.setFillColor(255, 255, 255);
+    doc.roundedRect(lm, y, pw, fTotalH, r, r, 'FD');
 
-    y += 9;
+    doc.setFillColor(200, 200, 200);
+    doc.roundedRect(lm, y, pw, fHeadH, r, r, 'F');
 
-    // Observaciones
-    doc.setFillColor(180, 180, 180);
-    doc.rect(lm, y, 22, 5, 'F');
+    doc.setDrawColor(42, 122, 228);
+    doc.line(lm, y + fHeadH, lm + pw, y + fHeadH);
+
+    let fx = lm;
+    for (let i = 0; i < fCols.length; i++) {
+      const cw = fCols[i];
+      if (i < fCols.length - 1) {
+        doc.line(fx + cw, y, fx + cw, y + fTotalH);
+      }
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7);
+      doc.setTextColor(42, 122, 228);
+      doc.text(fHeads[i], fx + cw / 2, y + fHeadH / 2 + 1.5, { align: 'center' });
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(30, 30, 30);
+      doc.text(fBody[i], fx + cw / 2, y + fHeadH + fBodyH / 2 + 1.5, { align: 'center' });
+
+      fx += cw;
+    }
+
+    y += fTotalH + 5;
+
+    // ---- Observaciones ----
+    const obsH = 14;
+    doc.setDrawColor(42, 122, 228);
+    doc.setLineWidth(0.3);
+    doc.setFillColor(255, 255, 255);
+    doc.roundedRect(lm, y, pw, obsH, r, r, 'FD');
+
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(7);
     doc.setTextColor(42, 122, 228);
-    doc.text('Observaciones:', lm + 1, y + 3.6);
+    doc.text('Observaciones:', lm + 2, y + 4.8);
+
     doc.setDrawColor(120, 120, 120);
-    doc.setLineWidth(0.3);
-    doc.line(lm + 24, y + 5, lm + pw, y + 5);
+    doc.setLineWidth(0.2);
+    doc.line(lm + 25, y + 6.5, lm + pw - 2, y + 6.5);
+    doc.line(lm + 2, y + 11.5, lm + pw - 2, y + 11.5);
 
-    y += 13;
+    y += obsH + 6;
 
-    // ---- Cuadros de firma ----
+    // ---- Firmas ----
     this.drawFirmas(doc, y);
   }
 
   private drawFirmas(doc: jsPDF, y: number): void {
     const lm = 12;
     const pw = 186;
-    const fw = (pw - 9) / 4;
-    const fh = 20;
+    const gap = 3;
+    const fw = (pw - gap * 3) / 4;
+    const fh = 26;
 
     const firmas = [
       { top: 'Trabajador(a)', bottom: 'Nombre y Firma' },
@@ -302,21 +331,22 @@ export class ReportPermisoPdfService {
     doc.setLineWidth(0.4);
 
     firmas.forEach((f, i) => {
-      const x = lm + i * (fw + 3);
-      doc.rect(x, y, fw, fh);
+      const x = lm + i * (fw + gap);
+      doc.setFillColor(255, 255, 255);
+      doc.roundedRect(x, y, fw, fh, 1.5, 1.5, 'FD');
 
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(6.5);
       doc.setTextColor(42, 122, 228);
       const lines = f.top.split('\n');
       lines.forEach((line, li) => {
-        doc.text(line, x + fw / 2, y + 4 + li * 3.5, { align: 'center' });
+        doc.text(line, x + fw / 2, y + 4.5 + li * 3.8, { align: 'center' });
       });
 
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(6.5);
       doc.setTextColor(42, 122, 228);
-      doc.text(f.bottom, x + fw / 2, y + fh - 2, { align: 'center' });
+      doc.text(f.bottom, x + fw / 2, y + fh - 2.5, { align: 'center' });
     });
   }
 
