@@ -1,0 +1,378 @@
+<div class="content-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Asignación de Equipos y Uniformes</h1>
+    </div>
+    <a (click)="setCreateMode()" class="btn-primary">
+      <i class="bi bi-plus-circle"></i>
+      Nueva Asignación
+    </a>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <div class="filter-group">
+        <label for="search">Buscar</label>
+        <input type="text" id="search" class="filter-input" placeholder="Artículo, colaborador, responsable..."
+          [(ngModel)]="searchTerm" (input)="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <label for="state">Estado</label>
+        <select id="state" class="filter-input" [(ngModel)]="selectedState" (change)="applyFilters()">
+          <option value="">Todos los estados</option>
+          <option *ngFor="let s of stateOptions" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+      <button class="btn-consult" (click)="consultItems()" [disabled]="isLoading">
+        <i class="bi bi-search"></i>
+      </button>
+      <button class="btn-filter" (click)="clearFilters()">
+        <i class="bi bi-list-ul"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-container" *ngIf="hasConsulted && !isLoading && filteredItems.length > 0">
+    <div class="table-header">
+      <div class="table-info">
+        Mostrando {{ items.length }} de {{ allItems.length }} asignaciones
+        <span *ngIf="hasActiveFilters()" class="text-muted">(filtradas)</span>
+      </div>
+      <div class="table-actions">
+        <button class="btn-filter1" (click)="exportToExcel()">
+          <i class="bi bi-file-earmark-excel"></i>
+          Exportar a Excel
+        </button>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Artículo</th>
+            <th>Colaborador</th>
+            <th>Cantidad</th>
+            <th>Fecha Asignación</th>
+            <th>Fecha Devolución</th>
+            <th>Estado</th>
+            <th>Responsable</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of items">
+            <td>{{ getInventoryName(item.id_inventory) }}</td>
+            <td>{{ getEmployeeName(item.id_employee) }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.assignment_date }}</td>
+            <td>{{ item.return_date || '—' }}</td>
+            <td>
+              <span class="state-badge" [ngClass]="{
+                'state-assigned': item.state === 'Asignado',
+                'state-returned': item.state === 'Devuelto',
+                'state-lost': item.state === 'Extraviado',
+                'state-damaged': item.state === 'Dañado'
+              }">{{ item.state }}</span>
+            </td>
+            <td>{{ item.responsible || '—' }}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn-action btn-view" (click)="viewItem(item)" title="Ver detalles">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn-action btn-edit" (click)="editItem(item)" title="Editar">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn-action btn-delete" (click)="deleteItem(item)" title="Eliminar">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Paginación -->
+    <div class="pagination-container" *ngIf="totalPages > 1">
+      <div class="pagination">
+        <button [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button *ngFor="let page of pages" [class.active]="page === currentPage" (click)="setPage(page)">
+          {{ page }}
+        </button>
+        <button [disabled]="currentPage === totalPages" (click)="setPage(currentPage + 1)">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-container placeholder-container"
+    *ngIf="hasConsulted && !isLoading && filteredItems.length === 0">
+    <div class="table-placeholder">
+      <i class="bi bi-inbox"></i>
+      No se encontraron asignaciones con los filtros aplicados.
+    </div>
+  </div>
+
+  <div class="table-container placeholder-container" *ngIf="hasConsulted && isLoading">
+    <div class="table-placeholder">
+      <i class="bi bi-arrow-repeat loading-icon"></i>
+      Cargando asignaciones...
+    </div>
+  </div>
+
+  <div class="consult-placeholder" *ngIf="!hasConsulted">
+    <i class="bi bi-info-circle"></i>
+    Consulte para ver las asignaciones de equipos y uniformes.
+  </div>
+</div>
+
+<!-- Modal Agregar Asignación -->
+<div class="modal fade" id="agregarAsignacionModal" tabindex="-1" aria-labelledby="agregarAsignacionModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="agregarAsignacionModalLabel">Nueva Asignación</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"
+          aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="assignmentForm" (ngSubmit)="saveItem()">
+
+          <div class="section-panel">
+            <h6 class="mb-3">Artículo y Colaborador</h6>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Artículo</label>
+                <select formControlName="id_inventory" class="form-select">
+                  <option value="">Seleccione un artículo</option>
+                  <option *ngFor="let inv of inventoryList" [value]="inv.id_inventory">
+                    {{ inv.name_inventory }}
+                  </option>
+                </select>
+                <div *ngIf="assignmentForm.get('id_inventory')?.invalid && assignmentForm.get('id_inventory')?.touched"
+                  class="text-danger mt-1">
+                  <small>El artículo es requerido</small>
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Colaborador</label>
+                <select formControlName="id_employee" class="form-select">
+                  <option value="">Seleccione un colaborador</option>
+                  <option *ngFor="let emp of employeeList" [value]="emp.id_employee">
+                    {{ emp.name_employee }}
+                  </option>
+                </select>
+                <div *ngIf="assignmentForm.get('id_employee')?.invalid && assignmentForm.get('id_employee')?.touched"
+                  class="text-danger mt-1">
+                  <small>El colaborador es requerido</small>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Cantidad</label>
+                <input formControlName="quantity" type="number" class="form-control" min="1">
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Estado</label>
+                <select formControlName="state" class="form-select">
+                  <option *ngFor="let s of stateOptions" [value]="s">{{ s }}</option>
+                </select>
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Fecha de Asignación</label>
+                <input formControlName="assignment_date" type="date" class="form-control">
+                <div *ngIf="assignmentForm.get('assignment_date')?.invalid && assignmentForm.get('assignment_date')?.touched"
+                  class="text-danger mt-1">
+                  <small>La fecha es requerida</small>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Fecha de Devolución</label>
+                <input formControlName="return_date" type="date" class="form-control">
+              </div>
+            </div>
+          </div>
+
+          <div class="section-panel">
+            <h6 class="mb-3">Información Adicional</h6>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Responsable</label>
+                <input formControlName="responsible" type="text" class="form-control"
+                  placeholder="Nombre del responsable">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Observaciones</label>
+                <input formControlName="observations" type="text" class="form-control">
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn-save">
+              <i class="bi bi-floppy"></i>
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Visualizar Asignación -->
+<div class="modal fade" id="visualizarAsignacionModal" tabindex="-1" aria-labelledby="visualizarAsignacionModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="visualizarAsignacionModalLabel">Detalle de Asignación</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"
+          aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedItem">
+        <div class="section-panel">
+          <h6 class="mb-3">Artículo y Colaborador</h6>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted">Artículo</label>
+              <p class="fw-medium">{{ getInventoryName(selectedItem.id_inventory) }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted">Colaborador</label>
+              <p class="fw-medium">{{ getEmployeeName(selectedItem.id_employee) }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label class="form-label text-muted">Cantidad</label>
+              <p class="fw-medium">{{ selectedItem.quantity }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label class="form-label text-muted">Estado</label>
+              <p>
+                <span class="state-badge" [ngClass]="{
+                  'state-assigned': selectedItem.state === 'Asignado',
+                  'state-returned': selectedItem.state === 'Devuelto',
+                  'state-lost': selectedItem.state === 'Extraviado',
+                  'state-damaged': selectedItem.state === 'Dañado'
+                }">{{ selectedItem.state }}</span>
+              </p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label class="form-label text-muted">Fecha de Asignación</label>
+              <p class="fw-medium">{{ selectedItem.assignment_date }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label class="form-label text-muted">Fecha de Devolución</label>
+              <p class="fw-medium">{{ selectedItem.return_date || '—' }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="section-panel">
+          <h6 class="mb-3">Información Adicional</h6>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted">Responsable</label>
+              <p class="fw-medium">{{ selectedItem.responsible || '—' }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted">Observaciones</label>
+              <p class="fw-medium">{{ selectedItem.observations || '—' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar Asignación -->
+<div class="modal fade" id="editarAsignacionModal" tabindex="-1" aria-labelledby="editarAsignacionModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="editarAsignacionModalLabel">Editar Asignación</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"
+          aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="assignmentForm" (ngSubmit)="updateItem()">
+
+          <div class="section-panel">
+            <h6 class="mb-3">Artículo y Colaborador</h6>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Artículo</label>
+                <select formControlName="id_inventory" class="form-select">
+                  <option value="">Seleccione un artículo</option>
+                  <option *ngFor="let inv of inventoryList" [value]="inv.id_inventory">
+                    {{ inv.name_inventory }}
+                  </option>
+                </select>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Colaborador</label>
+                <select formControlName="id_employee" class="form-select">
+                  <option value="">Seleccione un colaborador</option>
+                  <option *ngFor="let emp of employeeList" [value]="emp.id_employee">
+                    {{ emp.name_employee }}
+                  </option>
+                </select>
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Cantidad</label>
+                <input formControlName="quantity" type="number" class="form-control" min="1">
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Estado</label>
+                <select formControlName="state" class="form-select">
+                  <option *ngFor="let s of stateOptions" [value]="s">{{ s }}</option>
+                </select>
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Fecha de Asignación</label>
+                <input formControlName="assignment_date" type="date" class="form-control">
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Fecha de Devolución</label>
+                <input formControlName="return_date" type="date" class="form-control">
+              </div>
+            </div>
+          </div>
+
+          <div class="section-panel">
+            <h6 class="mb-3">Información Adicional</h6>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Responsable</label>
+                <input formControlName="responsible" type="text" class="form-control">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Observaciones</label>
+                <input formControlName="observations" type="text" class="form-control">
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn-save">
+              <i class="bi bi-floppy"></i>
+              Actualizar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

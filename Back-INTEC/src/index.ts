@@ -30,6 +30,11 @@ import disabilityRouter from './core/infrastructure/rest/routes/disability.route
 import salaryTabulatorRouter from './core/infrastructure/rest/routes/salary-tabulator.route';
 import salaryReportRouter from './core/infrastructure/rest/routes/salary-report.route';
 import templateAnalysisRouter from './core/infrastructure/rest/routes/template-analysis.route';
+import inventoryRouter from './core/infrastructure/rest/routes/inventory.route';
+import inventoryUniformRouter from './core/infrastructure/rest/routes/inventory-uniform.route';
+import inventoryExtintorRouter from './core/infrastructure/rest/routes/inventory-extintor.route';
+import inventoryMovementRouter from './core/infrastructure/rest/routes/inventory-movement.route';
+import inventoryAssignmentRouter from './core/infrastructure/rest/routes/inventory-assignment.route';
 
 import { RoleEntity } from './core/infrastructure/entity/roles.entity';
 import { UserEntity } from './core/infrastructure/entity/users.entity';
@@ -74,6 +79,11 @@ app.use('/api', disabilityRouter);
 app.use('/api', salaryTabulatorRouter);
 app.use('/api', salaryReportRouter);
 app.use('/api', templateAnalysisRouter);
+app.use('/api', inventoryRouter);
+app.use('/api', inventoryUniformRouter);
+app.use('/api', inventoryExtintorRouter);
+app.use('/api', inventoryMovementRouter);
+app.use('/api', inventoryAssignmentRouter);
 
 // Serve Frontend Static Files
 app.use(express.static(path.join(__dirname, '../public')));

@@ -21,6 +21,8 @@ import { JointCommitteesComponent } from './components/joint-committees/joint-co
 import { SalaryTabuladorComponent } from './components/salary-tabulador/salary-tabulador.component';
 import { SalaryReportComponent } from './components/salary-report/salary-report.component';
 import { TemplateAnalysisComponent } from './components/template-analysis/template-analysis.component';
+import { InventoryComponent } from './components/inventory/inventory.component';
+import { InventoryAssignmentComponent } from './components/inventory-assignment/inventory-assignment.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -49,6 +51,8 @@ export const routes: Routes = [
       { path: 'tabulador-salarios', component: SalaryTabuladorComponent },
       { path: 'reporte-salarios', component: SalaryReportComponent },
       { path: 'analisis-plantillas', component: TemplateAnalysisComponent },
+      { path: 'inventario-rh', component: InventoryComponent },
+      { path: 'asignacion-inventario', component: InventoryAssignmentComponent },
       { path: 'permisos-vacaciones', loadComponent: () => import('./components/permissions-vacations/permissions-vacations.component').then(m => m.PermissionsVacationsComponent) },
     ]
   },

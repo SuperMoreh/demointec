@@ -1,0 +1,673 @@
+<div class="content-container">
+  <!-- Header de la página -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Inventario</h1>
+    </div>
+    <div class="d-flex gap-2">
+      <a (click)="setCreateMode()" class="btn-primary" data-bs-toggle="modal" data-bs-target="#agregarItemModal">
+        <i class="bi bi-plus-circle"></i>
+        Agregar Artículo
+      </a>
+      <a class="btn-primary" data-bs-toggle="modal" data-bs-target="#asignarEquipoModal">
+        <i class="bi bi-person-check"></i>
+        Asignar Equipos/Uniformes
+      </a>
+      <a class="btn-primary" data-bs-toggle="modal" data-bs-target="#registrarSalidasModal">
+        <i class="bi bi-box-arrow-right"></i>
+        Registrar Entradas/Salidas
+      </a>
+    </div>
+  </div>
+
+  <!-- Filtros y búsqueda -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <div class="filter-group">
+        <label for="search">Buscar</label>
+        <input type="text" id="search" class="filter-input" placeholder="Nombre, ubicación, proveedor..."
+          [(ngModel)]="searchTerm" (input)="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <label for="category">Categoría</label>
+        <select id="category" class="filter-input" [(ngModel)]="selectedCategory" (change)="applyFilters()">
+          <option value="">Todas las categorías</option>
+          <option *ngFor="let cat of categoryOptions" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="status">Estado</label>
+        <select id="status" class="filter-input" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+          <option value="">Todos los estados</option>
+          <option value="true">Activo</option>
+          <option value="false">Inactivo</option>
+        </select>
+      </div>
+      <button class="btn-consult" (click)="consultItems()" [disabled]="isLoading">
+        <i class="bi bi-search"></i>
+      </button>
+      <button class="btn-filter" (click)="clearFilters()">
+        <i class="bi bi-list-ul"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabla de inventario -->
+  <div class="table-container" *ngIf="hasConsulted && !isLoading && filteredItems.length > 0">
+    <div class="table-header">
+      <div class="table-info">
+        Mostrando {{ items.length }} de {{ allItems.length }} artículos
+        <span *ngIf="hasActiveFilters()" class="text-muted">(filtrados)</span>
+      </div>
+      <div class="table-actions">
+        <button class="btn-filter1" (click)="exportToExcel()">
+          <i class="bi bi-file-earmark-excel"></i>
+          Exportar a Excel
+        </button>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Artículo</th>
+            <th>Categoría</th>
+            <th>Cantidad</th>
+            <th>Unidad</th>
+            <th>Stock Mín.</th>
+            <th>Stock Máx.</th>
+            <th>Ubicación</th>
+            <th>Condición</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of items">
+            <td>{{ item.name_inventory }}</td>
+            <td>
+              <span class="category-badge">{{ item.category }}</span>
+            </td>
+            <td>
+              <span [ngClass]="item.quantity <= item.minimum_stock ? 'stock-low' : 'stock-ok'">
+                {{ item.quantity }}
+              </span>
+            </td>
+            <td>{{ item.unit }}</td>
+            <td>{{ item.minimum_stock }}</td>
+            <td>{{ item.maximum_stock }}</td>
+            <td>{{ item.location }}</td>
+            <td>{{ item.state }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="item.status ? 'status-active' : 'status-inactive'">
+                {{ item.status ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn-action btn-view" (click)="viewItem(item)" data-bs-toggle="modal"
+                  data-bs-target="#visualizarItemModal" title="Ver detalles">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn-action btn-edit" (click)="editItem(item)" data-bs-toggle="modal"
+                  data-bs-target="#editarItemModal" title="Editar">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn-action btn-delete" (click)="deleteItem(item)" title="Eliminar">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Paginación -->
+    <div class="pagination-container" *ngIf="totalPages > 1">
+      <div class="pagination">
+        <button [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button *ngFor="let page of pages" [class.active]="page === currentPage" (click)="setPage(page)">
+          {{ page }}
+        </button>
+        <button [disabled]="currentPage === totalPages" (click)="setPage(currentPage + 1)">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-container placeholder-container"
+    *ngIf="hasConsulted && !isLoading && filteredItems.length === 0">
+    <div class="table-placeholder">
+      <i class="bi bi-inbox"></i>
+      No se encontraron artículos con los filtros aplicados.
+    </div>
+  </div>
+
+  <div class="table-container placeholder-container" *ngIf="hasConsulted && isLoading">
+    <div class="table-placeholder">
+      <i class="bi bi-arrow-repeat loading-icon"></i>
+      Cargando inventario...
+    </div>
+  </div>
+
+  <div class="consult-placeholder" *ngIf="!hasConsulted">
+    <i class="bi bi-info-circle"></i>
+    Consulte para ver la información del inventario.
+  </div>
+</div>
+
+<!-- Modal Agregar Artículo -->
+<div class="modal fade" id="agregarItemModal" tabindex="-1" aria-labelledby="agregarItemModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="agregarItemModalLabel">Agregar Artículo</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"
+          aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="inventoryForm" (ngSubmit)="saveItem()">
+
+          <div class="section-panel">
+            <h6 class="mb-3">Información General</h6>
+            <div class="row">
+              <div class="col-md-8 mb-3">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-box"></i></span>
+                  <input formControlName="name_inventory" type="text" class="form-control"
+                    placeholder="Nombre del artículo">
+                </div>
+                <div *ngIf="inventoryForm.get('name_inventory')?.invalid && inventoryForm.get('name_inventory')?.touched"
+                  class="text-danger mt-1">
+                  <small>El nombre es requerido</small>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Categoría</label>
+                <select formControlName="category" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let cat of categoryOptions" [value]="cat">{{ cat }}</option>
+                </select>
+              </div>
+              <div class="col-md-12 mb-3">
+                <label class="form-label">Descripción</label>
+                <textarea formControlName="description" class="form-control" rows="2"
+                  placeholder="Descripción del artículo"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-panel">
+            <h6 class="mb-3">Control de Stock</h6>
+            <div class="row">
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Cantidad</label>
+                <input formControlName="quantity" type="number" class="form-control" min="0">
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Unidad</label>
+                <select formControlName="unit" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let unit of unitOptions" [value]="unit">{{ unit }}</option>
+                </select>
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Stock Mínimo</label>
+                <input formControlName="minimum_stock" type="number" class="form-control" min="0">
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Stock Máximo</label>
+                <input formControlName="maximum_stock" type="number" class="form-control" min="0">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Ubicación</label>
+                <input formControlName="location" type="text" class="form-control"
+                  placeholder="Ej. Bodega A, Estante 3">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Condición</label>
+                <select formControlName="state" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let s of stateOptions" [value]="s">{{ s }}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-panel">
+            <h6 class="mb-3">Datos de Compra</h6>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Fecha de Compra</label>
+                <input formControlName="purchase_date" type="date" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Proveedor</label>
+                <input formControlName="supplier" type="text" class="form-control" placeholder="Nombre del proveedor">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Costo Unitario</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input formControlName="unit_cost" type="number" class="form-control" min="0" step="0.01">
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Responsable</label>
+                <input formControlName="responsible" type="text" class="form-control"
+                  placeholder="Nombre del responsable">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Observaciones</label>
+                <input formControlName="observations" type="text" class="form-control">
+              </div>
+            </div>
+          </div>
+
+          <!-- Campos adicionales: Extintores -->
+          <div class="section-panel" *ngIf="isExtintor" [formGroup]="extintorForm">
+            <h6 class="mb-3">Datos del Extintor</h6>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Tipo</label>
+                <select formControlName="extintor_type" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let t of extintorTypeOptions" [value]="t">{{ t }}</option>
+                </select>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Capacidad</label>
+                <input formControlName="capacity" type="text" class="form-control" placeholder="Ej. 6 kg">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">No. de Serie</label>
+                <input formControlName="serial_number" type="text" class="form-control">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Ubicación Exacta</label>
+                <input formControlName="exact_location" type="text" class="form-control"
+                  placeholder="Ej. Pasillo principal, columna B">
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Fecha de Recarga</label>
+                <input formControlName="recharge_date" type="date" class="form-control">
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Fecha de Caducidad</label>
+                <input formControlName="expiration_date" type="date" class="form-control">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Última Inspección</label>
+                <input formControlName="last_inspection" type="date" class="form-control">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Próxima Inspección</label>
+                <input formControlName="next_inspection" type="date" class="form-control">
+              </div>
+            </div>
+          </div>
+
+          <!-- Campos adicionales: Uniformes -->
+          <div class="section-panel" *ngIf="isUniform" [formGroup]="uniformForm">
+            <h6 class="mb-3">Datos del Uniforme</h6>
+            <div class="row">
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Talla</label>
+                <input formControlName="size" type="text" class="form-control" placeholder="Ej. M, L, XL, 42">
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Género</label>
+                <select formControlName="gender" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let g of genderOptions" [value]="g">{{ g }}</option>
+                </select>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Departamento</label>
+                <input formControlName="department" type="text" class="form-control">
+              </div>
+            </div>
+          </div>
+
+          <div class="section-panel">
+            <h6 class="mb-3">Estado</h6>
+            <div class="form-check form-switch">
+              <input formControlName="status" class="form-check-input" type="checkbox" id="statusSwitch">
+              <label class="form-check-label" for="statusSwitch">
+                {{ inventoryForm.get('status')?.value ? 'Activo' : 'Inactivo' }}
+              </label>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn-save">
+              <i class="bi bi-floppy"></i>
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Visualizar Artículo -->
+<div class="modal fade" id="visualizarItemModal" tabindex="-1" aria-labelledby="visualizarItemModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="visualizarItemModalLabel">Detalle del Artículo</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"
+          aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedItem">
+        <div class="section-panel">
+          <h6 class="mb-3">Información General</h6>
+          <div class="row">
+            <div class="col-md-8 mb-3">
+              <label class="form-label text-muted">Artículo</label>
+              <p class="fw-medium">{{ selectedItem.name_inventory }}</p>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label text-muted">Categoría</label>
+              <p><span class="category-badge">{{ selectedItem.category }}</span></p>
+            </div>
+            <div class="col-md-12 mb-3">
+              <label class="form-label text-muted">Descripción</label>
+              <p class="fw-medium">{{ selectedItem.description || '—' }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="section-panel">
+          <h6 class="mb-3">Control de Stock</h6>
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <label class="form-label text-muted">Cantidad</label>
+              <p class="fw-medium"
+                [ngClass]="selectedItem.quantity <= selectedItem.minimum_stock ? 'text-danger' : 'text-success'">
+                {{ selectedItem.quantity }}
+              </p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label class="form-label text-muted">Unidad</label>
+              <p class="fw-medium">{{ selectedItem.unit }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label class="form-label text-muted">Stock Mínimo</label>
+              <p class="fw-medium">{{ selectedItem.minimum_stock }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label class="form-label text-muted">Stock Máximo</label>
+              <p class="fw-medium">{{ selectedItem.maximum_stock }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted">Ubicación</label>
+              <p class="fw-medium">{{ selectedItem.location }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted">Condición</label>
+              <p class="fw-medium">{{ selectedItem.state || '—' }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="section-panel">
+          <h6 class="mb-3">Datos de Compra</h6>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label text-muted">Fecha de Compra</label>
+              <p class="fw-medium">{{ selectedItem.purchase_date || '—' }}</p>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label text-muted">Proveedor</label>
+              <p class="fw-medium">{{ selectedItem.supplier || '—' }}</p>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label text-muted">Costo Unitario</label>
+              <p class="fw-medium">{{ selectedItem.unit_cost | currency }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted">Responsable</label>
+              <p class="fw-medium">{{ selectedItem.responsible || '—' }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted">Observaciones</label>
+              <p class="fw-medium">{{ selectedItem.observations || '—' }}</p>
+            </div>
+          </div>
+        </div>
+        <!-- Datos del Extintor -->
+        <div class="section-panel" *ngIf="selectedItem.category === 'Extintores' && selectedExtintor">
+          <h6 class="mb-3">Datos del Extintor</h6>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label text-muted">Tipo</label>
+              <p class="fw-medium">{{ selectedExtintor.extintor_type || '—' }}</p>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label text-muted">Capacidad</label>
+              <p class="fw-medium">{{ selectedExtintor.capacity || '—' }}</p>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label text-muted">No. de Serie</label>
+              <p class="fw-medium">{{ selectedExtintor.serial_number || '—' }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted">Ubicación Exacta</label>
+              <p class="fw-medium">{{ selectedExtintor.exact_location || '—' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label class="form-label text-muted">Fecha de Recarga</label>
+              <p class="fw-medium">{{ selectedExtintor.recharge_date || '—' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label class="form-label text-muted">Fecha de Caducidad</label>
+              <p class="fw-medium">{{ selectedExtintor.expiration_date || '—' }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted">Última Inspección</label>
+              <p class="fw-medium">{{ selectedExtintor.last_inspection || '—' }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted">Próxima Inspección</label>
+              <p class="fw-medium">{{ selectedExtintor.next_inspection || '—' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Datos del Uniforme -->
+        <div class="section-panel" *ngIf="selectedItem.category === 'Uniformes' && selectedUniform">
+          <h6 class="mb-3">Datos del Uniforme</h6>
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <label class="form-label text-muted">Talla</label>
+              <p class="fw-medium">{{ selectedUniform.size || '—' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label class="form-label text-muted">Género</label>
+              <p class="fw-medium">{{ selectedUniform.gender || '—' }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted">Departamento</label>
+              <p class="fw-medium">{{ selectedUniform.department || '—' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-panel">
+          <h6 class="mb-3">Estado</h6>
+          <span class="status-badge" [ngClass]="selectedItem.status ? 'status-active' : 'status-inactive'">
+            {{ selectedItem.status ? 'Activo' : 'Inactivo' }}
+          </span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar Artículo -->
+<div class="modal fade" id="editarItemModal" tabindex="-1" aria-labelledby="editarItemModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="editarItemModalLabel">Editar Artículo</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"
+          aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="inventoryForm" (ngSubmit)="updateItem()">
+
+          <div class="section-panel">
+            <h6 class="mb-3">Información General</h6>
+            <div class="row">
+              <div class="col-md-8 mb-3">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-box"></i></span>
+                  <input formControlName="name_inventory" type="text" class="form-control"
+                    placeholder="Nombre del artículo">
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Categoría</label>
+                <select formControlName="category" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let cat of categoryOptions" [value]="cat">{{ cat }}</option>
+                </select>
+              </div>
+              <div class="col-md-12 mb-3">
+                <label class="form-label">Descripción</label>
+                <textarea formControlName="description" class="form-control" rows="2"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-panel">
+            <h6 class="mb-3">Control de Stock</h6>
+            <div class="row">
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Cantidad</label>
+                <input formControlName="quantity" type="number" class="form-control" min="0">
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Unidad</label>
+                <select formControlName="unit" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let unit of unitOptions" [value]="unit">{{ unit }}</option>
+                </select>
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Stock Mínimo</label>
+                <input formControlName="minimum_stock" type="number" class="form-control" min="0">
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Stock Máximo</label>
+                <input formControlName="maximum_stock" type="number" class="form-control" min="0">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Ubicación</label>
+                <input formControlName="location" type="text" class="form-control">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Condición</label>
+                <select formControlName="state" class="form-select">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let s of stateOptions" [value]="s">{{ s }}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-panel">
+            <h6 class="mb-3">Datos de Compra</h6>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Fecha de Compra</label>
+                <input formControlName="purchase_date" type="date" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Proveedor</label>
+                <input formControlName="supplier" type="text" class="form-control">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Costo Unitario</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input formControlName="unit_cost" type="number" class="form-control" min="0" step="0.01">
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Responsable</label>
+                <input formControlName="responsible" type="text" class="form-control">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Observaciones</label>
+                <input formControlName="observations" type="text" class="form-control">
+              </div>
+            </div>
+          </div>
+
+          <div class="section-panel">
+            <h6 class="mb-3">Estado</h6>
+            <div class="form-check form-switch">
+              <input formControlName="status" class="form-check-input" type="checkbox" id="editStatusSwitch">
+              <label class="form-check-label" for="editStatusSwitch">
+                {{ inventoryForm.get('status')?.value ? 'Activo' : 'Inactivo' }}
+              </label>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn-save">
+              <i class="bi bi-floppy"></i>
+              Actualizar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Asignar Equipos/Uniformes -->
+<div class="modal fade" id="asignarEquipoModal" tabindex="-1" aria-labelledby="asignarEquipoModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="asignarEquipoModalLabel">Asignación de Equipos y Uniformes</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"
+          aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body p-0">
+        <app-inventory-assignment></app-inventory-assignment>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Registrar Salidas -->
+<div class="modal fade" id="registrarSalidasModal" tabindex="-1" aria-labelledby="registrarSalidasModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="registrarSalidasModalLabel">Registrar Salidas</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"
+          aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body p-0">
+        <app-inventory-movement></app-inventory-movement>
+      </div>
+    </div>
+  </div>
+</div>

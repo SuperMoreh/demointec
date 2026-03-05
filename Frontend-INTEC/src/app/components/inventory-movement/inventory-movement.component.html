@@ -1,0 +1,296 @@
+<div class="content-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Registro de Salidas</h1>
+    </div>
+    <a (click)="openRegistrarModal()" class="btn-primary">
+      <i class="bi bi-plus-circle"></i>
+      Nuevo Movimiento
+    </a>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <div class="filter-group">
+        <label for="search">Buscar</label>
+        <input type="text" id="search" class="filter-input" placeholder="Artículo, motivo, responsable..."
+          [(ngModel)]="searchTerm" (input)="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <label for="type">Tipo</label>
+        <select id="type" class="filter-input" [(ngModel)]="selectedType" (change)="applyFilters()">
+          <option value="">Todos los tipos</option>
+          <option *ngFor="let t of movementTypeOptions" [value]="t">{{ t }}</option>
+        </select>
+      </div>
+      <button class="btn-consult" (click)="consultItems()" [disabled]="isLoading">
+        <i class="bi bi-search"></i>
+      </button>
+      <button class="btn-filter" (click)="clearFilters()">
+        <i class="bi bi-list-ul"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-container" *ngIf="hasConsulted && !isLoading && filteredItems.length > 0">
+    <div class="table-header">
+      <div class="table-info">
+        Mostrando {{ items.length }} de {{ allItems.length }} movimientos
+        <span *ngIf="hasActiveFilters()" class="text-muted">(filtrados)</span>
+      </div>
+      <div class="table-actions">
+        <button class="btn-filter1" (click)="exportToExcel()">
+          <i class="bi bi-file-earmark-excel"></i>
+          Exportar a Excel
+        </button>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Artículo</th>
+            <th>Tipo</th>
+            <th>Cantidad</th>
+            <th>Motivo</th>
+            <th>Colaborador</th>
+            <th>Responsable</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of items">
+            <td>{{ getInventoryName(item.id_inventory) }}</td>
+            <td>
+              <span class="type-badge" [ngClass]="{
+                'type-salida': item.movement_type === 'Salida',
+                'type-entrada': item.movement_type === 'Entrada',
+                'type-ajuste': item.movement_type === 'Ajuste',
+                'type-transferencia': item.movement_type === 'Transferencia',
+                'type-baja': item.movement_type === 'Baja'
+              }">{{ item.movement_type }}</span>
+            </td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.reason }}</td>
+            <td>{{ getEmployeeName(item.id_employee) }}</td>
+            <td>{{ item.responsible || '—' }}</td>
+            <td>{{ item.movement_date }}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn-action btn-view" (click)="viewItem(item)" title="Ver detalles">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Paginación -->
+    <div class="pagination-container" *ngIf="totalPages > 1">
+      <div class="pagination">
+        <button [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button *ngFor="let page of pages" [class.active]="page === currentPage" (click)="setPage(page)">
+          {{ page }}
+        </button>
+        <button [disabled]="currentPage === totalPages" (click)="setPage(currentPage + 1)">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-container placeholder-container"
+    *ngIf="hasConsulted && !isLoading && filteredItems.length === 0">
+    <div class="table-placeholder">
+      <i class="bi bi-inbox"></i>
+      No se encontraron movimientos con los filtros aplicados.
+    </div>
+  </div>
+
+  <div class="table-container placeholder-container" *ngIf="hasConsulted && isLoading">
+    <div class="table-placeholder">
+      <i class="bi bi-arrow-repeat loading-icon"></i>
+      Cargando movimientos...
+    </div>
+  </div>
+
+  <div class="consult-placeholder" *ngIf="!hasConsulted">
+    <i class="bi bi-info-circle"></i>
+    Consulte para ver el historial de salidas.
+  </div>
+</div>
+
+<!-- Modal Registrar Movimiento -->
+<div class="modal fade" id="registrarMovimientoModal" tabindex="-1" aria-labelledby="registrarMovimientoModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="registrarMovimientoModalLabel">Nuevo Movimiento</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"
+          aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="movementForm" (ngSubmit)="saveItem()">
+
+          <div class="section-panel">
+            <h6 class="mb-3">Datos del Movimiento</h6>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Artículo</label>
+                <select formControlName="id_inventory" class="form-select">
+                  <option value="">Seleccione un artículo</option>
+                  <option *ngFor="let inv of inventoryList" [value]="inv.id_inventory">
+                    {{ inv.name_inventory }}
+                  </option>
+                </select>
+                <div *ngIf="movementForm.get('id_inventory')?.invalid && movementForm.get('id_inventory')?.touched"
+                  class="text-danger mt-1">
+                  <small>El artículo es requerido</small>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Tipo de Movimiento</label>
+                <select formControlName="movement_type" class="form-select">
+                  <option *ngFor="let t of movementTypeOptions" [value]="t">{{ t }}</option>
+                </select>
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Cantidad</label>
+                <input formControlName="quantity" type="number" class="form-control" min="1">
+                <div *ngIf="movementForm.get('quantity')?.invalid && movementForm.get('quantity')?.touched"
+                  class="text-danger mt-1">
+                  <small>Cantidad requerida (mín. 1)</small>
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Motivo</label>
+                <input formControlName="reason" type="text" class="form-control" placeholder="Motivo del movimiento">
+                <div *ngIf="movementForm.get('reason')?.invalid && movementForm.get('reason')?.touched"
+                  class="text-danger mt-1">
+                  <small>El motivo es requerido</small>
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Fecha</label>
+                <input formControlName="movement_date" type="date" class="form-control">
+                <div *ngIf="movementForm.get('movement_date')?.invalid && movementForm.get('movement_date')?.touched"
+                  class="text-danger mt-1">
+                  <small>La fecha es requerida</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-panel">
+            <h6 class="mb-3">Información Adicional</h6>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Colaborador</label>
+                <select formControlName="id_employee" class="form-select">
+                  <option value="">Sin colaborador</option>
+                  <option *ngFor="let emp of employeeList" [value]="emp.id_employee">
+                    {{ emp.name_employee }}
+                  </option>
+                </select>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Responsable</label>
+                <input formControlName="responsible" type="text" class="form-control"
+                  placeholder="Nombre del responsable">
+              </div>
+              <div class="col-md-12 mb-3">
+                <label class="form-label">Observaciones</label>
+                <input formControlName="observations" type="text" class="form-control">
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn-save">
+              <i class="bi bi-floppy"></i>
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Visualizar Movimiento -->
+<div class="modal fade" id="visualizarMovimientoModal" tabindex="-1" aria-labelledby="visualizarMovimientoModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="visualizarMovimientoModalLabel">Detalle del Movimiento</h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"
+          aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedItem">
+        <div class="section-panel">
+          <h6 class="mb-3">Datos del Movimiento</h6>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted">Artículo</label>
+              <p class="fw-medium">{{ getInventoryName(selectedItem.id_inventory) }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label class="form-label text-muted">Tipo</label>
+              <p>
+                <span class="type-badge" [ngClass]="{
+                  'type-salida': selectedItem.movement_type === 'Salida',
+                  'type-entrada': selectedItem.movement_type === 'Entrada',
+                  'type-ajuste': selectedItem.movement_type === 'Ajuste',
+                  'type-transferencia': selectedItem.movement_type === 'Transferencia',
+                  'type-baja': selectedItem.movement_type === 'Baja'
+                }">{{ selectedItem.movement_type }}</span>
+              </p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label class="form-label text-muted">Cantidad</label>
+              <p class="fw-medium">{{ selectedItem.quantity }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted">Motivo</label>
+              <p class="fw-medium">{{ selectedItem.reason }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted">Fecha</label>
+              <p class="fw-medium">{{ selectedItem.movement_date }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="section-panel">
+          <h6 class="mb-3">Información Adicional</h6>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted">Colaborador</label>
+              <p class="fw-medium">{{ getEmployeeName(selectedItem.id_employee) }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted">Responsable</label>
+              <p class="fw-medium">{{ selectedItem.responsible || '—' }}</p>
+            </div>
+            <div class="col-md-12 mb-3">
+              <label class="form-label text-muted">Observaciones</label>
+              <p class="fw-medium">{{ selectedItem.observations || '—' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>

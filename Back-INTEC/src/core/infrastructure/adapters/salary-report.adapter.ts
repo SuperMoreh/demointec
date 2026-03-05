@@ -11,6 +11,7 @@ export class SalaryReportAdapterRepository implements SalaryReportRepository {
             where: { status: true },
             select: [
                 'id_employee',
+                'employee_code',
                 'name_employee',
                 'admission_date',
                 'position',
@@ -20,7 +21,7 @@ export class SalaryReportAdapterRepository implements SalaryReportRepository {
         });
 
         return employees.map(emp => ({
-            id_employee: emp.id_employee,
+            id_employee: emp.employee_code,
             name_employee: emp.name_employee,
             admission_date: emp.admission_date,
             position: emp.position,

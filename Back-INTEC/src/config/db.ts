@@ -24,6 +24,11 @@ import { CommitteeDocumentEntity } from '../core/infrastructure/entity/committee
 import { AbsenceRequestEntity } from '../core/infrastructure/entity/absence-request.entity';
 import { DisabilityEntity } from '../core/infrastructure/entity/disability.entity';
 import { SalaryTabulatorEntity } from '../core/infrastructure/entity/salary-tabulator.entity';
+import { InventoryEntity } from '../core/infrastructure/entity/inventory.entity';
+import { InventoryUniformEntity } from '../core/infrastructure/entity/inventory-uniform.entity';
+import { InventoryExtintorEntity } from '../core/infrastructure/entity/inventory-extintor.entity';
+import { InventoryMovementEntity } from '../core/infrastructure/entity/inventory-movement.entity';
+import { InventoryAssignmentEntity } from '../core/infrastructure/entity/inventory-assignment.entity';
 
 dotenv.config();
 
@@ -42,7 +47,8 @@ export const AppDataSource = new DataSource({
   entities: [UserEntity, RoleEntity, AttendanceEntity, ToolsEntity, MaterialEntity, ProjectEntity,
     CategoriesEntity, SubcategoriesEntity, EmployeeEntity, RequestDetailsEntity, RequestHeadersEntity, RequestsAdditionalEntity,
     LaborEventEntity, EmployeeUniformEntity, EmployeeDocumentEntity, JobDescriptionEntity, TerminationEntity,
-    CommitteeDocumentEntity, AbsenceRequestEntity, DisabilityEntity, SalaryTabulatorEntity],
+    CommitteeDocumentEntity, AbsenceRequestEntity, DisabilityEntity, SalaryTabulatorEntity,
+    InventoryEntity, InventoryUniformEntity, InventoryExtintorEntity, InventoryMovementEntity, InventoryAssignmentEntity],
 });
 
 
