@@ -74,6 +74,70 @@ export class FormatsComponent {
       icon: 'bi-file-earmark-pdf',
       filePath: '/formatos/CONTRATO CONFIDENCIALIDAD.pdf',
       fileName: 'Contrato de Confidencialidad.pdf'
+    },
+    {
+      key: 'contrato-obra-determinada',
+      label: 'Contrato Individual por Obra Determinada',
+      description: 'Contrato individual por obra determinada del colaborador',
+      icon: 'bi-file-earmark-pdf',
+      filePath: '/formatos/CONTRATO INDIVIDUAL POR OBRA DETERMINADA.pdf',
+      fileName: 'Contrato Individual por Obra Determinada.pdf'
+    },
+    {
+      key: 'contrato-tiempo-determinado',
+      label: 'Contrato por Tiempo Determinado',
+      description: 'Contrato por tiempo determinado del colaborador',
+      icon: 'bi-file-earmark-pdf',
+      filePath: '/formatos/Contrato por Tiempo Determinado.pdf',
+      fileName: 'Contrato por Tiempo Determinado.pdf'
+    },
+    {
+      key: 'politica-prestamos',
+      label: 'Política de Préstamos Personales',
+      description: 'Política de préstamos personales para colaboradores',
+      icon: 'bi-file-earmark-pdf',
+      filePath: '/formatos/POLITICA DE PRESTAMOS PERSONALES.pdf',
+      fileName: 'Política de Préstamos Personales.pdf'
+    },
+    {
+      key: 'politica-bono-permanencia',
+      label: 'Política de Bono por Permanencia',
+      description: 'Política de bono por permanencia para colaboradores',
+      icon: 'bi-file-earmark-pdf',
+      filePath: '/formatos/POLITICA DE BONO POR PERMANENCIA.pdf',
+      fileName: 'Política de Bono por Permanencia.pdf'
+    },
+    {
+      key: 'renuncia-laboral',
+      label: 'Renuncia Laboral',
+      description: 'Formato de renuncia laboral del colaborador',
+      icon: 'bi-file-earmark-pdf',
+      filePath: '/formatos/RENUNCIA LABORAL.pdf',
+      fileName: 'Renuncia Laboral.pdf'
+    },
+    {
+      key: 'responsiva-epp',
+      label: 'Responsiva Entrega de EPP',
+      description: 'Responsiva de entrega de equipo de protección personal',
+      icon: 'bi-file-earmark-pdf',
+      filePath: '/formatos/Responsiva Entrega de EPP.pdf',
+      fileName: 'Responsiva Entrega de EPP.pdf'
+    },
+    {
+      key: 'responsiva-llaves',
+      label: 'Responsiva Llaves',
+      description: 'Responsiva de entrega de llaves al colaborador',
+      icon: 'bi-file-earmark-pdf',
+      filePath: '/formatos/Responsiva Llaves.pdf',
+      fileName: 'Responsiva Llaves.pdf'
+    },
+    {
+      key: 'rit',
+      label: 'RIT — Reglamento Interior de Trabajo',
+      description: 'Reglamento interior de trabajo de la empresa',
+      icon: 'bi-file-earmark-pdf',
+      filePath: '/formatos/RIT Reglamento interior de trabajo.pdf',
+      fileName: 'RIT Reglamento Interior de Trabajo.pdf'
     }
   ];
 
