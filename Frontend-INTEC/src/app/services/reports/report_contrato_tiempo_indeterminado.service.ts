@@ -86,7 +86,7 @@ export class ReportContratoTiempoIndeterminadoService {
     y = this.drawInlineSegs(doc, [
       { t: 'EN ZAPOPAN JALISCO COMPARECEN POR UNA PARTE EL (LA) C. "', b: false },
       { t: data.nombreTrabajador.toUpperCase(), b: false },
-      { t: '", POR SU PROPIO DERECHO, A QUIEN EN LO SUCESIVO DENOMINADO COMO "EL (LA) TRABAJADOR(A)" Y POR OTRA PARTE LA PERSONA MORAL INTEC DE JALISCO SA DE CV A QUIEN EN LO SUCESIVO DENOMINAREMOS "EL PATRÓN" POR CONDUCTO DE SU REPRESENTANTE LEGAL "JUAN PABLO RUVALCABA ORNELAS", PARA CELEBRAR EL SIGUIENTE CONTRATO INDIVIDUAL DE TRABAJO:', b: false },
+      { t: '", POR SU PROPIO DERECHO, A QUIEN EN LO SUCESIVO DENOMINADO COMO "EL (LA) TRABAJADOR(A)" Y POR OTRA PARTE LA PERSONA MORAL INTEC DE JALISCO SA DE CV A QUIEN EN LO SUCESIVO DENOMINAREMOS "EL PATRÓN" POR CONDUCTO DE SU REPRESENTANTE LEGAL "JUAN PABLO JIMÉNEZ ESPINOSA”, MISMO QUE SUJETAN AL TENOR DE LAS SIGUIENTES DECLARACIONES Y CLÁUSULAS', b: false },
     ], lm, y, pw, lh, fs);
     y += 5;
 
@@ -109,7 +109,7 @@ export class ReportContratoTiempoIndeterminadoService {
     y = this.drawInlineSegs(doc, [
       { t: 'Declara EL PATRÓN por conducto de su representante, que es una sociedad debidamente constituida de conformidad con las leyes mexicanas, según acreditada en este acto con el testimonio del instrumento público número ', b: false },
       { t: '20,459', b: true },
-      { t: ' (', b: false }, { t: 'Veinte mil cuatrocientos cincuenta y nueve', b: true }, { t: ') a cargo del Licenciado ', b: false },
+      { t: ' (', b: false }, { t: 'Veinte  mil cuatrocientos cincuenta y nueve', b: true }, { t: ') a cargo del Licenciado ', b: false },
       { t: 'Eduardo de Alba Góngora', b: true },
       { t: ', titular de la notaria pública N.', b: false }, { t: '38', b: true },
       { t: ' de la Ciudad de Zapopan, Jalisco otorgada el día ', b: false }, { t: '08 de diciembre de 2022', b: true }, { t: '.', b: false },
@@ -146,7 +146,7 @@ export class ReportContratoTiempoIndeterminadoService {
 
     doc.setFont('helvetica', 'bold'); doc.text('1.', colNum, y); doc.setFont('helvetica', 'normal');
     y = this.drawInlineSegs(doc, [
-      { t: 'Que está consciente que se requieren sus servicios de manera indeterminada y que cuenta con los conocimientos, así como la capacitación y aptitudes para desempeñar el puesto que EL PATRÓN requiere, por lo que está conforme en prestar sus servicios en forma indeterminada, expresando el más amplio consentimiento que en derecho proceda con la firma del presente contrato.', b: false },
+      { t: 'Que está consciente que se requieren sus servicios de manera indeterminada y que cuenta con los conocimientos, así como la capacitación y aptitudes para desempeñar el puesto que EL PATRÓN  requiere, por lo que está conforme en prestar sus servicios en forma indeterminada, expresando el más amplio consentimiento que en derecho proceda con la firma del presente contrato.', b: false },
     ], colBody, y, pwBody, lh, fs);
     y += 2;
 
@@ -240,7 +240,7 @@ export class ReportContratoTiempoIndeterminadoService {
       { t: 'DESCRIPTIVO DE PUESTO', b: true },
       { t: ', así mismo, EL(LA) TRABAJADOR(A) se obliga a desempeñar cualquier otra actividad conexa o relacionada que le encomiende el PATRÓN, que sea compatible a sus conocimientos, capacidad o aptitudes, debiendo además acatar todas las disposiciones o instrucciones de carácter administrativo o de organización que EL PATRÓN llegue a dictar tanto de manera directa como a través sus gerentes, directivos, jefes, etc. a EL(LA) TRABAJADOR(A), como de carácter general a todo el personal, como anexo de este contrato. El local en el que prestará sus servicios EL (LA) TRABAJADOR(A), será el ubicado en ', b: false },
       { t: '"MISIONEROS #2138, JARDINES DEL COUNTRY. GUADALAJARA, JALISCO. C.P.44210"', b: true },
-      { t: '; o en cualquier otro local presente o futuro en el que EL PATRÓN tenga instaladas o llegue a instalar oficinas, sucursales o establecimientos, por lo que el lugar en que preste sus servicios podrá ser un domicilio diverso al señalado, pudiendo ser tanto en esta ciudad, como fuera de la misma. En el caso que EL PATRÓN por razones administrativas decida que EL (LA) TRABAJADOR(A) desempeñe sus labores en un lugar diverso al señalado en el párrafo anterior, deberá por escrito hacer del conocimiento de EL (LA) TRABAJADOR(A) tal decisión, y éste está conforme desde este momento en que deberá cumplirla como una orden de trabajo.', b: false },
+      { t: '; o en cualquier otro local presente o futuro en el que EL PATRÓN  tenga instaladas o llegue a instalar oficinas, sucursales o establecimientos, por lo que el lugar en que preste sus servicios podrá ser un domicilio diverso al señalado, pudiendo ser tanto en esta ciudad, como fuera de la misma. En el caso que EL PATRÓN por razones administrativas decida que EL (LA) TRABAJADOR(A) desempeñe sus labores en un lugar diverso al señalado en el párrafo anterior, deberá por escrito hacer del conocimiento de EL (LA) TRABAJADOR(A) tal decisión, y éste está conforme desde este momento en que deberá cumplirla como una orden de trabajo.', b: false },
     ], lm, y, pw, lh, fs);
     y += 3;
     y = this.checkPageBreak(doc, y);
